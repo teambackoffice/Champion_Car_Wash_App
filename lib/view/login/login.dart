@@ -1,3 +1,5 @@
+import 'package:champion_car_wash_app/view/bottom_nav/bottom_nav.dart';
+import 'package:champion_car_wash_app/view/bottom_nav/homepage/homepage.dart';
 import 'package:flutter/material.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -12,17 +14,17 @@ class LoginScreen extends StatelessWidget {
       body: SafeArea(
         child: SingleChildScrollView(
           child: SizedBox(
-            height: size.height,
             width: size.width,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 40),
                 Image.asset(
-                  'assets/logo.png',
-                  height: 60,
+                  'assets/login_logo.png',
+                  height: 29,
+                  width: 88,
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 130),
                 const Text(
                   'Login',
                   style: TextStyle(
@@ -67,7 +69,11 @@ class LoginScreen extends StatelessWidget {
                             ),
                           ),
                           onPressed: () {
-                            // Handle login logic here
+                         Navigator.push(
+  context, // <- this is missing or misplaced in your code
+  MaterialPageRoute(builder: (context) => BottomNavigation()),
+);
+
                           },
                           child: const Text(
                             'Login',
