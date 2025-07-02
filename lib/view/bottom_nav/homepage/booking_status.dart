@@ -80,7 +80,7 @@ class BookingStatus extends StatelessWidget {
                 onTap: () {
                    Navigator.push(
                      context,
-                      MaterialPageRoute(builder: (context) => PreBookingScreenContainer()),
+                      MaterialPageRoute(builder: (context) => PreBookingsScreenContainer()),
                          );
                 },
                 child: Container(
