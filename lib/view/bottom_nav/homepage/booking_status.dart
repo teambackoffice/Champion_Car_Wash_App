@@ -1,4 +1,4 @@
-import 'package:champion_car_wash_app/view/bottom_nav/homepage/pre_booking_container/pre_booking.dart';
+import 'package:champion_car_wash_app/view/bottom_nav/homepage/pre_booking/pre_booking.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/service_completed.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/under_process/under_process.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/new_booking/new_bookings.dart';
@@ -20,7 +20,7 @@ class BookingStatus extends StatelessWidget {
                 onTap: () {
                      Navigator.push(
                      context,
-                      MaterialPageRoute(builder: (context) => NewBookings()),
+                      MaterialPageRoute(builder: (context) => NewBookingsScreen()),
                          );
                 },
                 child: Container(
