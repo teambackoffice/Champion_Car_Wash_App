@@ -1,3 +1,4 @@
+import 'package:champion_car_wash_app/view/bottom_nav/homepage/new_booking/view_More.dart';
 import 'package:flutter/material.dart';
 
 class NewBookingsScreen extends StatelessWidget {
@@ -136,7 +137,10 @@ class NewBookingsScreen extends StatelessWidget {
           _buildInfoRow('Engine Model', booking['engineModel']),
           SizedBox(height: 8),
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              // Handle view more button tap
+              Navigator.push(context, MaterialPageRoute(builder: (context) => ViewMorePage()));
+            },
             child: Text(
               'View More',
               style: TextStyle(
