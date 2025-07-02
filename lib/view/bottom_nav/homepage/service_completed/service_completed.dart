@@ -100,52 +100,62 @@ class _ServiceCompletedScreenState extends State<ServiceCompletedScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Container(
-              padding: EdgeInsets.all(20),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: Container(
+          margin: EdgeInsets.all(5),
+          decoration: BoxDecoration(
+            color: Colors.red,
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.arrow_back_ios_new_outlined,
               color: Colors.white,
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      IconButton(onPressed: (){
-                        Navigator.pop(context);
-                      }, icon: Icon(Icons.arrow_back_ios_new_outlined)),
-                      SizedBox(width: 50,),
-                      Text(
-                        _currentIndex == 0 ? 'Service Completed' : 'Payment Due',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16),
-                  // Search Bar
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.grey[300]!),
-                    ),
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: 'Search Customer by Vehicle Number',
-                        hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
-                        prefixIcon: Icon(Icons.search, color: Colors.grey[500]),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      ),
-                    ),
-                  ),
-                ],
+              size: 16,
+            ),
+            padding: EdgeInsets.zero,
+          ),
+        ),
+        title: Text(
+          _currentIndex == 0 ? 'Service Completed' : 'Payment Due',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
+          ),
+        ),
+        centerTitle: false,
+        bottom: PreferredSize(
+          preferredSize: Size.fromHeight(80),
+          child: Container(
+            padding: EdgeInsets.all(20),
+            color: Colors.white,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey[300]!),
+              ),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: 'Search Customer by Vehicle Number',
+                  hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
+                  prefixIcon: Icon(Icons.search, color: Colors.grey[500]),
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                ),
               ),
             ),
+          ),
+        ),
+      ),
+      body: Column(
+        children: [
             // Animated Tab Bar with Buttons
             Container(
               color: Colors.white,
@@ -210,8 +220,8 @@ class _ServiceCompletedScreenState extends State<ServiceCompletedScreen>
             ),
           ],
         ),
-      ),
-    );
+      );
+    
   }
   
   // Animation handling methods

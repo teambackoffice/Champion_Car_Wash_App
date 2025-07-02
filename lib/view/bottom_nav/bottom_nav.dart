@@ -42,7 +42,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
         children: [
           HomePageContent(), // Your existing home page content
           AllBookingsPage(),
-          ProfilePage(),
+          ProfileScreen(),
         ],
       ),
       // Custom Bottom Navigation Bar

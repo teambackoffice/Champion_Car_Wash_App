@@ -8,21 +8,22 @@ class PreBookingsScreenContainer extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: Container(
-          margin: EdgeInsets.all(8),
+         leading: Container(
+          margin: EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.red,
             shape: BoxShape.circle,
           ),
           child: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
             icon: Icon(
               Icons.arrow_back_ios_new_outlined,
               color: Colors.white,
+              size: 16,
             ),
-            onPressed: () {
-              Navigator.pop(context);
-            }
-            
+            padding: EdgeInsets.zero,
           ),
         ),
         title: Text(

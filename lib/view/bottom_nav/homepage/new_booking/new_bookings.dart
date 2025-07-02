@@ -33,6 +33,24 @@ class NewBookingsScreen extends StatelessWidget {
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
        backgroundColor: Colors.white ,
+        leading: Container(
+          margin: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.red,
+            shape: BoxShape.circle,
+          ),
+          child: IconButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            icon: Icon(
+              Icons.arrow_back_ios_new_outlined,
+              color: Colors.white,
+              size: 16,
+            ),
+            padding: EdgeInsets.zero,
+          ),
+        ),
         title: Text(
           'New Bookings',
           style: TextStyle(

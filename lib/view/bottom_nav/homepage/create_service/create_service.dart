@@ -1,4 +1,5 @@
 import 'package:camera/camera.dart';
+import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/select_service.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -225,10 +226,11 @@ class _CreateServicePageState extends State<CreateServicePage> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      // Handle form submission
-                      _submitForm();
-                    }
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=>SelectService() ));
+                    // if (_formKey.currentState!.validate()) {
+                    //   // Handle form submission
+                    //   _submitForm();
+                    // }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
