@@ -1,3 +1,7 @@
+import 'dart:io';
+
+import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/car_wash.dart';
+import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/oil_change.dart';
 import 'package:flutter/material.dart';
 
 class SelectService extends StatefulWidget {
@@ -12,13 +16,6 @@ class _SelectServiceState extends State<SelectService> {
   final TextEditingController _lastServiceController = TextEditingController();
   final TextEditingController _currentOdometerController = TextEditingController();
   final TextEditingController _nextServiceController = TextEditingController();
-  
-  // Selected services
-  Map<String, bool> selectedServices = {
-    'Car Washing': false,
-    'Oil Change': false,
-    'Body Polish': false,
-  };
   
   // Fuel level
   double fuelLevel = 0.5; // 0.0 to 1.0 (Empty to Full)
@@ -41,11 +38,11 @@ class _SelectServiceState extends State<SelectService> {
         leading: Container(
           margin: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.red[50],
+            color: Colors.red,
             shape: BoxShape.circle,
           ),
           child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.red),
+            icon: const Icon(Icons.arrow_back_ios_new_outlined, color: Colors.white),
             onPressed: () => Navigator.pop(context),
           ),
         ),
@@ -91,99 +88,63 @@ class _SelectServiceState extends State<SelectService> {
     return Column(
       children: [
         _buildServiceItem(
-          icon: Icons.local_car_wash,
+          imagePath: 'assets/carwash.png', // Replace with your actual asset path
           title: 'Car Washing',
-          serviceKey: 'Car Washing',
+          onTap: () => _navigateToCarWashing(),
         ),
         const SizedBox(height: 12),
         _buildServiceItem(
-          icon: Icons.oil_barrel,
+          imagePath: 'assets/oil_change.png', // Replace with your actual asset path
           title: 'Oil Change',
-          serviceKey: 'Oil Change',
+          onTap: () => _navigateToOilChange(),
         ),
         const SizedBox(height: 12),
-        _buildServiceItem(
-          icon: Icons.auto_fix_high,
-          title: 'Body Polish',
-          serviceKey: 'Body Polish',
-        ),
       ],
     );
   }
 
   Widget _buildServiceItem({
-    required IconData icon,
+    required String imagePath,
     required String title,
-    required String serviceKey,
+    required VoidCallback onTap,
   }) {
-    bool isSelected = selectedServices[serviceKey] ?? false;
-    
     return Card(
       elevation: 2,
       shadowColor: Colors.black.withOpacity(0.1),
+      color: Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(
-          color: isSelected ? Colors.red : Colors.transparent,
-          width: 2,
-        ),
       ),
       child: InkWell(
-        onTap: () {
-          setState(() {
-            selectedServices[serviceKey] = !isSelected;
-          });
-        },
+        onTap: onTap,
         borderRadius: BorderRadius.circular(12),
         child: Container(
           padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: isSelected ? Colors.red.withOpacity(0.05) : Colors.white,
-            borderRadius: BorderRadius.circular(12),
-          ),
           child: Row(
             children: [
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isSelected ? Colors.red : Colors.red[50],
+                  color: Colors.red[50],
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
-                  icon, 
-                  color: isSelected ? Colors.white : Colors.red, 
-                  size: 24,
+                child: Image.asset(
+                  imagePath,
+                  width: 60,
+                  height: 60,
+                  color: Colors.red, // Optional: to tint the image
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Text(
                   title,
-                  style: TextStyle(
-                    fontSize: 16,
+                  style: const TextStyle(
+                    fontSize: 18,
                     fontWeight: FontWeight.w500,
-                    color: isSelected ? Colors.red[700] : Colors.black87,
+                    color: Colors.black87,
                   ),
                 ),
-              ),
-              Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: isSelected ? Colors.red : Colors.grey[400]!,
-                    width: 2,
-                  ),
-                  color: isSelected ? Colors.red : Colors.transparent,
-                ),
-                child: isSelected
-                    ? const Icon(
-                        Icons.check,
-                        color: Colors.white,
-                        size: 16,
-                      )
-                    : null,
               ),
             ],
           ),
@@ -307,49 +268,24 @@ class _SelectServiceState extends State<SelectService> {
     );
   }
 
-  Widget _buildFuelLevelIndicator() {
-    return Column(
-      children: [
-        Container(
-          height: 8,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(4),
-            gradient: LinearGradient(
-              colors: [
-                Colors.red,
-                Colors.orange,
-                Colors.green,
-              ],
-            ),
-          ),
-          child: Stack(
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
-                  color: Colors.grey[200],
-                ),
-              ),
-              FractionallySizedBox(
-                widthFactor: fuelLevel,
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(4),
-                    gradient: LinearGradient(
-                      colors: [
-                        Colors.red,
-                        Colors.orange,
-                        Colors.green,
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 8),
-        Row(
+ Widget _buildFuelLevelIndicator() {
+  return Column(
+    children: [
+      const SizedBox(height: 8),
+      Slider(
+        value: fuelLevel,
+        onChanged: (value) {
+          setState(() {
+            fuelLevel = value;
+          });
+        },
+        activeColor: Colors.red,
+        inactiveColor: Colors.grey[300],
+      ),
+      // Labels below the slider
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
@@ -357,6 +293,7 @@ class _SelectServiceState extends State<SelectService> {
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.grey[600],
+                fontWeight: FontWeight.w400,
               ),
             ),
             Text(
@@ -364,6 +301,7 @@ class _SelectServiceState extends State<SelectService> {
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.grey[600],
+                fontWeight: FontWeight.w400,
               ),
             ),
             Text(
@@ -371,25 +309,15 @@ class _SelectServiceState extends State<SelectService> {
               style: TextStyle(
                 fontSize: 12,
                 color: Colors.grey[600],
+                fontWeight: FontWeight.w400,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 8),
-        Slider(
-          value: fuelLevel,
-          onChanged: (value) {
-            setState(() {
-              fuelLevel = value;
-            });
-          },
-          activeColor: Colors.red,
-          inactiveColor: Colors.grey[300],
-        ),
-      ],
-    );
-  }
-
+      ),
+    ],
+  );
+}
   Widget _buildTextField(String label, TextEditingController controller, String hint) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -457,16 +385,27 @@ class _SelectServiceState extends State<SelectService> {
     );
   }
 
-  void _handleSubmit() {
-    // Get selected services
-    List<String> selected = selectedServices.entries
-        .where((entry) => entry.value)
-        .map((entry) => entry.key)
-        .toList();
+  void _navigateToCarWashing() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const CarWashingScreen(),
+      ),
+    );
+  }
 
+  void _navigateToOilChange() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const OilChangeScreen(),
+      ),
+    );
+  }
+
+  void _handleSubmit() {
     // Collect form data
     Map<String, dynamic> formData = {
-      'selectedServices': selected,
       'fuelLevel': fuelLevel,
       'lastServiceOdometer': _lastServiceController.text,
       'currentOdometer': _currentOdometerController.text,
@@ -478,15 +417,18 @@ class _SelectServiceState extends State<SelectService> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Service Request Submitted'),
+          title: const Text('Vehicle Details Submitted'),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Selected Services: ${selected.join(', ')}'),
               Text('Fuel Level: ${(fuelLevel * 100).toInt()}%'),
               if (_currentOdometerController.text.isNotEmpty)
                 Text('Current Odometer: ${_currentOdometerController.text}'),
+              if (_lastServiceController.text.isNotEmpty)
+                Text('Last Service: ${_lastServiceController.text}'),
+              if (_nextServiceController.text.isNotEmpty)
+                Text('Next Service: ${_nextServiceController.text}'),
             ],
           ),
           actions: [
