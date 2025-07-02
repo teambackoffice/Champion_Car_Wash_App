@@ -123,16 +123,23 @@ class _SelectServiceState extends State<SelectService> {
           child: Row(
             children: [
               Container(
+                
                 padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.red[50],
+                decoration:
+                
+                 BoxDecoration(
+                  border: Border.all(
+      color: Colors.red, // Replace with your desired border color
+    ),
+
+                  
+                  
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Image.asset(
                   imagePath,
                   width: 60,
                   height: 60,
-                  color: Colors.red, // Optional: to tint the image
                 ),
               ),
               const SizedBox(width: 16),
@@ -389,7 +396,7 @@ class _SelectServiceState extends State<SelectService> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const CarWashingScreen(),
+        builder: (context) => const CarWashScreen(),
       ),
     );
   }
