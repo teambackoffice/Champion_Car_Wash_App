@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/car_wash.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/oil_change.dart';
+import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/service_success.dart';
 import 'package:flutter/material.dart';
 
 class SelectService extends StatefulWidget {
@@ -36,7 +37,7 @@ class _SelectServiceState extends State<SelectService> {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: Container(
-          margin: const EdgeInsets.all(8),
+          margin: const EdgeInsets.all(9),
           decoration: BoxDecoration(
             color: Colors.red,
             shape: BoxShape.circle,
@@ -371,7 +372,9 @@ class _SelectServiceState extends State<SelectService> {
       height: 50,
       child: ElevatedButton(
         onPressed: () {
-          _handleSubmit();
+          Navigator.push(context, MaterialPageRoute(builder: (context)=> ServiceSuccessScreen()));
+    
+          // _handleSubmit();
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.red,
