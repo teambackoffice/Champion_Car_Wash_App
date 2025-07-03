@@ -1,3 +1,4 @@
+import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/create_invoice.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/service_completed.dart';
 import 'package:flutter/material.dart';
 
@@ -212,6 +213,7 @@ class ServiceCard extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context)=> CreateInvoicePage()));
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(content: Text('Creating invoice for $serviceId')),
                     );
