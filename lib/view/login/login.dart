@@ -19,50 +19,47 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isPasswordVisible = false;
   bool _isLoading = false;
 
-  void _handleLogin() async {
-    final loginController = Provider.of<LoginController>(context, listen: false);
+  // Update your _handleLogin method in the LoginScreen
+void _handleLogin() async {
+  final loginController = Provider.of<LoginController>(context, listen: false);
 
-    if (_formKey.currentState!.validate()) {
-      setState(() {
-        _isLoading = true;
-      });
+  if (_formKey.currentState!.validate()) {
+    setState(() {
+      _isLoading = true;
+    });
 
-      bool isLoggedIn = await loginController.login(
-        _usernameController.text.trim(),
-        _passwordController.text.trim(),
+    bool isLoggedIn = await loginController.login(
+      _usernameController.text.trim(),
+      _passwordController.text.trim(),
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+
+    if (isLoggedIn) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Login successful!'),
+          backgroundColor: Colors.green,
+        ),
       );
 
-      setState(() {
-        _isLoading = false;
-      });
-
-      if (isLoggedIn) {
-        // ✅ Save login status
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('isLoggedIn', true);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Login successful!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-
-        // ✅ Navigate and replace to prevent back navigation to login
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => BottomNavigation()),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(loginController.errorMessage ?? 'Login failed!'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      // Navigate and replace to prevent back navigation to login
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => BottomNavigation()),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(loginController.errorMessage ?? 'Login failed!'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {

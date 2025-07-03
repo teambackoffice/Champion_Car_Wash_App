@@ -1,4 +1,7 @@
+import 'package:champion_car_wash_app/controller/login_controller.dart';
+import 'package:champion_car_wash_app/view/login/login.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -50,45 +53,89 @@ class ProfileScreen extends StatelessWidget {
               const SizedBox(height: 12),
 
               // Logout Button
-             GestureDetector(
-  onTap: () {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Confirm Logout'),
-        content: const Text('Are you sure you want to log out?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(), // Close dialog
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-
-
-            style: ElevatedButton.styleFrom(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              
-              backgroundColor: Colors.red,
-            ),
-            onPressed: () {
-              Navigator.of(context).pop(); // Close dialog
-              // Add actual logout logic here
-              // e.g., navigate to login screen or clear user session
-            },
-            child: const Text('Log Out',style: TextStyle(color: Colors.white),),
-          ),
-        ],
-      ),
-    );
-  },
-  child: const ReadOnlyField(
-    icon: Icons.logout,
-    text: 'Log Out',
-    isButton: true,
-  ),
-)
-
+              Consumer<LoginController>(
+                builder: (context, loginController, child) {
+                  return GestureDetector(
+                    onTap: loginController.isLoading
+                        ? null
+                        : () {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                title: const Text('Confirm Logout'),
+                                content: const Text('Are you sure you want to log out?'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.of(context).pop(),
+                                    child: const Text('Cancel'),
+                                  ),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                    onPressed: loginController.isLoading
+                                        ? null
+                                        : () async {
+                                            Navigator.of(context).pop(); // Close dialog
+                                            
+                                            // Show loading indicator
+                                            showDialog(
+                                              context: context,
+                                              barrierDismissible: false,
+                                              builder: (context) => const Center(
+                                                child: CircularProgressIndicator(),
+                                              ),
+                                            );
+                                            
+                                            // Perform logout
+                                            await loginController.logout();
+                                            
+                                            // Close loading dialog
+                                            Navigator.of(context).pop();
+                                            
+                                            // Navigate to login screen
+                                            Navigator.pushAndRemoveUntil(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => const LoginScreen(),
+                                              ),
+                                              (Route<dynamic> route) => false,
+                                            );
+                                          },
+                                    child: loginController.isLoading
+                                        ? const SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              valueColor: AlwaysStoppedAnimation<Color>(
+                                                Colors.white,
+                                              ),
+                                            ),
+                                          )
+                                        : const Text(
+                                            'Log Out',
+                                            style: TextStyle(color: Colors.white),
+                                          ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                    child: ReadOnlyField(
+                      icon: Icons.logout,
+                      text: loginController.isLoading ? 'Logging out...' : 'Log Out',
+                      isButton: true,
+                    ),
+                  );
+                },
+              ),
             ],
           ),
         ),

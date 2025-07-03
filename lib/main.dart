@@ -1,3 +1,4 @@
+import 'package:champion_car_wash_app/controller/get_prebooking_controller.dart';
 import 'package:champion_car_wash_app/controller/login_controller.dart';
 import 'package:champion_car_wash_app/view/login/login.dart';
 import 'package:champion_car_wash_app/view/splashscreen/splash_screen.dart';
@@ -9,6 +10,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => LoginController()),
+        ChangeNotifierProvider(create: (_) => GetPrebookingListController()),
        
       ],
       child: MyApp(),

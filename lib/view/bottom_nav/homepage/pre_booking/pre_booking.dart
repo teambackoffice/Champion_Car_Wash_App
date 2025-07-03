@@ -1,6 +1,35 @@
+import 'package:champion_car_wash_app/controller/get_prebooking_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-class PreBookingsScreenContainer extends StatelessWidget {
+class PreBookingsScreenContainer extends StatefulWidget {
+  @override
+  State<PreBookingsScreenContainer> createState() => _PreBookingsScreenContainerState();
+}
+
+class _PreBookingsScreenContainerState extends State<PreBookingsScreenContainer> {
+  final TextEditingController _searchController = TextEditingController();
+  List<dynamic> _filteredBookings = [];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<GetPrebookingListController>(context, listen: false).fetchPreBookingList();
+    });
+  }
+
+  void _filterBookings(String query, List<dynamic> bookings) {
+    setState(() {
+      _filteredBookings = query.isEmpty 
+          ? bookings 
+          : bookings.where((booking) =>
+              booking.regNumber.toLowerCase().contains(query.toLowerCase()) ||
+              booking.customerName.toLowerCase().contains(query.toLowerCase()) ||
+              booking.phone.contains(query)).toList();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -8,239 +37,175 @@ class PreBookingsScreenContainer extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-         leading: Container(
+        leading: Container(
           margin: EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.red,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
           child: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: Icon(
-              Icons.arrow_back_ios_new_outlined,
-              color: Colors.white,
-              size: 16,
-            ),
+            onPressed: () => Navigator.pop(context),
+            icon: Icon(Icons.arrow_back_ios_new_outlined, color: Colors.white, size: 16),
             padding: EdgeInsets.zero,
           ),
         ),
-        title: Text(
-          'Pre Bookings',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
+        title: Text('Pre Bookings', style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.w500)),
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          // Search Bar
-          Container(
-            margin: EdgeInsets.all(16),
-            padding: EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(25),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  spreadRadius: 1,
-                  blurRadius: 3,
-                  offset: Offset(0, 1),
+      body: Consumer<GetPrebookingListController>(
+        builder: (context, controller, child) {
+          if (controller.bookingData.isNotEmpty && _filteredBookings.isEmpty) {
+            _filteredBookings = controller.bookingData;
+          }
+
+          return Column(
+            children: [
+              // Search Bar
+              Container(
+                margin: EdgeInsets.all(16),
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(25),
+                  boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), spreadRadius: 1, blurRadius: 3, offset: Offset(0, 1))],
                 ),
-              ],
-            ),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search Customer by Vehicle Number',
-                hintStyle: TextStyle(
-                  color: Colors.grey[500],
-                  fontSize: 14,
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: (value) => _filterBookings(value, controller.bookingData),
+                  decoration: InputDecoration(
+                    hintText: 'Search Customer by Vehicle Number',
+                    hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
+                    border: InputBorder.none,
+                    suffixIcon: Icon(Icons.search, color: Colors.grey[500]),
+                    contentPadding: EdgeInsets.symmetric(vertical: 16),
+                  ),
                 ),
-                border: InputBorder.none,
-                suffixIcon: Icon(
-                  Icons.search,
-                  color: Colors.grey[500],
-                ),
-                contentPadding: EdgeInsets.symmetric(vertical: 16),
               ),
-            ),
-          ),
-          
-          // Booking Cards
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              children: [
-                _buildBookingCard(
-                  registrationNumber: 'RO-2025-06-0039',
-                  bookingDate: 'Jun 25 2025',
-                  bookingTime: '12:00pm',
-                  userName: 'User 1',
-                  mobileNo: '+971 99865 25142',
-                  emailId: null,
-                  regNumber: 'R-2025-AJ-0039',
-                  services: ['Super Car Wash', 'Oil Change'],
-                ),
-                SizedBox(height: 16),
-                _buildBookingCard(
-                  registrationNumber: 'RO-2025-06-0039',
-                  bookingDate: 'Jun 25 2025',
-                  bookingTime: '12:00pm',
-                  userName: 'User 1',
-                  mobileNo: '+971 99865 25142',
-                  emailId: 'example@gmail.com',
-                  regNumber: 'R-2025-AJ-0039',
-                  services: ['Super Car Wash', 'Oil Change'],
-                ),
-              ],
-            ),
-          ),
-        ],
+              
+              // Content
+              Expanded(child: _buildContent(controller)),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildBookingCard({
-    required String registrationNumber,
-    required String bookingDate,
-    required String bookingTime,
-    required String userName,
-    required String mobileNo,
-    String? emailId,
-    required String regNumber,
-    required List<String> services,
-  }) {
+  Widget _buildContent(GetPrebookingListController controller) {
+    if (controller.isLoading) {
+      return Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.red)));
+    }
+
+    if (controller.error != null) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
+            SizedBox(height: 16),
+            Text('Failed to load bookings', style: TextStyle(fontSize: 16, color: Colors.grey[600], fontWeight: FontWeight.w500)),
+            SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () => controller.fetchPreBookingList(),
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.red, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8))),
+              child: Text('Retry', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_filteredBookings.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.calendar_today_outlined, size: 64, color: Colors.grey[400]),
+            SizedBox(height: 16),
+            Text(controller.bookingData.isEmpty ? 'No bookings found' : 'No results found', 
+                style: TextStyle(fontSize: 16, color: Colors.grey[600], fontWeight: FontWeight.w500)),
+          ],
+        ),
+      );
+    }
+
+    return ListView.builder(
+      padding: EdgeInsets.symmetric(horizontal: 16),
+      itemCount: _filteredBookings.length,
+      itemBuilder: (context, index) {
+        final booking = _filteredBookings[index];
+        return Column(
+          children: [
+            _buildBookingCard(booking: booking),
+            SizedBox(height: 16),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildBookingCard({required dynamic booking}) {
+    String formattedDate = _formatDate(booking.date);
+    Color statusColor = _getStatusColor(booking.status);
+    Color statusBgColor = _getStatusBgColor(booking.status);
+
     return Container(
       padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            spreadRadius: 1,
-            blurRadius: 5,
-            offset: Offset(0, 2),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: Colors.grey.withOpacity(0.1), spreadRadius: 1, blurRadius: 5, offset: Offset(0, 2))],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header with Registration Number and Status
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                registrationNumber,
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.black,
-                ),
-              ),
+              Text(booking.regNumber, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black)),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.pink[100],
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  'Pending',
-                  style: TextStyle(
-                    color: Colors.pink[700],
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                decoration: BoxDecoration(color: statusBgColor, borderRadius: BorderRadius.circular(12)),
+                child: Text(booking.status, style: TextStyle(color: statusColor, fontSize: 12, fontWeight: FontWeight.w500)),
               ),
             ],
           ),
-          
           SizedBox(height: 16),
-          
-          // Booking Details
-          _buildDetailRow('Booking Date', bookingDate),
-          _buildDetailRow('Booking Time', bookingTime),
-          _buildDetailRow('User Name', userName),
-          _buildDetailRow('Mobile No.', mobileNo),
-          if (emailId != null) _buildDetailRow('Email ID', emailId),
-          _buildDetailRow('Registration Number', regNumber),
-          
-          SizedBox(height: 16),
-          
-          // Selected Services
-          Text(
-            'Selected Services',
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          SizedBox(height: 8),
-          ...services.map((service) => Padding(
-            padding: EdgeInsets.only(bottom: 4),
-            child: Text(
-              service,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.black,
-              ),
-            ),
-          )).toList(),
-          
-          SizedBox(height: 20),
-          
-          // Action Buttons
-          Row(
+          _buildDetailRow('Booking Date', formattedDate),
+          _buildDetailRow('Booking Time', booking.time),
+          _buildDetailRow('User Name', booking.customerName),
+          _buildDetailRow('Mobile No.', booking.phone),
+          _buildDetailRow('Branch', booking.branch),
+          _buildDetailRow('Registration Number', booking.regNumber),
+          Text("Selected Services",style: TextStyle(fontSize: 12, color: Colors.grey[600], 
+          fontWeight: FontWeight.w500),),
+          SizedBox(height: 5,),
+           Text("Car Wash",style: TextStyle(fontSize: 14, color: Colors.black, 
+          fontWeight: FontWeight.w500),),
+           Text("Oil Change",style: TextStyle(fontSize: 14, color: Colors.black, 
+          fontWeight: FontWeight.w500),),
+           SizedBox(height: 20,),
+         Row(
             children: [
               Expanded(
                 child: OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () => _showCancelDialog(booking),
                   style: OutlinedButton.styleFrom(
                     side: BorderSide(color: Colors.grey[300]!),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     padding: EdgeInsets.symmetric(vertical: 12),
                   ),
-                  child: Text(
-                    'Cancel Booking',
-                    style: TextStyle(
-                      color: Colors.grey[700],
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+                  child: Text('Cancel Booking', style: TextStyle(color: Colors.grey[700], fontSize: 14, fontWeight: FontWeight.w500)),
                 ),
               ),
               SizedBox(width: 12),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () => _showConfirmDialog(booking),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     padding: EdgeInsets.symmetric(vertical: 12),
                     elevation: 0,
                   ),
-                  child: Text(
-                    'Confirm Booking',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+                  child: Text('Confirm Booking', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w500)),
                 ),
               ),
             ],
@@ -256,29 +221,85 @@ class PreBookingsScreenContainer extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 120,
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.black,
-              ),
-            ),
+          SizedBox(width: 120, child: Text(label, style: TextStyle(fontSize: 12, color: Colors.grey[600], fontWeight: FontWeight.w500))),
+          Expanded(child: Text(value, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.black))),
+        ],
+      ),
+    );
+  }
+
+  String _formatDate(DateTime date) {
+    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return '${months[date.month - 1]} ${date.day} ${date.year}';
+  }
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending': return Colors.orange[700]!;
+      case 'confirmed': return Colors.green[700]!;
+      case 'cancelled': return Colors.red[700]!;
+      case 'completed': return Colors.blue[700]!;
+      default: return Colors.pink[700]!;
+    }
+  }
+
+  Color _getStatusBgColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'pending': return Colors.orange[100]!;
+      case 'confirmed': return Colors.green[100]!;
+      case 'cancelled': return Colors.red[100]!;
+      case 'completed': return Colors.blue[100]!;
+      default: return Colors.pink[100]!;
+    }
+  }
+
+  void _showCancelDialog(dynamic booking) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Cancel Booking'),
+        content: Text('Are you sure you want to cancel this booking for ${booking.customerName}?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text('No')),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Booking cancelled for ${booking.customerName}'), backgroundColor: Colors.red),
+              );
+            },
+            child: Text('Yes', style: TextStyle(color: Colors.red)),
           ),
         ],
       ),
     );
+  }
+
+  void _showConfirmDialog(dynamic booking) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Confirm Booking'),
+        content: Text('Are you sure you want to confirm this booking for ${booking.customerName}?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(context).pop(), child: Text('No')),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Booking confirmed for ${booking.customerName}'), backgroundColor: Colors.green),
+              );
+            },
+            child: Text('Yes', style: TextStyle(color: Colors.green)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 }
