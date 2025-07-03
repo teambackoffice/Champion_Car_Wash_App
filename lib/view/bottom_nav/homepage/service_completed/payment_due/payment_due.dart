@@ -219,7 +219,7 @@ class ServiceCard extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red[600],
+                    backgroundColor: Color(0xFFD32F2F),
                     foregroundColor: Colors.white,
                     padding: EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(
