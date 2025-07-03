@@ -1,4 +1,5 @@
-import 'package:champion_car_wash_app/view/bottom_nav/homepage/booking_status.dart';
+import 'package:champion_car_wash_app/view/bottom_nav/bottom_nav.dart';
+import 'package:champion_car_wash_app/view/bottom_nav/homepage/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
@@ -77,9 +78,11 @@ class ServiceSuccessScreen extends StatelessWidget {
                     width: double.infinity,
                     child: OutlinedButton(
                       onPressed: () {
-                        // Navigate back to BookingStatus home page and clear the stack
+                        // Navigate back to HomePageContent and clear the navigation stack
                         Navigator.of(context).pushAndRemoveUntil(
-                          MaterialPageRoute(builder: (context) => const BookingStatus()),
+                          MaterialPageRoute(
+                            builder: (context) => BottomNavigation(),
+                          ),
                           (route) => false,
                         );
                       },
