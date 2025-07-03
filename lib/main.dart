@@ -1,11 +1,20 @@
+import 'package:champion_car_wash_app/controller/login_controller.dart';
 import 'package:champion_car_wash_app/view/login/login.dart';
 import 'package:champion_car_wash_app/view/splashscreen/splash_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => LoginController()),
+       
+      ],
+      child: MyApp(),
+    ),
+  );
 }
-
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
