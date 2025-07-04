@@ -1,9 +1,10 @@
 import 'package:camera/camera.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/select_service.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/service_success.dart';
+import 'package:champion_car_wash_app/modal/get_all_makes_modal.dart';
+import 'package:champion_car_wash_app/controller/get_all_makes_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
-
 
 class CreateServicePage extends StatefulWidget {
   @override
@@ -12,6 +13,7 @@ class CreateServicePage extends StatefulWidget {
 
 class _CreateServicePageState extends State<CreateServicePage> {
   final _formKey = GlobalKey<FormState>();
+  final CarMakesController _makesController = CarMakesController();
   
   // Controllers
   final TextEditingController _vehicleNumberController = TextEditingController();
@@ -33,10 +35,23 @@ class _CreateServicePageState extends State<CreateServicePage> {
   // Checkbox
   bool _inspectionNeeded = false;
   
-  // Sample data for dropdowns
-  final List<String> _makes = ['Toyota', 'Honda', 'Ford', 'BMW', 'Mercedes', 'Audi'];
+  // Loading state
+  bool _isLoadingMakes = true;
+  
+  // Static data for other dropdowns
   final List<String> _models = ['Camry', 'Civic', 'F-150', 'X3', 'C-Class', 'A4'];
   final List<String> _types = ['Sedan', 'SUV', 'Hatchback', 'Truck', 'Coupe'];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadMakes();
+  }
+
+  Future<void> _loadMakes() async {
+    await _makesController.fetchMakes();
+    setState(() => _isLoadingMakes = false);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -148,12 +163,8 @@ class _CreateServicePageState extends State<CreateServicePage> {
               _buildSectionTitle('Vehicle Details'),
               SizedBox(height: 16),
               
-              _buildDropdown(
-                value: _selectedMake,
-                hintText: 'Select Make',
-                items: _makes,
-                onChanged: (value) => setState(() => _selectedMake = value),
-              ),
+              // Make Dropdown with API data
+              _buildMakeDropdown(),
               SizedBox(height: 16),
               
               _buildDropdown(
@@ -227,11 +238,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=>SelectService() ));
-                    // if (_formKey.currentState!.validate()) {
-                    //   // Handle form submission
-                    //   _submitForm();
-                    // }
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => SelectService()));
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
@@ -254,6 +261,91 @@ class _CreateServicePageState extends State<CreateServicePage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildMakeDropdown() {
+    if (_isLoadingMakes) {
+      return Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.grey[50],
+          border: Border.all(color: Colors.grey[300]!),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+            SizedBox(width: 12),
+            Text('Loading makes...', style: TextStyle(color: Colors.grey[600])),
+          ],
+        ),
+      );
+    }
+
+    if (_makesController.makes.isEmpty) {
+      return Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.grey[50],
+          border: Border.all(color: Colors.grey[300]!),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.error_outline, color: Colors.red, size: 20),
+            SizedBox(width: 12),
+            Text('Failed to load makes', style: TextStyle(color: Colors.red)),
+            Spacer(),
+            TextButton(
+              onPressed: () {
+                setState(() => _isLoadingMakes = true);
+                _loadMakes();
+              },
+              child: Text('Retry'),
+            ),
+          ],
+        ),
+      );
+    }
+
+    return DropdownButtonFormField<String>(
+      value: _selectedMake,
+      hint: Text('Select Make', style: TextStyle(color: Colors.grey[400])),
+      items: _makesController.makes.map((CarMake make) {
+        return DropdownMenuItem<String>(
+          value: make.name,
+          child: Text(make.name),
+        );
+      }).toList(),
+      onChanged: (value) => setState(() => _selectedMake = value),
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: Colors.grey[50],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.grey[300]!),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.blue),
+        ),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Please select a make';
+        }
+        return null;
+      },
     );
   }
 
@@ -368,15 +460,12 @@ class _CreateServicePageState extends State<CreateServicePage> {
 
   void _openVideoCapture() async {
     try {
-      // Request camera permission
       final permission = await Permission.camera.request();
       
       if (permission.isGranted) {
-        // Get available cameras
         final cameras = await availableCameras();
         
         if (cameras.isNotEmpty) {
-          // Navigate to video capture screen
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -385,7 +474,6 @@ class _CreateServicePageState extends State<CreateServicePage> {
           );
         }
       } else {
-        // Show permission denied message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Camera permission is required for video capture'),
@@ -406,22 +494,8 @@ class _CreateServicePageState extends State<CreateServicePage> {
     }
   }
 
-  void _submitForm() {
-    // Handle form submission logic here
-    print('Form submitted!');
-    
-    // Show success message
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Service created successfully!'),
-        backgroundColor: Colors.green,
-      ),
-    );
-  }
-
   @override
   void dispose() {
-    // Dispose controllers
     _vehicleNumberController.dispose();
     _customerNameController.dispose();
     _phoneController.dispose();
@@ -436,7 +510,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
   }
 }
 
-// Video Capture Screen
+// Video Capture Screen (unchanged)
 class VideoCaptureScreen extends StatefulWidget {
   final CameraDescription camera;
 
@@ -454,10 +528,7 @@ class _VideoCaptureScreenState extends State<VideoCaptureScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = CameraController(
-      widget.camera,
-      ResolutionPreset.high,
-    );
+    _controller = CameraController(widget.camera, ResolutionPreset.high);
     _initializeControllerFuture = _controller.initialize();
   }
 
@@ -537,11 +608,9 @@ class _VideoCaptureScreenState extends State<VideoCaptureScreen> {
   void _toggleRecording() async {
     try {
       if (_isRecording) {
-        // Stop recording
         final video = await _controller.stopVideoRecording();
         setState(() => _isRecording = false);
         
-        // Show success message and return to previous screen
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Video saved: ${video.path}'),
@@ -550,7 +619,6 @@ class _VideoCaptureScreenState extends State<VideoCaptureScreen> {
         );
         Navigator.pop(context);
       } else {
-        // Start recording
         await _controller.startVideoRecording();
         setState(() => _isRecording = true);
       }

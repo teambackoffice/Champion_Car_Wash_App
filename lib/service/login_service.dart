@@ -1,10 +1,11 @@
 // services/auth_service.dart
 import 'dart:convert';
+import 'package:champion_car_wash_app/config/api_constants.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
 class LoginService {
-  final String baseUrl = 'https://carwash.tbo365.cloud//api/method/carwash.Api.auth.user_login';
+  final String baseUrl = '${ApiConstants.baseUrl}api/method/carwash.Api.auth.user_login';
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
   Future<bool> login(String username, String password) async {
