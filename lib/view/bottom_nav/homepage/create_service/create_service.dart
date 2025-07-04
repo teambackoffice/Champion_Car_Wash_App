@@ -1,6 +1,9 @@
+// Updated CreateServicePage with Models Integration
+
 import 'package:camera/camera.dart';
+import 'package:champion_car_wash_app/controller/get_makes_by_modal_controller.dart';
+import 'package:champion_car_wash_app/modal/get_make_modal.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/select_service.dart';
-import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/service_success.dart';
 import 'package:champion_car_wash_app/modal/get_all_makes_modal.dart';
 import 'package:champion_car_wash_app/controller/get_all_makes_controller.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +17,7 @@ class CreateServicePage extends StatefulWidget {
 class _CreateServicePageState extends State<CreateServicePage> {
   final _formKey = GlobalKey<FormState>();
   final CarMakesController _makesController = CarMakesController();
+  final CarModelsController _modelsController = CarModelsController();
   
   // Controllers
   final TextEditingController _vehicleNumberController = TextEditingController();
@@ -35,11 +39,10 @@ class _CreateServicePageState extends State<CreateServicePage> {
   // Checkbox
   bool _inspectionNeeded = false;
   
-  // Loading state
+  // Loading states
   bool _isLoadingMakes = true;
   
-  // Static data for other dropdowns
-  final List<String> _models = ['Camry', 'Civic', 'F-150', 'X3', 'C-Class', 'A4'];
+  // Static data for types
   final List<String> _types = ['Sedan', 'SUV', 'Hatchback', 'Truck', 'Coupe'];
 
   @override
@@ -51,6 +54,19 @@ class _CreateServicePageState extends State<CreateServicePage> {
   Future<void> _loadMakes() async {
     await _makesController.fetchMakes();
     setState(() => _isLoadingMakes = false);
+  }
+
+  void _onMakeChanged(String? make) {
+    setState(() {
+      _selectedMake = make;
+      _selectedModel = null; // Clear selected model when make changes
+    });
+    
+    if (make != null && make.isNotEmpty) {
+      _modelsController.fetchModelsByMake(make);
+    } else {
+      _modelsController.clearData();
+    }
   }
 
   @override
@@ -163,16 +179,12 @@ class _CreateServicePageState extends State<CreateServicePage> {
               _buildSectionTitle('Vehicle Details'),
               SizedBox(height: 16),
               
-              // Make Dropdown with API data
+              // Make Dropdown
               _buildMakeDropdown(),
               SizedBox(height: 16),
               
-              _buildDropdown(
-                value: _selectedModel,
-                hintText: 'Select Model',
-                items: _models,
-                onChanged: (value) => setState(() => _selectedModel = value),
-              ),
+              // Model Dropdown
+              _buildModelDropdown(),
               SizedBox(height: 16),
               
               _buildDropdown(
@@ -266,51 +278,14 @@ class _CreateServicePageState extends State<CreateServicePage> {
 
   Widget _buildMakeDropdown() {
     if (_isLoadingMakes) {
-      return Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.grey[50],
-          border: Border.all(color: Colors.grey[300]!),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            ),
-            SizedBox(width: 12),
-            Text('Loading makes...', style: TextStyle(color: Colors.grey[600])),
-          ],
-        ),
-      );
+      return _buildLoadingDropdown('Loading makes...');
     }
 
     if (_makesController.makes.isEmpty) {
-      return Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.grey[50],
-          border: Border.all(color: Colors.grey[300]!),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            Icon(Icons.error_outline, color: Colors.red, size: 20),
-            SizedBox(width: 12),
-            Text('Failed to load makes', style: TextStyle(color: Colors.red)),
-            Spacer(),
-            TextButton(
-              onPressed: () {
-                setState(() => _isLoadingMakes = true);
-                _loadMakes();
-              },
-              child: Text('Retry'),
-            ),
-          ],
-        ),
-      );
+      return _buildErrorDropdown('Failed to load makes', () {
+        setState(() => _isLoadingMakes = true);
+        _loadMakes();
+      });
     }
 
     return DropdownButtonFormField<String>(
@@ -322,30 +297,128 @@ class _CreateServicePageState extends State<CreateServicePage> {
           child: Text(make.name),
         );
       }).toList(),
-      onChanged: (value) => setState(() => _selectedMake = value),
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.grey[50],
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey[300]!),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey[300]!),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.blue),
-        ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please select a make';
+      onChanged: _onMakeChanged,
+      decoration: _dropdownDecoration(),
+      validator: (value) => value == null || value.isEmpty ? 'Please select a make' : null,
+    );
+  }
+
+  Widget _buildModelDropdown() {
+    // If no make is selected, show disabled dropdown
+    if (_selectedMake == null || _selectedMake!.isEmpty) {
+      return _buildDisabledDropdown('Select make first');
+    }
+
+    return AnimatedBuilder(
+      animation: _modelsController,
+      builder: (context, child) {
+        if (_modelsController.isLoading) {
+          return _buildLoadingDropdown('Loading models...');
         }
-        return null;
+
+        if (_modelsController.models.isEmpty && _modelsController.errorMessage.isNotEmpty) {
+          return _buildErrorDropdown('Failed to load models', () {
+            _modelsController.fetchModelsByMake(_selectedMake!);
+          });
+        }
+
+        if (_modelsController.models.isEmpty) {
+          return _buildDisabledDropdown('No models available');
+        }
+
+        return DropdownButtonFormField<String>(
+          value: _selectedModel,
+          hint: Text('Select Model', style: TextStyle(color: Colors.grey[400])),
+          items: _modelsController.models.map((CarModel model) {
+            return DropdownMenuItem<String>(
+              value: model.model,
+              child: Text(model.model),
+            );
+          }).toList(),
+          onChanged: (value) => setState(() => _selectedModel = value),
+          decoration: _dropdownDecoration(),
+          validator: (value) => value == null || value.isEmpty ? 'Please select a model' : null,
+        );
       },
+    );
+  }
+
+  Widget _buildLoadingDropdown(String text) {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        border: Border.all(color: Colors.grey[300]!),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+          SizedBox(width: 12),
+          Text(text, style: TextStyle(color: Colors.grey[600])),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildErrorDropdown(String text, VoidCallback onRetry) {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        border: Border.all(color: Colors.grey[300]!),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.error_outline, color: Colors.red, size: 20),
+          SizedBox(width: 12),
+          Expanded(child: Text(text, style: TextStyle(color: Colors.red))),
+          TextButton(onPressed: onRetry, child: Text('Retry')),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDisabledDropdown(String text) {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        border: Border.all(color: Colors.grey[300]!),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.info_outline, color: Colors.grey[400], size: 20),
+          SizedBox(width: 12),
+          Text(text, style: TextStyle(color: Colors.grey[400])),
+        ],
+      ),
+    );
+  }
+
+  InputDecoration _dropdownDecoration() {
+    return InputDecoration(
+      filled: true,
+      fillColor: Colors.grey[50],
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: Colors.grey[300]!),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: Colors.grey[300]!),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: Colors.blue),
+      ),
+      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     );
   }
 
@@ -407,29 +480,8 @@ class _CreateServicePageState extends State<CreateServicePage> {
         );
       }).toList(),
       onChanged: onChanged,
-      decoration: InputDecoration(
-        filled: true,
-        fillColor: Colors.grey[50],
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey[300]!),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey[300]!),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.blue),
-        ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      ),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return 'Please select an option';
-        }
-        return null;
-      },
+      decoration: _dropdownDecoration(),
+      validator: (value) => value == null || value.isEmpty ? 'Please select an option' : null,
     );
   }
 
@@ -466,12 +518,12 @@ class _CreateServicePageState extends State<CreateServicePage> {
         final cameras = await availableCameras();
         
         if (cameras.isNotEmpty) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => VideoCaptureScreen(camera: cameras.first),
-            ),
-          );
+          // Navigator.push(
+          //   context,
+          //   MaterialPageRoute(
+          //     builder: (context) => VideoCaptureScreen(camera: cameras.first),
+          //   ),
+          // );
         }
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -506,145 +558,6 @@ class _CreateServicePageState extends State<CreateServicePage> {
     _engineNumberController.dispose();
     _chassisNumberController.dispose();
     _registrationNumberController.dispose();
-    super.dispose();
-  }
-}
-
-// Video Capture Screen (unchanged)
-class VideoCaptureScreen extends StatefulWidget {
-  final CameraDescription camera;
-
-  const VideoCaptureScreen({Key? key, required this.camera}) : super(key: key);
-
-  @override
-  _VideoCaptureScreenState createState() => _VideoCaptureScreenState();
-}
-
-class _VideoCaptureScreenState extends State<VideoCaptureScreen> {
-  late CameraController _controller;
-  late Future<void> _initializeControllerFuture;
-  bool _isRecording = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = CameraController(widget.camera, ResolutionPreset.high);
-    _initializeControllerFuture = _controller.initialize();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Video Capture'),
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
-      ),
-      body: FutureBuilder<void>(
-        future: _initializeControllerFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return Stack(
-              children: [
-                CameraPreview(_controller),
-                Positioned(
-                  bottom: 50,
-                  left: 0,
-                  right: 0,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      FloatingActionButton(
-                        onPressed: () => Navigator.pop(context),
-                        backgroundColor: Colors.grey,
-                        child: Icon(Icons.close),
-                      ),
-                      FloatingActionButton(
-                        onPressed: _toggleRecording,
-                        backgroundColor: _isRecording ? Colors.red : Colors.white,
-                        child: Icon(
-                          _isRecording ? Icons.stop : Icons.videocam,
-                          color: _isRecording ? Colors.white : Colors.red,
-                        ),
-                      ),
-                      FloatingActionButton(
-                        onPressed: _isRecording ? null : () => _switchCamera(),
-                        backgroundColor: Colors.white,
-                        child: Icon(Icons.switch_camera, color: Colors.black),
-                      ),
-                    ],
-                  ),
-                ),
-                if (_isRecording)
-                  Positioned(
-                    top: 50,
-                    left: 20,
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.red,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.circle, color: Colors.white, size: 12),
-                          SizedBox(width: 8),
-                          Text('REC', style: TextStyle(color: Colors.white)),
-                        ],
-                      ),
-                    ),
-                  ),
-              ],
-            );
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        },
-      ),
-    );
-  }
-
-  void _toggleRecording() async {
-    try {
-      if (_isRecording) {
-        final video = await _controller.stopVideoRecording();
-        setState(() => _isRecording = false);
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Video saved: ${video.path}'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        Navigator.pop(context);
-      } else {
-        await _controller.startVideoRecording();
-        setState(() => _isRecording = true);
-      }
-    } catch (e) {
-      print('Error during video recording: $e');
-    }
-  }
-
-  void _switchCamera() async {
-    final cameras = await availableCameras();
-    if (cameras.length > 1) {
-      final newCamera = cameras.firstWhere(
-        (camera) => camera != widget.camera,
-        orElse: () => cameras.first,
-      );
-      
-      await _controller.dispose();
-      _controller = CameraController(newCamera, ResolutionPreset.high);
-      _initializeControllerFuture = _controller.initialize();
-      setState(() {});
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
     super.dispose();
   }
 }
