@@ -1,10 +1,10 @@
+import 'package:champion_car_wash_app/modal/get_prebooking_list.dart';
 import 'package:champion_car_wash_app/service/get_prebooking_list_service.dart';
 import 'package:flutter/material.dart';
-import 'package:champion_car_wash_app/modal/get_prebooking_list.dart';
 
 class GetPrebookingListController extends ChangeNotifier {
   final GetPrebookingListService _service = GetPrebookingListService();
-  
+
   GetPreBookingList? _preBookingList;
   bool _isLoading = false;
   String? _error;
@@ -45,22 +45,17 @@ class GetPrebookingListController extends ChangeNotifier {
 
   // Filter bookings by date
   List<Datum> getBookingsByDate(DateTime date) {
-    return bookingData.where((booking) => 
-      booking.date.year == date.year &&
-      booking.date.month == date.month &&
-      booking.date.day == date.day
-    ).toList();
+    return bookingData
+        .where(
+          (booking) =>
+              booking.date.year == date.year &&
+              booking.date.month == date.month &&
+              booking.date.day == date.day,
+        )
+        .toList();
   }
 
   // Search bookings by customer name or phone
-  List<Datum> searchBookings(String query) {
-    if (query.isEmpty) return bookingData;
-    
-    return bookingData.where((booking) => 
-      booking.customerName.toLowerCase().contains(query.toLowerCase()) ||
-      booking.phone.contains(query)
-    ).toList();
-  }
 
   // Clear error
   void clearError() {
