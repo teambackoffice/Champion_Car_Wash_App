@@ -18,6 +18,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
   final _formKey = GlobalKey<FormState>();
   final CarMakesController _makesController = CarMakesController();
   final CarModelsController _modelsController = CarModelsController();
+  final CarModelsController _typeController = CarModelsController();
   
   // Controllers
   final TextEditingController _vehicleNumberController = TextEditingController();
@@ -186,13 +187,11 @@ class _CreateServicePageState extends State<CreateServicePage> {
               // Model Dropdown
               _buildModelDropdown(),
               SizedBox(height: 16),
+
+                _buildTypeDropdown(),
+              SizedBox(height: 16),
               
-              _buildDropdown(
-                value: _selectedType,
-                hintText: 'Select Type',
-                items: _types,
-                onChanged: (value) => setState(() => _selectedType = value),
-              ),
+             
               SizedBox(height: 16),
               
               _buildTextField(
@@ -342,6 +341,37 @@ class _CreateServicePageState extends State<CreateServicePage> {
       },
     );
   }
+  Widget _buildTypeDropdown() {
+  // If no model is selected, show disabled dropdown
+  if (_selectedModel == null || _selectedModel!.isEmpty) {
+    return _buildDisabledDropdown('Select model first');
+  }
+
+  // Find car type from selected model
+  final selectedCarModel = _modelsController.models.firstWhere(
+    (model) => model.model == _selectedModel,
+    orElse: () => CarModel(model: '', carType: ''),
+  );
+
+  if (selectedCarModel.carType.isEmpty) {
+    return _buildDisabledDropdown('No car type available');
+  }
+
+  return DropdownButtonFormField<String>(
+    value: _selectedType ?? selectedCarModel.carType,
+    hint: Text('Select Car Type', style: TextStyle(color: Colors.grey[400])),
+    items: [selectedCarModel.carType].map((type) {
+      return DropdownMenuItem<String>(
+        value: type,
+        child: Text(type),
+      );
+    }).toList(),
+    onChanged: (value) => setState(() => _selectedType = value),
+    decoration: _dropdownDecoration(),
+    validator: (value) => value == null || value.isEmpty ? 'Please select car type' : null,
+  );
+}
+
 
   Widget _buildLoadingDropdown(String text) {
     return Container(
