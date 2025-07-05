@@ -1,3 +1,4 @@
+import 'package:champion_car_wash_app/controller/confirm_prebook_controller.dart';
 import 'package:champion_car_wash_app/controller/get_prebooking_controller.dart';
 import 'package:champion_car_wash_app/modal/get_prebooking_list.dart';
 import 'package:flutter/material.dart';
@@ -122,6 +123,50 @@ class _PreBookingsScreenContainerState
       ),
     );
   }
+  // Add this method to your _PreBookingsScreenContainerState class:
+
+  Future<void> _refreshBookingList() async {
+    try {
+      print("Starting booking list refresh...");
+
+      // Clear current data
+      setState(() {
+        _filteredBookings.clear();
+      });
+
+      // Clear search if any
+      _searchController.clear();
+
+      // Fetch fresh data
+      final controller = Provider.of<GetPrebookingListController>(
+        context,
+        listen: false,
+      );
+
+      await controller.fetchPreBookingList();
+
+      // Update UI with fresh data
+      if (mounted && controller.bookingData.isNotEmpty) {
+        setState(() {
+          _filteredBookings = List.from(controller.bookingData);
+        });
+      }
+
+      print(
+        "Booking list refreshed successfully with ${_filteredBookings.length} items",
+      );
+    } catch (e) {
+      print("Error refreshing booking list: $e");
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Failed to refresh booking list'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
 
   Widget _buildContent(GetPrebookingListController controller) {
     if (controller.isLoading) {
@@ -189,18 +234,22 @@ class _PreBookingsScreenContainerState
       );
     }
 
-    return ListView.builder(
-      padding: EdgeInsets.symmetric(horizontal: 16),
-      itemCount: _filteredBookings.length,
-      itemBuilder: (context, index) {
-        final booking = _filteredBookings[index];
-        return Column(
-          children: [
-            _buildBookingCard(booking: booking),
-            SizedBox(height: 16),
-          ],
-        );
-      },
+    return RefreshIndicator(
+      onRefresh: _refreshBookingList,
+      color: Colors.red,
+      child: ListView.builder(
+        padding: EdgeInsets.symmetric(horizontal: 16),
+        itemCount: _filteredBookings.length,
+        itemBuilder: (context, index) {
+          final booking = _filteredBookings[index];
+          return Column(
+            children: [
+              _buildBookingCard(booking: booking),
+              SizedBox(height: 16),
+            ],
+          );
+        },
+      ),
     );
   }
 
@@ -538,35 +587,93 @@ class _PreBookingsScreenContainerState
     );
   }
 
+  // Alternative simpler approach - replace the _showConfirmDialog method with this:
+
   void _showConfirmDialog(dynamic booking) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Confirm Booking'),
-        content: Text(
-          'Are you sure you want to confirm this booking for ${booking.customerName}?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('No'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Booking confirmed for ${booking.customerName}',
-                  ),
-                  backgroundColor: Colors.green,
-                ),
-              );
-            },
-            child: Text('Yes', style: TextStyle(color: Colors.green)),
-          ),
-        ],
-      ),
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Consumer<ConfirmPrebookController>(
+              builder: (context, controller, child) {
+                return AlertDialog(
+                  title: Text('Confirm Booking'),
+                  content: controller.isLoading
+                      ? Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.red,
+                              ),
+                            ),
+                            SizedBox(height: 16),
+                            Text('Confirming booking...'),
+                          ],
+                        )
+                      : Text(
+                          'Are you sure you want to confirm this booking for ${booking.customerName}?',
+                        ),
+                  actions: controller.isLoading
+                      ? []
+                      : [
+                          TextButton(
+                            onPressed: () => Navigator.of(dialogContext).pop(),
+                            child: Text('No'),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              // Call API
+                              await controller.confirmPreBooking(booking.name);
+
+                              // Close dialog
+                              if (Navigator.of(dialogContext).canPop()) {
+                                Navigator.of(dialogContext).pop();
+                              }
+
+                              // Show result
+                              final message =
+                                  controller.responseMessage ?? 'No response';
+                              final isSuccess =
+                                  !message.toLowerCase().contains("error") &&
+                                  !message.toLowerCase().contains(
+                                    "exception",
+                                  ) &&
+                                  !message.toLowerCase().contains("failed");
+
+                              // Use the original context (this.context) for SnackBar
+                              ScaffoldMessenger.of(this.context).showSnackBar(
+                                SnackBar(
+                                  content: Text(message),
+                                  backgroundColor: isSuccess
+                                      ? Colors.green
+                                      : Colors.red,
+                                  duration: Duration(seconds: 3),
+                                ),
+                              );
+
+                              // If successful, refresh the booking list
+                              if (isSuccess) {
+                                Provider.of<GetPrebookingListController>(
+                                  this.context,
+                                  listen: false,
+                                ).fetchPreBookingList();
+                              }
+                            },
+                            child: Text(
+                              'Yes',
+                              style: TextStyle(color: Colors.green),
+                            ),
+                          ),
+                        ],
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 

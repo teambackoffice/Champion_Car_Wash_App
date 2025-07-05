@@ -1,16 +1,16 @@
 {
     "editor.formatOnSave": true,
     "editor.codeActionsOnSave": {
-        "source.fixAll": true,
-        "source.organizeImports": true,
-        "source.fixAll.dart": true
+        "source.fixAll": "explicit",
+        "source.organizeImports": "explicit",
+        "source.fixAll.dart": "explicit"
     },
     "[dart]": {
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
-            "source.fixAll": true,
-            "source.organizeImports": true,
-            "source.fixAll.dart": true
+            "source.fixAll": "explicit",
+            "source.organizeImports": "explicit",
+            "source.fixAll.dart": "explicit"
         }
     }
 }
