@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:champion_car_wash_app/controller/get_services_controller.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/car_wash.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/oil_change.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/service_success.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SelectService extends StatefulWidget {
   const SelectService({Key? key}) : super(key: key);
@@ -17,6 +19,14 @@ class _SelectServiceState extends State<SelectService> {
   final TextEditingController _lastServiceController = TextEditingController();
   final TextEditingController _currentOdometerController = TextEditingController();
   final TextEditingController _nextServiceController = TextEditingController();
+    late ServiceTypeController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = ServiceTypeController();
+    _controller.loadServiceTypes(); // ✅ fetch data here
+  }
   
   // Fuel level
   double fuelLevel = 0.5; // 0.0 to 1.0 (Empty to Full)
@@ -31,78 +41,101 @@ class _SelectServiceState extends State<SelectService> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: Container(
-          margin: const EdgeInsets.all(9),
-          decoration: BoxDecoration(
-            color: Colors.red,
-            shape: BoxShape.circle,
+    return ChangeNotifierProvider<ServiceTypeController>.value(
+    value: _controller,
+      child: Scaffold(
+        backgroundColor: Colors.grey[50],
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          leading: Container(
+            margin: const EdgeInsets.all(9),
+            decoration: BoxDecoration(
+              color: Colors.red,
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new_outlined, color: Colors.white),
+              onPressed: () => Navigator.pop(context),
+            ),
           ),
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_outlined, color: Colors.white),
-            onPressed: () => Navigator.pop(context),
+          title: const Text(
+            'Services',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
           ),
+          centerTitle: true,
         ),
-        title: const Text(
-          'Services',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Services Section
+              _buildServicesSection(),
+              
+              const SizedBox(height: 24),
+              
+              // Pricing Section
+              _buildPricingSection(),
+              
+              const SizedBox(height: 24),
+              
+              // Vehicle Details Section
+              _buildVehicleDetailsSection(),
+              
+              const SizedBox(height: 32),
+              
+              // Submit Button
+              _buildSubmitButton(),
+            ],
           ),
-        ),
-        centerTitle: true,
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Services Section
-            _buildServicesSection(),
-            
-            const SizedBox(height: 24),
-            
-            // Pricing Section
-            _buildPricingSection(),
-            
-            const SizedBox(height: 24),
-            
-            // Vehicle Details Section
-            _buildVehicleDetailsSection(),
-            
-            const SizedBox(height: 32),
-            
-            // Submit Button
-            _buildSubmitButton(),
-          ],
         ),
       ),
     );
   }
 
   Widget _buildServicesSection() {
-    return Column(
-      children: [
-        _buildServiceItem(
-          imagePath: 'assets/carwash.png', // Replace with your actual asset path
-          title: 'Car Washing',
-          onTap: () => _navigateToCarWashing(),
-        ),
-        const SizedBox(height: 12),
-        _buildServiceItem(
-          imagePath: 'assets/oil_change.png', // Replace with your actual asset path
-          title: 'Oil Change',
-          onTap: () => _navigateToOilChange(),
-        ),
-        const SizedBox(height: 12),
-      ],
-    );
-  }
+  return Consumer<ServiceTypeController>(
+    builder: (context, controller, child) {
+      if (controller.isLoading) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      if (controller.hasError) {
+        return Center(child: Text(controller.error ?? 'Unknown error'));
+      }
+
+      final services = controller.serviceTypes;
+      final serviceConfigMap = getServiceConfig(context);
+
+      return ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: services.length,
+        itemBuilder: (context, index) {
+          final service = services[index];
+          final config = serviceConfigMap[service.name];
+
+          return Column(
+            children: [
+              _buildServiceItem(
+                imagePath: config?.imagePath ?? 'assets/icons/default.png',
+                title: service.name,
+                onTap: config?.onTap ?? () {}, // fallback if unknown
+              ),
+              if (index < services.length - 1) const SizedBox(height: 12),
+            ],
+          );
+        },
+      );
+    },
+  );
+}
+
 
   Widget _buildServiceItem({
     required String imagePath,
@@ -454,4 +487,31 @@ class _SelectServiceState extends State<SelectService> {
     // Here you would typically send the data to your backend
     print('Form Data: $formData');
   }
+  Map<String, ServiceUIConfig> getServiceConfig(BuildContext context) {
+  return {
+    'Car Wash': ServiceUIConfig(
+      imagePath: 'assets/carwash.png',
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const CarWashScreen()),
+      ),
+    ),
+    'Oil Change': ServiceUIConfig(
+      imagePath: 'assets/oil_change.png',
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => const OilChangeScreen()),
+      ),
+    ),
+    // Add more mappings as needed
+  };
+}
+}
+class ServiceUIConfig {
+  final String imagePath;
+  final VoidCallback onTap;
+
+  ServiceUIConfig({required this.imagePath, required this.onTap});
+  
+
 }

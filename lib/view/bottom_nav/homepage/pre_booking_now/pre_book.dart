@@ -1,4 +1,6 @@
+import 'package:champion_car_wash_app/controller/get_services_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class PreBookingButton extends StatefulWidget {
   const PreBookingButton({super.key});
@@ -8,6 +10,12 @@ class PreBookingButton extends StatefulWidget {
 }
 
 class _PreBookingButtonState extends State<PreBookingButton> {
+  late ServiceTypeController _controller;
+   void initState() {
+    super.initState();
+    _controller = ServiceTypeController();
+    _controller.loadServiceTypes(); // ✅ fetch data here
+  }
   final _formKey = GlobalKey<FormState>();
   String? _selectedService;
   DateTime? _selectedDate;
@@ -45,98 +53,94 @@ class _PreBookingButtonState extends State<PreBookingButton> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
+    return ChangeNotifierProvider<ServiceTypeController>.value(
+    value: _controller,
+      child: Scaffold(
         backgroundColor: Colors.white,
-        elevation: 0,
-        
-        centerTitle: true,
-        title: const Text('Pre Booking', style: TextStyle(color: Colors.black)),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Customer Details",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  const SizedBox(height: 10),
-                  _buildTextField(_nameController, "Customer Name"),
-                  const SizedBox(height: 10),
-                  _buildTextField(_phoneController, "+971 Phone Number here", keyboardType: TextInputType.phone),
-                  const SizedBox(height: 10),
-                  DropdownButtonFormField<String>(
-                    decoration: _inputDecoration("Select Service"),
-                    value: _selectedService,
-                    items: ['Wash', 'Repair', 'Detailing']
-                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                        .toList(),
-                    onChanged: (val) => setState(() => _selectedService = val),
-                  ),
-                  const SizedBox(height: 10),
-                  _buildTextField(_regNumberController, "Registration Number"),
-                  const SizedBox(height: 10),
-                  GestureDetector(
-                    onTap: _pickDate,
-                    child: AbsorbPointer(
-                      child: TextFormField(
-                        decoration: _inputDecoration("Select Date").copyWith(
-                          suffixIcon: const Icon(Icons.calendar_today),
-                        ),
-                        controller: TextEditingController(
-                          text: _selectedDate == null
-                              ? ''
-                              : "${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}",
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          
+          centerTitle: true,
+          title: const Text('Pre Booking', style: TextStyle(color: Colors.black)),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      "Customer Details",
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildTextField(_nameController, "Customer Name"),
+                    const SizedBox(height: 10),
+                    _buildTextField(_phoneController, "+971 Phone Number here", keyboardType: TextInputType.phone),
+                    const SizedBox(height: 10),
+                   _buildServiceDropdown(),
+                    const SizedBox(height: 10),
+                    _buildTextField(_regNumberController, "Registration Number"),
+                    const SizedBox(height: 10),
+                    GestureDetector(
+                      onTap: _pickDate,
+                      child: AbsorbPointer(
+                        child: TextFormField(
+                          decoration: _inputDecoration("Select Date").copyWith(
+                            suffixIcon: const Icon(Icons.calendar_today),
+                          ),
+                          controller: TextEditingController(
+                            text: _selectedDate == null
+                                ? ''
+                                : "${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}",
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 10),
-                  GestureDetector(
-                    onTap: _pickTime,
-                    child: AbsorbPointer(
-                      child: TextFormField(
-                        decoration: _inputDecoration("Select Time").copyWith(
-                          suffixIcon: const Icon(Icons.access_time),
-                        ),
-                        controller: TextEditingController(
-                          text: _selectedTime == null
-                              ? ''
-                              : _selectedTime!.format(context),
+                    const SizedBox(height: 10),
+                    GestureDetector(
+                      onTap: _pickTime,
+                      child: AbsorbPointer(
+                        child: TextFormField(
+                          decoration: _inputDecoration("Select Time").copyWith(
+                            suffixIcon: const Icon(Icons.access_time),
+                          ),
+                          controller: TextEditingController(
+                            text: _selectedTime == null
+                                ? ''
+                                : _selectedTime!.format(context),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
+                  ],
                 ),
-                onPressed: () {
-                  if (_formKey.currentState!.validate()) {
-                    // Handle booking logic
-                  }
-                },
-                child: const Text("Book Now", style: TextStyle(color: Colors.white, fontSize: 16)),
               ),
-            ),
-          ],
+              const Spacer(),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      // Handle booking logic
+                    }
+                  },
+                  child: const Text("Book Now", style: TextStyle(color: Colors.white, fontSize: 16)),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -171,4 +175,32 @@ class _PreBookingButtonState extends State<PreBookingButton> {
       decoration: _inputDecoration(hint),
     );
   }
+  Widget _buildServiceDropdown() {
+  return Consumer<ServiceTypeController>(
+    builder: (context, controller, child) {
+      if (controller.isLoading) {
+        return const CircularProgressIndicator(); // Show loading
+      }
+
+      if (controller.hasError) {
+        return Text(controller.error ?? 'Error loading services'); // Show error
+      }
+
+      final services = controller.serviceTypes;
+
+      return DropdownButtonFormField<String>(
+        decoration: _inputDecoration("Select Service"),
+        value: _selectedService,
+        items: services
+            .map((service) => DropdownMenuItem<String>(
+                  value: service.name,
+                  child: Text(service.name),
+                ))
+            .toList(),
+        onChanged: (val) => setState(() => _selectedService = val),
+      );
+    },
+  );
+}
+
 }

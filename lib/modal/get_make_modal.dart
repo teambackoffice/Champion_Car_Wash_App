@@ -1,7 +1,6 @@
 
 
-// ==================== MODAL CLASS ====================
-// File: modal/car_models_modal.dart
+
 
 class CarModel {
   final String model;
