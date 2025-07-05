@@ -1,3 +1,4 @@
+import 'package:champion_car_wash_app/controller/cancel_prebook_controller.dart';
 import 'package:champion_car_wash_app/controller/confirm_prebook_controller.dart';
 import 'package:champion_car_wash_app/controller/get_prebooking_controller.dart';
 import 'package:champion_car_wash_app/modal/get_prebooking_list.dart';
@@ -127,8 +128,6 @@ class _PreBookingsScreenContainerState
 
   Future<void> _refreshBookingList() async {
     try {
-      print("Starting booking list refresh...");
-
       // Clear current data
       setState(() {
         _filteredBookings.clear();
@@ -151,12 +150,7 @@ class _PreBookingsScreenContainerState
           _filteredBookings = List.from(controller.bookingData);
         });
       }
-
-      print(
-        "Booking list refreshed successfully with ${_filteredBookings.length} items",
-      );
     } catch (e) {
-      print("Error refreshing booking list: $e");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -555,35 +549,99 @@ class _PreBookingsScreenContainerState
     }
   }
 
+  // Replace your _showCancelDialog method with this:
+
   void _showCancelDialog(dynamic booking) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Cancel Booking'),
-        content: Text(
-          'Are you sure you want to cancel this booking for ${booking.customerName}?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: Text('No'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(
-                    'Booking cancelled for ${booking.customerName}',
-                  ),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            },
-            child: Text('Yes', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Consumer<CancelPrebookController>(
+              builder: (context, controller, child) {
+                return AlertDialog(
+                  title: Text('Cancel Booking'),
+                  content: controller.isLoading
+                      ? Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.red,
+                              ),
+                            ),
+                            SizedBox(height: 16),
+                            Text('Cancelling booking...'),
+                          ],
+                        )
+                      : Text(
+                          'Are you sure you want to cancel this booking for ${booking.customerName}?',
+                        ),
+                  actions: controller.isLoading
+                      ? []
+                      : [
+                          TextButton(
+                            onPressed: () => Navigator.of(dialogContext).pop(),
+                            child: Text('No'),
+                          ),
+                          TextButton(
+                            onPressed: () async {
+                              try {
+                                // Call API to cancel booking
+                                await controller.cancelPreBooking(booking.name);
+
+                                // Close dialog
+                                if (Navigator.of(dialogContext).canPop()) {
+                                  Navigator.of(dialogContext).pop();
+                                }
+
+                                // Show result
+                                final message =
+                                    controller.responseMessage ?? 'No response';
+                                final isSuccess =
+                                    !message.toLowerCase().contains("error") &&
+                                    !message.toLowerCase().contains(
+                                      "exception",
+                                    ) &&
+                                    !message.toLowerCase().contains("failed");
+
+                                // Use the original context (this.context) for SnackBar
+
+                                // REFRESH THE PAGE using the safe refresh method
+                                if (isSuccess) {
+                                  await _refreshBookingList();
+                                }
+                              } catch (e) {
+                                // Close dialog on error
+                                if (Navigator.of(dialogContext).canPop()) {
+                                  Navigator.of(dialogContext).pop();
+                                }
+
+                                // Show error message
+                                ScaffoldMessenger.of(this.context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      'Failed to cancel booking: $e',
+                                    ),
+                                    backgroundColor: Colors.red,
+                                    duration: Duration(seconds: 3),
+                                  ),
+                                );
+                              }
+                            },
+                            child: Text(
+                              'Yes',
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ),
+                        ],
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 

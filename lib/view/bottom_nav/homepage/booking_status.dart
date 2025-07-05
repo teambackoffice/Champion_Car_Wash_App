@@ -1,13 +1,13 @@
+import 'package:champion_car_wash_app/controller/get_prebooking_controller.dart';
+import 'package:champion_car_wash_app/view/bottom_nav/homepage/new_booking/new_bookings.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/pre_booking/pre_booking.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/service_completed.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/under_process/under_process.dart';
-import 'package:champion_car_wash_app/view/bottom_nav/homepage/new_booking/new_bookings.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class BookingStatus extends StatelessWidget {
-  const BookingStatus({
-    super.key,
-  });
+  const BookingStatus({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -18,10 +18,12 @@ class BookingStatus extends StatelessWidget {
             Expanded(
               child: InkWell(
                 onTap: () {
-                     Navigator.push(
-                     context,
-                      MaterialPageRoute(builder: (context) => NewBookingsScreen()),
-                         );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => NewBookingsScreen(),
+                    ),
+                  );
                 },
                 child: Container(
                   padding: const EdgeInsets.all(20),
@@ -41,7 +43,7 @@ class BookingStatus extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color:  Colors.blue,
+                          color: Colors.blue,
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: const Icon(
@@ -75,64 +77,71 @@ class BookingStatus extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 15),
-            Expanded(
-              child: InkWell(
-                onTap: () {
-                   Navigator.push(
-                     context,
-                      MaterialPageRoute(builder: (context) => PreBookingsScreenContainer()),
-                         );
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
+            Consumer<GetPrebookingListController>(
+              builder: (context, controller, child) {
+                final prebook = controller.preBookingList;
+                return Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PreBookingsScreenContainer(),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                    ],
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.red,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(
+                              Icons.event_available,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          const Text(
+                            "Pre Booking",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            prebook!.message.totalPreBookingCount.toString(),
+                            style: TextStyle(
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color:  Colors.red,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(
-                          Icons.event_available,
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      const Text(
-                        "Pre Booking",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        "10",
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.red,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+                );
+              },
             ),
           ],
         ),
@@ -142,10 +151,12 @@ class BookingStatus extends StatelessWidget {
             Expanded(
               child: InkWell(
                 onTap: () {
-                   Navigator.push(
-                     context,
-                      MaterialPageRoute(builder: (context) => UnderProcessScreen()),
-                         );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => UnderProcessScreen(),
+                    ),
+                  );
                 },
                 child: Container(
                   padding: const EdgeInsets.all(20),
@@ -165,8 +176,7 @@ class BookingStatus extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Color(0xFFFFCF6F)
-                    ,
+                          color: Color(0xFFFFCF6F),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: const Icon(
@@ -191,8 +201,7 @@ class BookingStatus extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFFFFCF6F)
-                    ,
+                          color: Color(0xFFFFCF6F),
                         ),
                       ),
                     ],
@@ -204,10 +213,12 @@ class BookingStatus extends StatelessWidget {
             Expanded(
               child: InkWell(
                 onTap: () {
-                   Navigator.push(
-                     context,
-                      MaterialPageRoute(builder: (context) => ServiceCompletedScreen()),
-                         );
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ServiceCompletedScreen(),
+                    ),
+                  );
                 },
 
                 child: Container(

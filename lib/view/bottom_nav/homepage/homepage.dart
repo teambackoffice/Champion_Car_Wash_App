@@ -1,22 +1,24 @@
-import 'package:champion_car_wash_app/view/bottom_nav/booking_page/all_bookings.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/booking_status.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/create_service.dart';
-import 'package:champion_car_wash_app/view/bottom_nav/homepage/new_booking/new_bookings.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/pre_booking_now/pre_book.dart';
-import 'package:champion_car_wash_app/view/bottom_nav/profile_page/profile.dart';
 import 'package:flutter/material.dart';
-
-
 
 // Extract your existing HomePage content into this widget
 class HomePageContent extends StatelessWidget {
+  const HomePageContent({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 100),
+          padding: const EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: 100,
+          ),
           child: Column(
             children: [
               // User Profile Section
@@ -44,7 +46,10 @@ class HomePageContent extends StatelessWidget {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(35),
-                        child: Image.asset("assets/person.jpeg", fit: BoxFit.cover)
+                        child: Image.asset(
+                          "assets/person.jpeg",
+                          fit: BoxFit.cover,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 15),
@@ -82,24 +87,26 @@ class HomePageContent extends StatelessWidget {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               // Booking Statistics
               BookingStatus(),
-              
+
               const SizedBox(height: 30),
-              
+
               // Create Service Button
-              Container(
+              SizedBox(
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
                   onPressed: () {
-                     Navigator.push(
-                     context,
-                      MaterialPageRoute(builder: (context) => CreateServicePage()),
-                         );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => CreateServicePage(),
+                      ),
+                    );
                     print("Create Service tapped");
                   },
                   style: ElevatedButton.styleFrom(
@@ -137,19 +144,21 @@ class HomePageContent extends StatelessWidget {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 20),
-              
+
               // Pre Book Now Button
-              Container(
+              SizedBox(
                 width: double.infinity,
                 height: 55,
                 child: ElevatedButton(
                   onPressed: () {
-                     Navigator.push(
-                     context,
-                      MaterialPageRoute(builder: (context) => PreBookingButton()),
-                         );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PreBookingButton(),
+                      ),
+                    );
                     print("Pre Book Now tapped");
                   },
                   style: OutlinedButton.styleFrom(
@@ -161,10 +170,7 @@ class HomePageContent extends StatelessWidget {
                   ),
                   child: const Text(
                     "Pre Book Now",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -175,4 +181,3 @@ class HomePageContent extends StatelessWidget {
     );
   }
 }
-
