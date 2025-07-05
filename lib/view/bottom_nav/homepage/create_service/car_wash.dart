@@ -1,92 +1,150 @@
+import 'package:champion_car_wash_app/controller/get_carwash_controller.dart';
 import 'package:flutter/material.dart';
-
-class CarWashOption {
-  final String title;
-  final String price;
-  final String imagePath;
-
-  CarWashOption({
-    required this.title,
-    required this.price,
-    required this.imagePath,
-  });
-}
+import 'package:provider/provider.dart';
 
 class CarWashScreen extends StatefulWidget {
-  const CarWashScreen({Key? key}) : super(key: key);
+  const CarWashScreen({super.key});
 
   @override
   State<CarWashScreen> createState() => _CarWashScreenState();
 }
 
 class _CarWashScreenState extends State<CarWashScreen> {
-  final List<CarWashOption> options = [
-    CarWashOption(
-      title: 'Basic Car Wash',
-      price: '100 AED',
-      imagePath: 'assets/bodywash2.jpg',
-    ),
-    CarWashOption(
-      title: 'Super Car Wash',
-      price: '200 AED',
-      imagePath: 'assets/steam-car-wash.jpg',
-    ),
-    CarWashOption(
-      title: 'Steam Wash',
-      price: '250 AED',
-      imagePath: 'assets/superWash.jpg',
-    ),
-    CarWashOption(
-      title: 'VIP Wash',
-      price: '400 AED',
-      imagePath: 'assets/bodyWash1.jpg',
-    ),
-  ];
-
   int selectedIndex = 0;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    Provider.of<CarwashServiceController>(
+      context,
+      listen: false,
+    ).fetchCarwashServices();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFAFBF8),
       body: SafeArea(
-        child: Column(
-          children: [
-            const SizedBox(height: 16),
-            _buildHeader(),
-            const SizedBox(height: 16),
-            Expanded(
-              child: ListView.builder(
-                itemCount: options.length,
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                itemBuilder: (context, index) {
-                  return _buildWashCard(options[index], index);
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFD82332),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                  ),
-                  onPressed: () {
-                    // Handle continue logic
-                  },
-                  child: const Text(
-                    'Continue',
-                    style: TextStyle(fontSize: 16,color: Colors.white),
+        child: Consumer<CarwashServiceController>(
+          builder: (context, controller, child) {
+            if (controller.isLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (controller.carwashList == null ||
+                controller.carwashList!.message.washType.isEmpty) {
+              return const Center(child: Text("No wash types available"));
+            }
+
+            final washList = controller.carwashList!.message.washType;
+
+            return Column(
+              children: [
+                const SizedBox(height: 16),
+                _buildHeader(),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: washList.length,
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    itemBuilder: (context, index) {
+                      final wash = washList[index];
+                      final bool isSelected = index == selectedIndex;
+
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            selectedIndex = index;
+                          });
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(vertical: 10),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(
+                              color: isSelected
+                                  ? const Color(0xFFD82332)
+                                  : Colors.transparent,
+                              width: 1.5,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.07),
+                                spreadRadius: 1,
+                                blurRadius: 6,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8),
+                                child: Image.asset(
+                                  "assets/bodyWash1.jpg",
+                                  width: 70,
+                                  height: 70,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    wash.name,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  Text(
+                                    "₹${wash.price.toStringAsFixed(2)}",
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Color(0xFFD82332),
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 ),
-              ),
-            ),
-          ],
+                Padding(
+                  padding: const EdgeInsets.all(20.0),
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFD82332),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      onPressed: () {
+                        // Handle continue logic
+                      },
+                      child: const Text(
+                        'Continue',
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
         ),
       ),
     );
@@ -105,86 +163,19 @@ class _CarWashScreenState extends State<CarWashScreen> {
                 shape: BoxShape.circle,
               ),
               padding: const EdgeInsets.all(5),
-              child: const Icon(Icons.arrow_back_ios_new_outlined, color: Colors.white),
+              child: const Icon(
+                Icons.arrow_back_ios_new_outlined,
+                color: Colors.white,
+              ),
             ),
           ),
           const Spacer(),
           const Text(
             'Car Washing',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-            ),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
           ),
           const Spacer(flex: 2),
         ],
-      ),
-    );
-  }
-
-  Widget _buildWashCard(CarWashOption option, int index) {
-    final bool isSelected = index == selectedIndex;
-
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedIndex = index;
-        });
-      },
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 10),
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(
-            color: isSelected ? const Color(0xFFD82332) : Colors.transparent,
-            width: 1.5,
-          ),
-          borderRadius: BorderRadius.circular(12),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.grey.withOpacity(0.07),
-              spreadRadius: 1,
-              blurRadius: 6,
-              offset: const Offset(0, 3),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                option.imagePath,
-                width: 70,
-                height: 70,
-                fit: BoxFit.cover,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  option.title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  option.price,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(0xFFD82332),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
       ),
     );
   }

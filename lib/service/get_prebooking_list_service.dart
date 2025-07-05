@@ -15,7 +15,6 @@ class GetPrebookingListService {
 
   Future<GetPreBookingList> getPreBookingList() async {
     try {
-      print("url $Url");
       final request = http.Request('GET', Uri.parse(Url));
       request.headers.addAll(headers);
 
@@ -23,7 +22,6 @@ class GetPrebookingListService {
       final responseBody = await response.stream.bytesToString();
 
       if (response.statusCode == 200) {
-        print("response $responseBody");
         final jsonData = json.decode(responseBody);
         return GetPreBookingList.fromJson(jsonData);
       } else {
@@ -32,7 +30,6 @@ class GetPrebookingListService {
         );
       }
     } catch (e) {
-      print("error $e");
       throw Exception('Error fetching pre-booking list: $e');
     }
   }
