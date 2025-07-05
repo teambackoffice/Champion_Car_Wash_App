@@ -1,7 +1,3 @@
-// To parse this JSON data, do
-//
-//     final getPreBookingList = getPreBookingListFromJson(jsonString);
-
 import 'dart:convert';
 
 GetPreBookingList getPreBookingListFromJson(String str) =>
@@ -11,7 +7,7 @@ String getPreBookingListToJson(GetPreBookingList data) =>
     json.encode(data.toJson());
 
 class GetPreBookingList {
-  Message message;
+  final Message message;
 
   GetPreBookingList({required this.message});
 
@@ -22,9 +18,9 @@ class GetPreBookingList {
 }
 
 class Message {
-  int successKey;
-  List<Datum> data;
-  int totalPreBookingCount;
+  final int successKey;
+  final List<Datum> data;
+  final int totalPreBookingCount;
 
   Message({
     required this.successKey,
@@ -46,15 +42,15 @@ class Message {
 }
 
 class Datum {
-  String name;
-  CustomerName customerName;
-  Phone phone;
-  RegNumber regNumber;
-  DateTime date;
-  String time;
-  Branch branch;
-  String status;
-  List<Service> services;
+  final String name;
+  final String customerName;
+  final String phone;
+  final String regNumber;
+  final DateTime date;
+  final String time;
+  final String branch;
+  final String status;
+  final List<Service> services;
 
   Datum({
     required this.name,
@@ -70,13 +66,13 @@ class Datum {
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
     name: json["name"],
-    customerName: customerNameValues.map[json["customer_name"]]!,
-    phone: phoneValues.map[json["phone"]]!,
-    regNumber: regNumberValues.map[json["reg_number"]]!,
+    customerName: json["customer_name"],
+    phone: json["phone"],
+    regNumber: json["reg_number"],
     date: DateTime.parse(json["date"]),
     time: json["time"],
-    branch: branchValues.map[json["branch"]]!,
-    status: json["status"]!,
+    branch: json["branch"],
+    status: json["status"],
     services: List<Service>.from(
       json["services"].map((x) => Service.fromJson(x)),
     ),
@@ -84,75 +80,24 @@ class Datum {
 
   Map<String, dynamic> toJson() => {
     "name": name,
-    "customer_name": customerNameValues.reverse[customerName],
-    "phone": phoneValues.reverse[phone],
-    "reg_number": regNumberValues.reverse[regNumber],
-    "date":
-        "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}",
+    "customer_name": customerName,
+    "phone": phone,
+    "reg_number": regNumber,
+    "date": date.toIso8601String().split("T").first,
     "time": time,
-    "branch": branchValues.reverse[branch],
+    "branch": branch,
     "status": status,
     "services": List<dynamic>.from(services.map((x) => x.toJson())),
   };
 }
 
-enum Branch { DUBAI, QATAR }
-
-final branchValues = EnumValues({"Dubai": Branch.DUBAI, "Qatar": Branch.QATAR});
-
-enum CustomerName { JOHN_DOE, QWE }
-
-final customerNameValues = EnumValues({
-  "John Doe": CustomerName.JOHN_DOE,
-  "qwe": CustomerName.QWE,
-});
-
-enum Phone { THE_9090909090, THE_919876543210 }
-
-final phoneValues = EnumValues({
-  "9090909090": Phone.THE_9090909090,
-  "+91 9876543210": Phone.THE_919876543210,
-});
-
-enum RegNumber { KL55_AB9932, TN01_AB1234 }
-
-final regNumberValues = EnumValues({
-  "KL55AB9932": RegNumber.KL55_AB9932,
-  "TN01AB1234": RegNumber.TN01_AB1234,
-});
-
 class Service {
-  ServiceName serviceName;
+  final String serviceName;
 
   Service({required this.serviceName});
 
   factory Service.fromJson(Map<String, dynamic> json) =>
-      Service(serviceName: serviceNameValues.map[json["service_name"]]!);
+      Service(serviceName: json["service_name"]);
 
-  Map<String, dynamic> toJson() => {
-    "service_name": serviceNameValues.reverse[serviceName],
-  };
-}
-
-enum ServiceName { CAR_WASH, OIL_CHANGE }
-
-final serviceNameValues = EnumValues({
-  "Car Wash": ServiceName.CAR_WASH,
-  "Oil Change": ServiceName.OIL_CHANGE,
-});
-
-enum Status { PENDING }
-
-final statusValues = EnumValues({"Pending": Status.PENDING});
-
-class EnumValues<T> {
-  Map<String, T> map;
-  late Map<T, String> reverseMap;
-
-  EnumValues(this.map);
-
-  Map<T, String> get reverse {
-    reverseMap = map.map((k, v) => MapEntry(v, k));
-    return reverseMap;
-  }
+  Map<String, dynamic> toJson() => {"service_name": serviceName};
 }

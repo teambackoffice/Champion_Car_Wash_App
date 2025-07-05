@@ -1,4 +1,5 @@
 import 'package:champion_car_wash_app/controller/get_prebooking_controller.dart';
+import 'package:champion_car_wash_app/modal/get_prebooking_list.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -33,13 +34,13 @@ class _PreBookingsScreenContainerState
           : bookings
                 .where(
                   (booking) =>
-                      booking.regNumber.toString().toLowerCase().contains(
+                      booking.regNumber.toLowerCase().contains(
                         query.toLowerCase(),
                       ) ||
-                      booking.customerName.toString().toLowerCase().contains(
+                      booking.customerName.toLowerCase().contains(
                         query.toLowerCase(),
                       ) ||
-                      booking.phone.toString().contains(query),
+                      booking.phone.contains(query),
                 )
                 .toList();
     });
@@ -229,7 +230,7 @@ class _PreBookingsScreenContainerState
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                booking.regNumber.toString(),
+                booking.regNumber,
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
@@ -256,13 +257,12 @@ class _PreBookingsScreenContainerState
           SizedBox(height: 16),
           _buildDetailRow('Booking Date', formattedDate),
           _buildDetailRow('Booking Time', booking.time),
-          _buildDetailRow('User Name', booking.customerName.toString()),
-          _buildDetailRow('Mobile No.', booking.phone.toString()),
-          _buildDetailRow('Branch', booking.branch.toString()),
-          _buildDetailRow('Registration Number', booking.regNumber.toString()),
+          _buildDetailRow('User Name', booking.customerName),
+          _buildDetailRow('Mobile No.', booking.phone),
+          _buildDetailRow('Branch', booking.branch),
+          _buildDetailRow('Registration Number', booking.regNumber),
 
-          // Selected Services Section
-          SizedBox(height: 8),
+          // Updated Services Section
           Text(
             "Selected Services",
             style: TextStyle(
@@ -271,73 +271,47 @@ class _PreBookingsScreenContainerState
               fontWeight: FontWeight.w500,
             ),
           ),
-          SizedBox(height: 8),
+          SizedBox(height: 5),
 
-          // Services List
+          // Dynamic Services List
           if (booking.services != null && booking.services.isNotEmpty)
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey[200]!),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: booking.services.map<Widget>((service) {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(vertical: 2),
-                    child: Row(
-                      children: [
-                        Icon(
-                          Icons.check_circle_outline,
-                          size: 16,
-                          color: Colors.green[600],
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: booking.services.map<Widget>((service) {
+                return Padding(
+                  padding: EdgeInsets.only(bottom: 2),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.check_circle_outline,
+                        size: 16,
+                        color: Colors.green[600],
+                      ),
+                      SizedBox(width: 8),
+                      Text(
+                        service.serviceName,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500,
                         ),
-                        SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            service.serviceName
-                                .toString()
-                                .split('.')
-                                .last
-                                .replaceAll('_', ' '),
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black87,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-              ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
             )
           else
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.grey[50],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey[200]!),
-              ),
-              child: Text(
-                'No services selected',
-                style: TextStyle(
-                  fontSize: 13,
-                  color: Colors.grey[600],
-                  fontStyle: FontStyle.italic,
-                ),
+            Text(
+              "No services selected",
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[500],
+                fontStyle: FontStyle.italic,
               ),
             ),
 
-          SizedBox(height: 16),
-
-          // Action Buttons
+          SizedBox(height: 20),
           Row(
             children: [
               Expanded(
@@ -386,6 +360,69 @@ class _PreBookingsScreenContainerState
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildServicesCompact(List<Service> services) {
+    if (services.isEmpty) {
+      return Text(
+        "No services selected",
+        style: TextStyle(
+          fontSize: 14,
+          color: Colors.grey[500],
+          fontStyle: FontStyle.italic,
+        ),
+      );
+    }
+
+    String serviceNames = services
+        .map((service) => service.serviceName)
+        .join(', ');
+
+    return Text(
+      serviceNames,
+      style: TextStyle(
+        fontSize: 14,
+        color: Colors.black,
+        fontWeight: FontWeight.w500,
+      ),
+    );
+  }
+
+  // Alternative: If you want to show services with chips/tags
+  Widget _buildServicesChips(List<Service> services) {
+    if (services.isEmpty) {
+      return Text(
+        "No services selected",
+        style: TextStyle(
+          fontSize: 14,
+          color: Colors.grey[500],
+          fontStyle: FontStyle.italic,
+        ),
+      );
+    }
+
+    return Wrap(
+      spacing: 8,
+      runSpacing: 4,
+      children: services.map((service) {
+        return Container(
+          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: Colors.blue[50],
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.blue[200]!),
+          ),
+          child: Text(
+            service.serviceName,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.blue[700],
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        );
+      }).toList(),
     );
   }
 
