@@ -1,14 +1,19 @@
 import 'package:champion_car_wash_app/view/bottom_nav/bottom_nav.dart';
-import 'package:champion_car_wash_app/view/bottom_nav/homepage/homepage.dart';
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-class ServiceSuccessScreen extends StatelessWidget {
+class ServiceSuccessScreen extends StatefulWidget {
   const ServiceSuccessScreen({super.key});
 
   @override
+  State<ServiceSuccessScreen> createState() => _ServiceSuccessScreenState();
+}
+
+class _ServiceSuccessScreenState extends State<ServiceSuccessScreen> {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -33,10 +38,7 @@ class ServiceSuccessScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   const Text(
                     "Service Created Successfully",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 24),
                   QrImageView(
@@ -45,14 +47,8 @@ class ServiceSuccessScreen extends StatelessWidget {
                     size: 180.0,
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    "Super Car Wash",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                  const Text(
-                    "Oil Change",
-                    style: TextStyle(fontSize: 14),
-                  ),
+                  const Text("Super Car Wash", style: TextStyle(fontSize: 16)),
+                  const Text("Oil Change", style: TextStyle(fontSize: 14)),
                   const SizedBox(height: 32),
                   SizedBox(
                     width: double.infinity,
@@ -95,10 +91,7 @@ class ServiceSuccessScreen extends StatelessWidget {
                       ),
                       child: const Text(
                         "Back to Home",
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontSize: 16,
-                        ),
+                        style: TextStyle(color: Colors.red, fontSize: 16),
                       ),
                     ),
                   ),

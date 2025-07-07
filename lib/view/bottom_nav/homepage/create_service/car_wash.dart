@@ -1,4 +1,5 @@
 import 'package:champion_car_wash_app/controller/get_carwash_controller.dart';
+import 'package:champion_car_wash_app/modal/selected_service_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,7 +15,6 @@ class _CarWashScreenState extends State<CarWashScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     Provider.of<CarwashServiceController>(
       context,
@@ -133,7 +133,18 @@ class _CarWashScreenState extends State<CarWashScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
                       onPressed: () {
-                        // Handle continue logic
+                        // Get the selected wash service
+                        final selectedWash = washList[selectedIndex];
+
+                        // Create SelectedService object
+                        final selectedService = SelectedService(
+                          name: selectedWash.name,
+                          price: selectedWash.price,
+                          details: 'Car Wash Service',
+                        );
+
+                        // Return to previous screen with selected service data
+                        Navigator.pop(context, selectedService);
                       },
                       child: const Text(
                         'Continue',

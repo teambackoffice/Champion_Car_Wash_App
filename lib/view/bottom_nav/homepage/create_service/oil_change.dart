@@ -1,4 +1,5 @@
 import 'package:champion_car_wash_app/controller/get_oil_brand_contrtoller.dart';
+import 'package:champion_car_wash_app/modal/selected_service_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -130,7 +131,7 @@ class _OilChangeScreenState extends State<OilChangeScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   Text(
-                                    '\$${oilBrand.price.toStringAsFixed(2)}',
+                                    '₹${oilBrand.price.toStringAsFixed(2)}',
                                     style: const TextStyle(
                                       fontSize: 18,
                                       color: Color(0xFFD82332),
@@ -160,7 +161,18 @@ class _OilChangeScreenState extends State<OilChangeScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 16),
                       ),
                       onPressed: () {
-                        // Handle continue logic - you can navigate to booking screen
+                        // Get the selected oil brand
+                        final selectedOil = oillist[selectedIndex];
+
+                        // Create SelectedService object
+                        final selectedService = SelectedService(
+                          name: selectedOil.name,
+                          price: selectedOil.price,
+                          details: 'Oil Change Service',
+                        );
+
+                        // Return to previous screen with selected service data
+                        Navigator.pop(context, selectedService);
                       },
                       child: const Text(
                         'Continue',
@@ -198,7 +210,7 @@ class _OilChangeScreenState extends State<OilChangeScreen> {
             ),
           ),
           const Spacer(),
-          const Text(
+          Text(
             'Oil Change Service',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
           ),
