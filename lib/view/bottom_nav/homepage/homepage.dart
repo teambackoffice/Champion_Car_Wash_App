@@ -1,11 +1,51 @@
+import 'package:champion_car_wash_app/controller/get_prebooking_controller.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/booking_status.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/create_service.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/pre_booking_now/pre_book.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:provider/provider.dart';
 
 // Extract your existing HomePage content into this widget
-class HomePageContent extends StatelessWidget {
+class HomePageContent extends StatefulWidget {
   const HomePageContent({super.key});
+
+  @override
+  State<HomePageContent> createState() => _HomePageContentState();
+}
+
+class _HomePageContentState extends State<HomePageContent> {
+  String fullname = '';
+  final storage = const FlutterSecureStorage();
+  String branch = '';
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<GetPrebookingListController>(
+        context,
+        listen: false,
+      ).fetchPreBookingList();
+    });
+    _loadFullname();
+    loadbranch();
+  }
+
+  Future<void> _loadFullname() async {
+    final storedName = await storage.read(key: "full_name");
+    setState(() {
+      fullname = storedName ?? '';
+    });
+  }
+
+  Future<void> loadbranch() async {
+    final storedBranch = await storage.read(key: "branch");
+    setState(() {
+      branch = storedBranch ?? '';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,25 +97,31 @@ class HomePageContent extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            "Mohammed Ali",
+                          Text(
+                            fullname.isNotEmpty
+                                ? fullname[0].toUpperCase() +
+                                      fullname.substring(1)
+                                : '',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: Colors.black87,
                             ),
                           ),
+
                           const SizedBox(height: 5),
-                          const Text(
-                            "+966 87523 7236",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black54,
-                            ),
-                          ),
+                          // const Text(
+                          //   "+966 87523 7236",
+                          //   style: TextStyle(
+                          //     fontSize: 14,
+                          //     color: Colors.black54,
+                          //   ),
+                          // ),
                           const SizedBox(height: 3),
-                          const Text(
-                            "Al Hamidya 1, Ajman",
+                          Text(
+                            branch.isNotEmpty
+                                ? branch[0].toUpperCase() + branch.substring(1)
+                                : '',
                             style: TextStyle(
                               fontSize: 14,
                               color: Colors.black54,
@@ -107,7 +153,6 @@ class HomePageContent extends StatelessWidget {
                         builder: (context) => CreateServicePage(),
                       ),
                     );
-                    print("Create Service tapped");
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFD32F2F),

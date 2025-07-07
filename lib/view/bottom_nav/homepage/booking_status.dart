@@ -4,10 +4,27 @@ import 'package:champion_car_wash_app/view/bottom_nav/homepage/pre_booking/pre_b
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/service_completed.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/under_process/under_process.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 
-class BookingStatus extends StatelessWidget {
+class BookingStatus extends StatefulWidget {
   const BookingStatus({super.key});
+
+  @override
+  State<BookingStatus> createState() => _BookingStatusState();
+}
+
+class _BookingStatusState extends State<BookingStatus> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<GetPrebookingListController>(
+        context,
+        listen: false,
+      ).fetchPreBookingList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,6 +97,7 @@ class BookingStatus extends StatelessWidget {
             Consumer<GetPrebookingListController>(
               builder: (context, controller, child) {
                 final prebook = controller.preBookingList;
+
                 return Expanded(
                   child: InkWell(
                     onTap: () {
@@ -128,14 +146,20 @@ class BookingStatus extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          Text(
-                            prebook!.message.totalPreBookingCount.toString(),
-                            style: TextStyle(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.red,
-                            ),
-                          ),
+                          controller.isLoading || prebook == null
+                              ? const SpinKitThreeBounce(
+                                  color: Colors.red,
+                                  size: 20,
+                                )
+                              : Text(
+                                  prebook.message.totalPreBookingCount
+                                      .toString(),
+                                  style: const TextStyle(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red,
+                                  ),
+                                ),
                         ],
                       ),
                     ),

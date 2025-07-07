@@ -1,10 +1,42 @@
 import 'package:champion_car_wash_app/controller/login_controller.dart';
 import 'package:champion_car_wash_app/view/login/login.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String fullname = '';
+  final storage = const FlutterSecureStorage();
+  String branch = '';
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loadFullname();
+    loadbranch();
+  }
+
+  Future<void> _loadFullname() async {
+    final storedName = await storage.read(key: "full_name");
+    setState(() {
+      fullname = storedName ?? '';
+    });
+  }
+
+  Future<void> loadbranch() async {
+    final storedBranch = await storage.read(key: "branch");
+    setState(() {
+      branch = storedBranch ?? '';
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,24 +64,23 @@ class ProfileScreen extends StatelessWidget {
               const SizedBox(height: 32),
 
               // Name Field
-              const ReadOnlyField(
+              ReadOnlyField(
                 icon: Icons.person_outline,
-                text: 'Muhammed Ali',
+                text: fullname.isNotEmpty
+                    ? fullname[0].toUpperCase() + fullname.substring(1)
+                    : '',
               ),
               const SizedBox(height: 12),
 
               // Phone Field
-              const ReadOnlyField(
-                icon: Icons.phone_outlined,
-                text: '+971 8271674928',
-              ),
-              const SizedBox(height: 12),
+              // const ReadOnlyField(
+              //   icon: Icons.phone_outlined,
+              //   text: '+971 8271674928',
+              // ),
+              // const SizedBox(height: 12),
 
               // Address Field
-              const ReadOnlyField(
-                icon: Icons.location_on_outlined,
-                text: 'Al Hamidiya 1, Ajman',
-              ),
+              ReadOnlyField(icon: Icons.location_on_outlined, text: branch),
               const SizedBox(height: 12),
 
               // Logout Button
@@ -66,10 +97,13 @@ class ProfileScreen extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                                 title: const Text('Confirm Logout'),
-                                content: const Text('Are you sure you want to log out?'),
+                                content: const Text(
+                                  'Are you sure you want to log out?',
+                                ),
                                 actions: [
                                   TextButton(
-                                    onPressed: () => Navigator.of(context).pop(),
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(),
                                     child: const Text('Cancel'),
                                   ),
                                   ElevatedButton(
@@ -82,28 +116,32 @@ class ProfileScreen extends StatelessWidget {
                                     onPressed: loginController.isLoading
                                         ? null
                                         : () async {
-                                            Navigator.of(context).pop(); // Close dialog
-                                            
+                                            Navigator.of(
+                                              context,
+                                            ).pop(); // Close dialog
+
                                             // Show loading indicator
                                             showDialog(
                                               context: context,
                                               barrierDismissible: false,
                                               builder: (context) => const Center(
-                                                child: CircularProgressIndicator(),
+                                                child:
+                                                    CircularProgressIndicator(),
                                               ),
                                             );
-                                            
+
                                             // Perform logout
                                             await loginController.logout();
-                                            
+
                                             // Close loading dialog
                                             Navigator.of(context).pop();
-                                            
+
                                             // Navigate to login screen
                                             Navigator.pushAndRemoveUntil(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) => const LoginScreen(),
+                                                builder: (context) =>
+                                                    const LoginScreen(),
                                               ),
                                               (Route<dynamic> route) => false,
                                             );
@@ -114,14 +152,17 @@ class ProfileScreen extends StatelessWidget {
                                             height: 20,
                                             child: CircularProgressIndicator(
                                               strokeWidth: 2,
-                                              valueColor: AlwaysStoppedAnimation<Color>(
-                                                Colors.white,
-                                              ),
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                    Colors.white,
+                                                  ),
                                             ),
                                           )
                                         : const Text(
                                             'Log Out',
-                                            style: TextStyle(color: Colors.white),
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                            ),
                                           ),
                                   ),
                                 ],
@@ -130,7 +171,9 @@ class ProfileScreen extends StatelessWidget {
                           },
                     child: ReadOnlyField(
                       icon: Icons.logout,
-                      text: loginController.isLoading ? 'Logging out...' : 'Log Out',
+                      text: loginController.isLoading
+                          ? 'Logging out...'
+                          : 'Log Out',
                       isButton: true,
                     ),
                   );
