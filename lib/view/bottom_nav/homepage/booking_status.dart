@@ -1,3 +1,4 @@
+import 'package:champion_car_wash_app/controller/get_newbooking_controller.dart';
 import 'package:champion_car_wash_app/controller/get_prebooking_controller.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/new_booking/new_bookings.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/pre_booking/pre_booking.dart';
@@ -24,6 +25,12 @@ class _BookingStatusState extends State<BookingStatus> {
         listen: false,
       ).fetchPreBookingList();
     });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<GetNewbookingController>(
+        context,
+        listen: false,
+      ).fetchBookingList();
+    });
   }
 
   @override
@@ -32,66 +39,76 @@ class _BookingStatusState extends State<BookingStatus> {
       children: [
         Row(
           children: [
-            Expanded(
-              child: InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => NewBookingsScreen(),
+            Consumer<GetNewbookingController>(
+              builder: (context, controller, child) {
+                final newbook = controller.bookingList;
+                return Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NewBookingsScreen(),
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.blue,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(
+                              Icons.calendar_month,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          const Text(
+                            "New Booking",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          controller.isLoading || newbook == null
+                              ? const SpinKitThreeBounce(
+                                  color: Colors.red,
+                                  size: 20,
+                                )
+                              : Text(
+                                  newbook.count.toString(),
+                                  style: TextStyle(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                        ],
+                      ),
                     ),
-                  );
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
                   ),
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.blue,
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(
-                          Icons.calendar_month,
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      const Text(
-                        "New Booking",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        "30",
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.blue,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+                );
+              },
             ),
             const SizedBox(width: 15),
             Consumer<GetPrebookingListController>(

@@ -1,55 +1,36 @@
+import 'package:champion_car_wash_app/modal/get_newbooking_modal.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
-class ViewMorePage extends StatefulWidget {
-  const ViewMorePage({super.key});
+class ViewMorePage extends StatelessWidget {
+  final ServiceData booking;
 
-  @override
-  State<ViewMorePage> createState() => _ViewMorePageState();
-}
+  const ViewMorePage({super.key, required this.booking});
 
-class _ViewMorePageState extends State<ViewMorePage> {
-  final List<Map<String, dynamic>> bookings = [
-    {
-      'id': 'RO-2025-06-0039',
-      'date': 'Jun 25 2025',
-      'time': '12:00pm',
-      'userName': 'User 1',
-      'mobile': '+971 99865 25142',
-      'email': 'example@gmail.com',
-      'vehicleType': 'SUV',
-      'engineModel': 'Fortuner',
-      'vehicleMake': 'Toyota',
-      'purchaseDate': 'Jan 10 2023',
-      'chassis': 'CHS123456789',
-      'registration': 'ABC1234',
-      'services': ['Super Car Wash', 'Oil Change'],
-    },
-    
-  ];
+  String _formatDate(String date) {
+    try {
+      final parsedDate = DateTime.parse(date); // expects yyyy-MM-dd
+      return DateFormat(
+        'dd MMMM yyyy',
+      ).format(parsedDate); // e.g., 07 July 2025
+    } catch (_) {
+      return date; // fallback if parsing fails
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('View More'),
-      ),
-      body: ListView.builder(
+      appBar: AppBar(title: const Text('View More')),
+      backgroundColor: Colors.grey[100],
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        itemCount: bookings.length,
-        itemBuilder: (context, index) {
-          final booking = bookings[index];
-          return Column(
-            children: [
-              _buildBookingCard(context, booking),
-              const SizedBox(height: 16),
-            ],
-          );
-        },
+        child: _buildBookingCard(),
       ),
     );
   }
 
-  Widget _buildBookingCard(BuildContext context, Map<String, dynamic> booking) {
+  Widget _buildBookingCard() {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -66,11 +47,12 @@ class _ViewMorePageState extends State<ViewMorePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Title Row
           Row(
             children: [
               Expanded(
                 child: Text(
-                  booking['id'],
+                  booking.registrationNumber,
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -95,19 +77,35 @@ class _ViewMorePageState extends State<ViewMorePage> {
               ),
             ],
           ),
+
           const SizedBox(height: 16),
-          _buildInfoRow('Booking Date', booking['date']),
-          _buildInfoRow('Booking Time', booking['time']),
-          _buildInfoRow('User Name', booking['userName']),
-          _buildInfoRow('Mobile No', booking['mobile']),
-          _buildInfoRow('Email ID', booking['email']),
-          _buildInfoRow('Vehicle Type', booking['vehicleType']),
-          _buildInfoRow('Vehicle Model', booking['engineModel']),
-          _buildInfoRow('Vehicle Make', booking['vehicleMake']),
-          _buildInfoRow('Purchase Date', booking['purchaseDate']),
-          _buildInfoRow('Chassis No', booking['chassis']),
-          _buildInfoRow('Registration No', booking['registration']),
+          // Info Rows
+          _buildInfoRow('Booking Date', _formatDate(booking.purchaseDate)),
+          _buildInfoRow('Customer Name', booking.customerName),
+          _buildInfoRow('Mobile No', booking.phone),
+          _buildInfoRow('Email ID', booking.email),
+          _buildInfoRow('Vehicle Type', booking.carType),
+          _buildInfoRow('Vehicle Model', booking.model),
+          _buildInfoRow('Vehicle Make', booking.make),
+          _buildInfoRow('Chassis No', booking.chasisNumber),
+          _buildInfoRow('Engine No', booking.engineNumber),
+          _buildInfoRow('Address', booking.address),
+          _buildInfoRow('Branch', booking.branch),
+          _buildInfoRow(
+            'Current ODO',
+            '${booking.currentOdometerReading.toStringAsFixed(0)} KM',
+          ),
+          _buildInfoRow(
+            'Next ODO',
+            '${booking.nextServiceOdometer.toStringAsFixed(0)} KM',
+          ),
+          _buildInfoRow(
+            'Fuel Level',
+            '${booking.fuelLevel.toStringAsFixed(0)} %',
+          ),
+
           const SizedBox(height: 16),
+          // Selected Services
           Text(
             'Selected Services',
             style: TextStyle(
@@ -117,17 +115,23 @@ class _ViewMorePageState extends State<ViewMorePage> {
             ),
           ),
           const SizedBox(height: 8),
-          ...booking['services'].map<Widget>((service) => Padding(
-                padding: const EdgeInsets.only(bottom: 4),
-                child: Text(
-                  service,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
-                  ),
+          ...booking.services.map(
+            (service) => Padding(
+              padding: const EdgeInsets.only(bottom: 4),
+              child: Text(
+                [
+                  service.serviceType,
+                  if (service.washType != null) service.washType!,
+                  if (service.oilBrand != null) service.oilBrand!,
+                ].join(' - '),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black,
                 ),
-              )),
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -143,10 +147,7 @@ class _ViewMorePageState extends State<ViewMorePage> {
             width: 120,
             child: Text(
               label,
-              style: TextStyle(
-                color: Colors.grey[600],
-                fontSize: 14,
-              ),
+              style: TextStyle(color: Colors.grey[600], fontSize: 14),
             ),
           ),
           Expanded(
