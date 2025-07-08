@@ -7,6 +7,7 @@ import 'package:champion_car_wash_app/controller/get_oil_brand_contrtoller.dart'
 import 'package:champion_car_wash_app/controller/get_prebooking_controller.dart';
 import 'package:champion_car_wash_app/controller/get_services_controller.dart';
 import 'package:champion_car_wash_app/controller/login_controller.dart';
+import 'package:champion_car_wash_app/controller/service_underproccessing_controller.dart';
 import 'package:champion_car_wash_app/view/splashscreen/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -24,6 +25,9 @@ void main() {
         ChangeNotifierProvider(create: (_) => ConfirmPrebookController()),
         ChangeNotifierProvider(create: (_) => CancelPrebookController()),
         ChangeNotifierProvider(create: (_) => GetNewbookingController()),
+        ChangeNotifierProvider(
+          create: (_) => ServiceUnderproccessingController(),
+        ),
       ],
       child: MyApp(),
     ),

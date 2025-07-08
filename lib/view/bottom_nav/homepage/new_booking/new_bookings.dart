@@ -1,4 +1,5 @@
 import 'package:champion_car_wash_app/controller/get_newbooking_controller.dart';
+import 'package:champion_car_wash_app/controller/service_underproccessing_controller.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/new_booking/view_More.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -211,8 +212,48 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
                           SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              onPressed: () {
-                                // TODO: Implement "Start Service"
+                              onPressed: () async {
+                                final confirm = await showDialog<bool>(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: Text('Confirm'),
+                                    content: Text(
+                                      'Are you sure you want to start the service?',
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(false),
+                                        child: Text('Cancel'),
+                                      ),
+                                      ElevatedButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(true),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.red,
+                                          foregroundColor: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              12,
+                                            ),
+                                          ),
+                                        ),
+                                        child: Text('Start'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+
+                                if (confirm == true) {
+                                  await Provider.of<
+                                        ServiceUnderproccessingController
+                                      >(context, listen: false)
+                                      .markServiceInProgress(booking.serviceId);
+                                  await Provider.of<GetNewbookingController>(
+                                    context,
+                                    listen: false,
+                                  ).fetchBookingList();
+                                }
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.red,

@@ -1,4 +1,4 @@
-import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/create_invoice.dart';
+import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/invoice_submit.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/service_completed.dart';
 import 'package:flutter/material.dart';
 
@@ -14,7 +14,7 @@ class ServiceCard extends StatelessWidget {
   final bool isHighlighted;
 
   const ServiceCard({
-    Key? key,
+    super.key,
     required this.serviceId,
     required this.bookingDate,
     required this.bookingTime,
@@ -24,7 +24,7 @@ class ServiceCard extends StatelessWidget {
     required this.status,
     this.showCreateInvoice = false,
     this.isHighlighted = false,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +66,9 @@ class ServiceCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    status == ServiceStatus.completed ? 'Completed' : 'Payment Pending',
+                    status == ServiceStatus.completed
+                        ? 'Completed'
+                        : 'Payment Pending',
                     style: TextStyle(
                       color: status == ServiceStatus.completed
                           ? Colors.teal[700]
@@ -170,17 +172,19 @@ class ServiceCard extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 8),
-                ...services.map((service) => Padding(
-                  padding: EdgeInsets.only(bottom: 4),
-                  child: Text(
-                    service,
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
+                ...services.map(
+                  (service) => Padding(
+                    padding: EdgeInsets.only(bottom: 4),
+                    child: Text(
+                      service,
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
-                )).toList(),
+                ),
               ],
             ),
             SizedBox(height: 16),
@@ -213,9 +217,16 @@ class ServiceCard extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=> CreateInvoicePage()));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => InvoiceSubmitPage(),
+                      ),
+                    );
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Creating invoice for $serviceId')),
+                      SnackBar(
+                        content: Text('Creating invoice for $serviceId'),
+                      ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -228,11 +239,8 @@ class ServiceCard extends StatelessWidget {
                     elevation: 0,
                   ),
                   child: Text(
-                    'Create Invoice',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    'Make Payment',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),

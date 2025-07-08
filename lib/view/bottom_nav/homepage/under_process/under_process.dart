@@ -1,18 +1,19 @@
+import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/create_invoice.dart';
 import 'package:flutter/material.dart';
 
-
-
 class UnderProcessScreen extends StatefulWidget {
+  const UnderProcessScreen({super.key});
+
   @override
   _UnderProcessScreenState createState() => _UnderProcessScreenState();
 }
 
 class _UnderProcessScreenState extends State<UnderProcessScreen> {
   final TextEditingController _searchController = TextEditingController();
-  
+
   // Status options for dropdowns
   final List<String> _statusOptions = ['Select Status', 'Started', 'Complete'];
-  
+
   // Selected status for each service
   String _oilChangeStatus1 = 'Select Status';
   String _carWashStatus1 = 'Select Status';
@@ -28,10 +29,7 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
         elevation: 2,
         leading: Container(
           margin: EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: Colors.red,
-            shape: BoxShape.circle,
-          ),
+          decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
           child: IconButton(
             onPressed: () {
               Navigator.pop(context);
@@ -109,34 +107,21 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
     );
   }
 
-
-
   Widget _buildSearchBar() {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
       child: TextField(
         controller: _searchController,
         decoration: InputDecoration(
           hintText: 'Search Customer by Vehicle Number',
-          hintStyle: TextStyle(
-            color: Colors.grey[500],
-            fontSize: 14,
-          ),
-          prefixIcon: Icon(
-            Icons.search,
-            color: Colors.grey[500],
-            size: 20,
-          ),
+          hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
+          prefixIcon: Icon(Icons.search, color: Colors.grey[500], size: 20),
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         ),
@@ -161,11 +146,7 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: Offset(0, 3),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
         ],
       ),
       child: Column(
@@ -203,7 +184,7 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
               ],
             ),
           ),
-          
+
           // Booking details
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16),
@@ -218,7 +199,7 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
               ],
             ),
           ),
-          
+
           // Selected Services
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16),
@@ -234,14 +215,22 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                   ),
                 ),
                 SizedBox(height: 12),
-                _buildServiceRow('Oil Change', oilChangeStatus, onOilChangeChanged),
+                _buildServiceRow(
+                  'Oil Change',
+                  oilChangeStatus,
+                  onOilChangeChanged,
+                ),
                 SizedBox(height: 12),
-                _buildServiceRow('Super Car Wash', carWashStatus, onCarWashChanged),
+                _buildServiceRow(
+                  'Super Car Wash',
+                  carWashStatus,
+                  onCarWashChanged,
+                ),
                 SizedBox(height: 20),
               ],
             ),
           ),
-          
+
           // Continue button
           Padding(
             padding: EdgeInsets.all(16),
@@ -250,7 +239,12 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
               child: ElevatedButton(
                 onPressed: () {
                   // Handle continue action
-                  print('Continue pressed for $registrationNumber');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CreateInvoicePage(),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFFE8A5A5),
@@ -263,10 +257,7 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                 ),
                 child: Text(
                   'Continue',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                 ),
               ),
             ),
@@ -284,10 +275,7 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
           width: 140,
           child: Text(
             label,
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
           ),
         ),
         Expanded(
@@ -304,7 +292,11 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
     );
   }
 
-  Widget _buildServiceRow(String serviceName, String selectedStatus, ValueChanged<String?> onChanged) {
+  Widget _buildServiceRow(
+    String serviceName,
+    String selectedStatus,
+    ValueChanged<String?> onChanged,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -333,7 +325,9 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                   status,
                   style: TextStyle(
                     fontSize: 13,
-                    color: status == 'Select Status' ? Colors.grey[600] : Colors.black87,
+                    color: status == 'Select Status'
+                        ? Colors.grey[600]
+                        : Colors.black87,
                   ),
                 ),
               );

@@ -1,8 +1,8 @@
-import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/invoice_submit.dart';
+import 'package:champion_car_wash_app/view/bottom_nav/homepage/under_process/invoice_success.dart';
 import 'package:flutter/material.dart';
 
 class CreateInvoicePage extends StatelessWidget {
-  const CreateInvoicePage({Key? key}) : super(key: key);
+  const CreateInvoicePage({super.key});
 
   // Sample data for services
   final List<Map<String, dynamic>> services = const [
@@ -13,7 +13,8 @@ class CreateInvoicePage extends StatelessWidget {
   ];
 
   // Calculate totals
-  double get subtotal => services.fold(0, (sum, service) => sum + service['price']);
+  double get subtotal =>
+      services.fold(0, (sum, service) => sum + service['price']);
   double get serviceCharge => 50;
   double get total => subtotal + serviceCharge;
 
@@ -48,9 +49,9 @@ class CreateInvoicePage extends StatelessWidget {
                   ),
                 ],
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Services ListView Container
               Container(
                 height: 300, // Fixed height for services list
@@ -93,9 +94,9 @@ class CreateInvoicePage extends StatelessWidget {
                   },
                 ),
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               // Summary Container
               Container(
                 width: double.infinity,
@@ -107,38 +108,51 @@ class CreateInvoicePage extends StatelessWidget {
                 child: Column(
                   children: [
                     // Subtotal
-                    _buildSummaryRow('Sub Total', '${subtotal.toInt()} AED', false),
-                    const SizedBox(height: 16),
-                    
-                    // Service Charge
-                    _buildSummaryRow('Service Charge', '${serviceCharge.toInt()} AED', false),
-                    const SizedBox(height: 16),
-                    
-                    // Divider
-                    Container(
-                      height: 1,
-                      color: Colors.grey[300],
+                    _buildSummaryRow(
+                      'Sub Total',
+                      '${subtotal.toInt()} AED',
+                      false,
                     ),
                     const SizedBox(height: 16),
-                    
+
+                    // Service Charge
+                    _buildSummaryRow(
+                      'Service Charge',
+                      '${serviceCharge.toInt()} AED',
+                      false,
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Divider
+                    Container(height: 1, color: Colors.grey[300]),
+                    const SizedBox(height: 16),
+
                     // Total
                     _buildSummaryRow('Total', '${total.toInt()} AED', true),
                   ],
                 ),
               ),
-              
+
               const Spacer(),
-              
+
               const SizedBox(height: 16),
-              
+
               // Submit Button - Separate at bottom
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 child: ElevatedButton(
                   onPressed: () {
                     // Handle submit action
-                  Navigator.push(context, MaterialPageRoute(builder: (context)=>InvoiceSubmitPage()));
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => InvoiceSuccessPage(),
+                      ),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFB53E3E),
@@ -150,11 +164,8 @@ class CreateInvoicePage extends StatelessWidget {
                     ),
                   ),
                   child: const Text(
-                    'Create and Submit Invoice',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    'Create Invoice',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
               ),
@@ -188,6 +199,4 @@ class CreateInvoicePage extends StatelessWidget {
       ],
     );
   }
-
-  
 }
