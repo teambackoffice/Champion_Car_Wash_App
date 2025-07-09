@@ -1,22 +1,15 @@
+import 'package:champion_car_wash_app/modal/underprocess_modal.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/under_process/invoice_success.dart';
 import 'package:flutter/material.dart';
 
 class CreateInvoicePage extends StatelessWidget {
-  const CreateInvoicePage({super.key});
+  final ServiceCars? booking;
 
-  // Sample data for services
-  final List<Map<String, dynamic>> services = const [
-    {'name': 'Super Car Wash', 'price': 200},
-    {'name': 'Oil Change', 'price': 300},
-    {'name': 'Tire Rotation', 'price': 150},
-    {'name': 'Brake Inspection', 'price': 100},
-  ];
+  const CreateInvoicePage({super.key, required this.booking});
 
-  // Calculate totals
-  double get subtotal =>
-      services.fold(0, (sum, service) => sum + service['price']);
-  double get serviceCharge => 50;
-  double get total => subtotal + serviceCharge;
+  List<ServiceItem> get services => booking!.services;
+
+  double get subtotal => services.fold(0, (sum, s) => sum + s.price);
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +20,7 @@ class CreateInvoicePage extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
+              // Header
               Column(
                 children: [
                   Align(
@@ -41,31 +35,27 @@ class CreateInvoicePage extends StatelessWidget {
                       },
                     ),
                   ),
+                  const SizedBox(height: 8),
                   Text(
-                    'Order ID',
-                    style: TextStyle(
+                    'Customer: ${booking!.customerName}',
+                    style: const TextStyle(
                       fontSize: 16,
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  const Text(
-                    'RO-2025-06-0039',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
-                    ),
+                  Text(
+                    'Registration No : ${booking!.registrationNumber}',
+                    style: const TextStyle(fontSize: 14, color: Colors.black54),
                   ),
                 ],
               ),
 
               const SizedBox(height: 16),
 
-              // Services ListView Container
+              // Services ListView
               Container(
-                height: 300, // Fixed height for services list
+                height: 200,
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -83,16 +73,39 @@ class CreateInvoicePage extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            service['name'],
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black,
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  service.serviceType,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                if (service.washType != null)
+                                  Text(
+                                    'Wash Type: ${service.washType}',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                if (service.oilBrand != null)
+                                  Text(
+                                    'Oil Brand: ${service.oilBrand}',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                              ],
                             ),
                           ),
                           Text(
-                            '${service['price']} AED',
+                            '₹${service.price.toInt()}',
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -108,7 +121,7 @@ class CreateInvoicePage extends StatelessWidget {
 
               const SizedBox(height: 16),
 
-              // Summary Container
+              // Summary
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(24.0),
@@ -118,37 +131,21 @@ class CreateInvoicePage extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    // Subtotal
+                    _buildSummaryRow('Sub Total', '₹${subtotal.toInt()}'),
+
+                    Divider(color: Colors.grey[300]),
                     _buildSummaryRow(
-                      'Sub Total',
-                      '${subtotal.toInt()} AED',
-                      false,
+                      'Total',
+                      '₹${subtotal.toInt()}',
+                      isTotal: true,
                     ),
-                    const SizedBox(height: 16),
-
-                    // Service Charge
-                    _buildSummaryRow(
-                      'Service Charge',
-                      '${serviceCharge.toInt()} AED',
-                      false,
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Divider
-                    Container(height: 1, color: Colors.grey[300]),
-                    const SizedBox(height: 16),
-
-                    // Total
-                    _buildSummaryRow('Total', '${total.toInt()} AED', true),
                   ],
                 ),
               ),
 
               const Spacer(),
 
-              const SizedBox(height: 16),
-
-              // Submit Button - Separate at bottom
+              // Submit Button
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(
@@ -157,11 +154,10 @@ class CreateInvoicePage extends StatelessWidget {
                 ),
                 child: ElevatedButton(
                   onPressed: () {
-                    // Handle submit action
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => InvoiceSuccessPage(),
+                        builder: (context) => const InvoiceSuccessPage(),
                       ),
                     );
                   },
@@ -187,7 +183,7 @@ class CreateInvoicePage extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryRow(String label, String amount, bool isTotal) {
+  Widget _buildSummaryRow(String label, String amount, {bool isTotal = false}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -195,7 +191,7 @@ class CreateInvoicePage extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: isTotal ? 18 : 16,
-            fontWeight: isTotal ? FontWeight.w600 : FontWeight.w500,
+            fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
             color: Colors.black,
           ),
         ),

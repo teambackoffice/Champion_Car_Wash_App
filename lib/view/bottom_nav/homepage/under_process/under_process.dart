@@ -31,6 +31,7 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
       listen: false,
     );
     final booking = controller.getBookingById(serviceId);
+    final bookings = controller.serviceCars;
 
     showDialog(
       context: context,
@@ -55,7 +56,7 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const CreateInvoicePage(),
+                    builder: (context) => CreateInvoicePage(booking: booking),
                   ),
                 );
               },
