@@ -1,17 +1,16 @@
 import 'dart:convert';
 
 import 'package:champion_car_wash_app/config/api_constants.dart';
-import 'package:champion_car_wash_app/modal/get_prebooking_list.dart';
+import 'package:champion_car_wash_app/modal/get_allbooking_modal.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
-class GetPrebookingListService {
+class GetAllbookingService {
   final String Url =
-      '${ApiConstants.baseUrl}api/method/carwash.Api.auth.get_pre_booking_list';
-
+      '${ApiConstants.baseUrl}api/method/carwash.Api.auth.get_all_service_bookings';
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
-  Future<GetPreBookingList> getPreBookingList() async {
+  Future<GetAllbookingModal> getallbooking() async {
     try {
       final request = http.Request('GET', Uri.parse(Url));
       final String? sid = await _secureStorage.read(key: 'sid');
@@ -30,7 +29,7 @@ class GetPrebookingListService {
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(responseBody);
-        return GetPreBookingList.fromJson(jsonData);
+        return GetAllbookingModal.fromJson(jsonData);
       } else {
         throw Exception(
           'Failed to load new-booking list. Status Code: ${response.statusCode}',

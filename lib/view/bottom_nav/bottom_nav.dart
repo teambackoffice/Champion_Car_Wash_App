@@ -1,4 +1,4 @@
-import 'package:champion_car_wash_app/view/bottom_nav/booking_page/all_bookings.dart';
+import 'package:champion_car_wash_app/view/bottom_nav/allbooking_page/all_bookings.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/homepage.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/profile_page/profile.dart';
 import 'package:flutter/material.dart';
