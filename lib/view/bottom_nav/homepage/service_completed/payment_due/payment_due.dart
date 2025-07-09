@@ -5,11 +5,11 @@ import 'package:flutter/material.dart';
 class ServiceCard extends StatelessWidget {
   final String serviceId;
   final String bookingDate;
-  final String bookingTime;
   final String registrationNumber;
   final List<String> services;
   final String amount;
   final ServiceStatus status;
+  final String? customerName;
   final bool showCreateInvoice;
   final bool isHighlighted;
 
@@ -17,13 +17,13 @@ class ServiceCard extends StatelessWidget {
     super.key,
     required this.serviceId,
     required this.bookingDate,
-    required this.bookingTime,
     required this.registrationNumber,
     required this.services,
     required this.amount,
     required this.status,
     this.showCreateInvoice = false,
     this.isHighlighted = false,
+    required this.customerName,
   });
 
   @override
@@ -113,7 +113,7 @@ class ServiceCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Booking Time',
+                        'Customer',
                         style: TextStyle(
                           color: Colors.grey[600],
                           fontSize: 12,
@@ -122,7 +122,7 @@ class ServiceCard extends StatelessWidget {
                       ),
                       SizedBox(height: 4),
                       Text(
-                        bookingTime,
+                        customerName!,
                         style: TextStyle(
                           color: Colors.black87,
                           fontSize: 14,

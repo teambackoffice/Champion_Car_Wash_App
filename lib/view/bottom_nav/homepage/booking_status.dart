@@ -1,3 +1,4 @@
+import 'package:champion_car_wash_app/controller/get_completed_controller.dart';
 import 'package:champion_car_wash_app/controller/get_newbooking_controller.dart';
 import 'package:champion_car_wash_app/controller/get_prebooking_controller.dart';
 import 'package:champion_car_wash_app/controller/underprocess_controller.dart';
@@ -36,6 +37,10 @@ class _BookingStatusState extends State<BookingStatus> {
       context,
       listen: false,
     ).fetchUnderProcessingBookings();
+    Provider.of<GetCompletedController>(
+      context,
+      listen: false,
+    ).fetchcompletedlist();
   }
 
   @override
@@ -266,67 +271,77 @@ class _BookingStatusState extends State<BookingStatus> {
               },
             ),
             const SizedBox(width: 15),
-            Expanded(
-              child: InkWell(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => ServiceCompletedScreen(),
-                    ),
-                  );
-                },
+            Consumer<GetCompletedController>(
+              builder: (context, controller, child) {
+                final completedcount = controller.completed?.count ?? 0;
+                return Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ServiceCompletedScreen(),
+                        ),
+                      );
+                    },
 
-                child: Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.08),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
+                    child: Container(
+                      padding: const EdgeInsets.all(20),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 10,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                    ],
+                      child: Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF30CDBC),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: const Icon(
+                              Icons.verified,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                          ),
+                          const SizedBox(height: 15),
+                          const Text(
+                            "Service Completed",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          controller.isLoading
+                              ? const SpinKitThreeBounce(
+                                  color: Color(0xFF30CDBC),
+                                  size: 20,
+                                )
+                              : Text(
+                                  completedcount.toString(),
+                                  style: TextStyle(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF30CDBC),
+                                  ),
+                                ),
+                        ],
+                      ),
+                    ),
                   ),
-                  child: Column(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF30CDBC),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(
-                          Icons.verified,
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                      ),
-                      const SizedBox(height: 15),
-                      const Text(
-                        "Service Completed",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      const Text(
-                        "50",
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF30CDBC),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+                );
+              },
             ),
           ],
         ),
