@@ -2,7 +2,7 @@ import 'package:champion_car_wash_app/modal/create_invoice_modal.dart';
 import 'package:champion_car_wash_app/service/create_invoice_service.dart';
 import 'package:flutter/material.dart';
 
-class SalesInvoiceController with ChangeNotifier {
+class SalesInvoiceController extends ChangeNotifier {
   bool isLoading = false;
   String? responseMessage;
 

@@ -70,17 +70,17 @@ class _CompletedTabState extends State<CompletedTab> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Consumer<GetCompletedController>(
-        builder: (context, controller, child) {
-          // Show loading indicator
-          if (controller.isLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+    return Consumer<GetCompletedController>(
+      builder: (context, controller, child) {
+        // Show loading indicator
+        if (controller.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-          // Show error message
-          if (controller.error != null) {
-            return Center(
+        // Show error message
+        if (controller.error != null) {
+          return Expanded(
+            child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -106,63 +106,59 @@ class _CompletedTabState extends State<CompletedTab> {
                   ),
                 ],
               ),
-            );
-          }
-
-          // Show empty state
-          if (controller.bookingData.isEmpty) {
-            return const Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.check_circle_outline,
-                    color: Colors.grey,
-                    size: 48,
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    'No completed services found',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                  ),
-                  SizedBox(height: 8),
-                  Text(
-                    'Completed services will appear here',
-                    style: TextStyle(fontSize: 14, color: Colors.grey),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          // Show completed services list
-          return RefreshIndicator(
-            onRefresh: () async {
-              await controller.fetchcompletedlist();
-            },
-            child: ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: controller.bookingData.length,
-              itemBuilder: (context, index) {
-                final service = controller.bookingData[index];
-
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16),
-                  child: ServiceCard(
-                    serviceId: service.serviceId,
-                    bookingDate: _formatDate(service.purchaseDate),
-                    customerName: service.customerName,
-                    registrationNumber: service.registrationNumber,
-                    services: _formatServices(service.services),
-                    amount: _calculateTotalAmount(service.services),
-                    status: ServiceStatus.completed,
-                  ),
-                );
-              },
             ),
           );
-        },
-      ),
+        }
+
+        // Show empty state
+        if (controller.bookingData.isEmpty) {
+          return const Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.check_circle_outline, color: Colors.grey, size: 48),
+                SizedBox(height: 16),
+                Text(
+                  'No completed services found',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Completed services will appear here',
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+              ],
+            ),
+          );
+        }
+
+        // Show completed services list
+        return RefreshIndicator(
+          onRefresh: () async {
+            await controller.fetchcompletedlist();
+          },
+          child: ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: controller.bookingData.length,
+            itemBuilder: (context, index) {
+              final service = controller.bookingData[index];
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: ServiceCard(
+                  serviceId: service.serviceId,
+                  bookingDate: _formatDate(service.purchaseDate),
+                  customerName: service.customerName,
+                  registrationNumber: service.registrationNumber,
+                  services: _formatServices(service.services),
+                  amount: _calculateTotalAmount(service.services),
+                  status: ServiceStatus.completed,
+                ),
+              );
+            },
+          ),
+        );
+      },
     );
   }
 }

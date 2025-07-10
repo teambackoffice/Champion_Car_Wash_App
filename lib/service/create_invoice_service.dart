@@ -13,6 +13,7 @@ class CreateInvoiceService {
   static Future<http.Response?> createSalesInvoice(
     CreateInvoiceModal requestData,
   ) async {
+    print(_url);
     try {
       // Get SID from secure storage
       final sid = await _storage.read(key: 'sid');

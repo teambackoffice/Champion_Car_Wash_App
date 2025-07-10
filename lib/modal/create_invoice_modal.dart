@@ -1,27 +1,7 @@
-class ServiceItem {
-  final String itemCode;
-  final int price;
-  final int qty;
-
-  ServiceItem({required this.itemCode, required this.price, required this.qty});
-
-  factory ServiceItem.fromJson(Map<String, dynamic> json) {
-    return ServiceItem(
-      itemCode: json['item_code'],
-      price: json['price'],
-      qty: json['qty'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'item_code': itemCode, 'price': price, 'qty': qty};
-  }
-}
-
 class CreateInvoiceModal {
   final String customer;
   final String serviceId;
-  final List<ServiceItem> items;
+  final List<Item> items;
 
   CreateInvoiceModal({
     required this.customer,
@@ -34,7 +14,7 @@ class CreateInvoiceModal {
       customer: json['customer'],
       serviceId: json['service_id'],
       items: (json['items'] as List)
-          .map((item) => ServiceItem.fromJson(item))
+          .map((item) => Item.fromJson(item))
           .toList(),
     );
   }
@@ -45,5 +25,25 @@ class CreateInvoiceModal {
       'service_id': serviceId,
       'items': items.map((item) => item.toJson()).toList(),
     };
+  }
+}
+
+class Item {
+  final String itemCode;
+  final double price;
+  final int qty;
+
+  Item({required this.itemCode, required this.price, required this.qty});
+
+  factory Item.fromJson(Map<String, dynamic> json) {
+    return Item(
+      itemCode: json['item_code'],
+      price: (json['price'] as num).toDouble(),
+      qty: json['qty'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {'item_code': itemCode, 'price': price, 'qty': qty};
   }
 }
