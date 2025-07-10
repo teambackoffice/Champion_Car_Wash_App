@@ -1,4 +1,5 @@
 import 'package:champion_car_wash_app/controller/underprocess_controller.dart';
+import 'package:champion_car_wash_app/modal/underprocess_modal.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/create_invoice.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -11,15 +12,54 @@ class UnderProcessScreen extends StatefulWidget {
 }
 
 class _UnderProcessScreenState extends State<UnderProcessScreen> {
+  List<ServiceCars> _filteredBookings = [];
+  bool _isSearching = false;
+
   final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    Provider.of<UnderProcessingController>(
+    final controller = Provider.of<UnderProcessingController>(
       context,
       listen: false,
-    ).fetchUnderProcessingBookings();
+    );
+    controller.fetchUnderProcessingBookings().then((_) {
+      setState(() {
+        _filteredBookings = controller.serviceCars;
+      });
+    });
+
+    _searchController.addListener(() {
+      _filterBookings(_searchController.text);
+    });
+  }
+
+  void _filterBookings(String query) {
+    final controller = Provider.of<UnderProcessingController>(
+      context,
+      listen: false,
+    );
+    final allBookings = controller.serviceCars;
+
+    if (query.isEmpty) {
+      setState(() {
+        _filteredBookings = allBookings;
+        _isSearching = false;
+      });
+      return;
+    }
+
+    final filtered = allBookings.where((booking) {
+      return booking.registrationNumber.toLowerCase().contains(
+        query.toLowerCase(),
+      );
+    }).toList();
+
+    setState(() {
+      _filteredBookings = filtered;
+      _isSearching = true;
+    });
   }
 
   final List<String> _statusOptions = ['Select Status', 'Started', 'Complete'];
@@ -135,7 +175,9 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
               );
             }
 
-            final bookings = controller.serviceCars;
+            final bookings = _isSearching
+                ? _filteredBookings
+                : controller.serviceCars;
 
             if (bookings.isEmpty) {
               return const Center(
@@ -171,6 +213,16 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                           color: Colors.grey[500],
                           size: 20,
                         ),
+                        suffixIcon: _searchController.text.isNotEmpty
+                            ? IconButton(
+                                icon: Icon(Icons.clear),
+                                onPressed: () {
+                                  _searchController.clear();
+                                  _filterBookings('');
+                                },
+                              )
+                            : null,
+
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
