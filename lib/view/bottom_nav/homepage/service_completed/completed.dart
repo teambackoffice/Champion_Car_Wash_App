@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class CompletedTab extends StatefulWidget {
-  const CompletedTab({super.key});
+  final String searchQuery;
+  const CompletedTab({super.key, required this.searchQuery});
 
   @override
   State<CompletedTab> createState() => _CompletedTabState();
@@ -131,15 +132,22 @@ class _CompletedTabState extends State<CompletedTab> {
             ),
           );
         }
+        final filteredData = controller.bookingData.where((service) {
+          return service.registrationNumber.toLowerCase().contains(
+            widget.searchQuery.toLowerCase(),
+          );
+        }).toList();
 
         // Show completed services list
         return RefreshIndicator(
           onRefresh: () async {
             await controller.fetchcompletedlist();
           },
+
           child: ListView.builder(
             padding: const EdgeInsets.all(16),
-            itemCount: controller.bookingData.length,
+
+            itemCount: filteredData.length,
             itemBuilder: (context, index) {
               final service = controller.bookingData[index];
 
@@ -164,6 +172,7 @@ class _CompletedTabState extends State<CompletedTab> {
 }
 
 class PaymentDueTab extends StatelessWidget {
+  final String searchQuery;
   // Sample data for payment pending services
   final List<Map<String, dynamic>> paymentDueServices = [
     {
@@ -208,7 +217,7 @@ class PaymentDueTab extends StatelessWidget {
     },
   ];
 
-  PaymentDueTab({super.key});
+  PaymentDueTab({super.key, required this.searchQuery});
 
   @override
   Widget build(BuildContext context) {
