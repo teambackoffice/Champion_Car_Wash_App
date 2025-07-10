@@ -1,5 +1,6 @@
 import 'package:champion_car_wash_app/controller/get_newbooking_controller.dart';
 import 'package:champion_car_wash_app/controller/service_underproccessing_controller.dart';
+import 'package:champion_car_wash_app/modal/get_newbooking_modal.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/new_booking/view_More.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -12,14 +13,36 @@ class NewBookingsScreen extends StatefulWidget {
 }
 
 class _NewBookingsScreenState extends State<NewBookingsScreen> {
+  final TextEditingController _searchController = TextEditingController();
+  List<ServiceData> _filteredBookings = [];
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<GetNewbookingController>(
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final controller = Provider.of<GetNewbookingController>(
         context,
         listen: false,
-      ).fetchBookingList();
+      );
+      await controller.fetchBookingList();
+      setState(() {
+        _filteredBookings = controller.bookingData;
+      });
+    });
+  }
+
+  void _filterBookings(String query, List<ServiceData> allBookings) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredBookings = allBookings;
+      } else {
+        _filteredBookings = allBookings
+            .where(
+              (booking) => booking.registrationNumber.toLowerCase().contains(
+                query.toLowerCase(),
+              ),
+            )
+            .toList();
+      }
     });
   }
 
@@ -58,6 +81,14 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
             color: Colors.white,
             padding: EdgeInsets.all(16),
             child: TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                final allBookings = Provider.of<GetNewbookingController>(
+                  context,
+                  listen: false,
+                ).bookingData;
+                _filterBookings(value, allBookings);
+              },
               decoration: InputDecoration(
                 hintText: 'Search Customer by Vehicle Number',
                 hintStyle: TextStyle(color: Colors.grey[500]),
@@ -88,7 +119,16 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
                   return Center(child: Text(controller.error!));
                 }
 
-                final bookings = controller.bookingData;
+                final bookings = _filteredBookings;
+                if (bookings.isEmpty) {
+                  return Center(
+                    child: Text(
+                      controller.bookingData.isEmpty
+                          ? 'No new bookings found.'
+                          : 'No matching registration number.',
+                    ),
+                  );
+                }
 
                 if (bookings.isEmpty) {
                   return Center(child: Text('No new bookings found.'));
