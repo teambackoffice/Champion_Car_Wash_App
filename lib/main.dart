@@ -12,30 +12,39 @@ import 'package:champion_car_wash_app/controller/login_controller.dart';
 import 'package:champion_car_wash_app/controller/service_underproccessing_controller.dart';
 import 'package:champion_car_wash_app/controller/underprocess_controller.dart';
 import 'package:champion_car_wash_app/view/splashscreen/splash_screen.dart';
+import 'package:device_preview/device_preview.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 void main() {
   runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => LoginController()),
-        ChangeNotifierProvider(create: (_) => GetPrebookingListController()),
-        ChangeNotifierProvider(create: (_) => ServiceTypeController()),
-        ChangeNotifierProvider(create: (_) => AddPrebookingController()),
-        ChangeNotifierProvider(create: (_) => CarwashServiceController()),
-        ChangeNotifierProvider(create: (_) => GetOilBrandContrtoller()),
-        ChangeNotifierProvider(create: (_) => ConfirmPrebookController()),
-        ChangeNotifierProvider(create: (_) => CancelPrebookController()),
-        ChangeNotifierProvider(create: (_) => GetNewbookingController()),
-        ChangeNotifierProvider(
-          create: (_) => ServiceUnderproccessingController(),
-        ),
-        ChangeNotifierProvider(create: (_) => UnderProcessingController()),
-        ChangeNotifierProvider(create: (_) => GetAllbookingController()),
-        ChangeNotifierProvider(create: (_) => GetCompletedController()),
-      ],
-      child: MyApp(),
+    DevicePreview(
+      enabled: !kReleaseMode,
+      builder: (context) {
+        return MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => LoginController()),
+            ChangeNotifierProvider(
+              create: (_) => GetPrebookingListController(),
+            ),
+            ChangeNotifierProvider(create: (_) => ServiceTypeController()),
+            ChangeNotifierProvider(create: (_) => AddPrebookingController()),
+            ChangeNotifierProvider(create: (_) => CarwashServiceController()),
+            ChangeNotifierProvider(create: (_) => GetOilBrandContrtoller()),
+            ChangeNotifierProvider(create: (_) => ConfirmPrebookController()),
+            ChangeNotifierProvider(create: (_) => CancelPrebookController()),
+            ChangeNotifierProvider(create: (_) => GetNewbookingController()),
+            ChangeNotifierProvider(
+              create: (_) => ServiceUnderproccessingController(),
+            ),
+            ChangeNotifierProvider(create: (_) => UnderProcessingController()),
+            ChangeNotifierProvider(create: (_) => GetAllbookingController()),
+            ChangeNotifierProvider(create: (_) => GetCompletedController()),
+          ],
+          child: MyApp(),
+        );
+      },
     ),
   );
 }
@@ -47,6 +56,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      useInheritedMediaQuery: true, // 👈 Important for device_preview
+      locale: DevicePreview.locale(context), // 👈 Use the preview locale
+      builder: DevicePreview.appBuilder,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'Sarabun',

@@ -50,8 +50,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
       // Custom Bottom Navigation Bar
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Container(
-        margin: const EdgeInsets.only(bottom: 20),
-        height: 78,
+        height: 75,
         width: 275,
         decoration: BoxDecoration(
           color: Colors.white,

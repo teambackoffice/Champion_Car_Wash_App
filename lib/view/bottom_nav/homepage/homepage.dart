@@ -134,7 +134,7 @@ class _HomePageContentState extends State<HomePageContent> {
                 ),
               ),
 
-              const SizedBox(height: 40),
+              const SizedBox(height: 20),
 
               // Booking Statistics
               BookingStatus(),
