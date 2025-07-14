@@ -19,19 +19,22 @@ class LoginService {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         final fullName = responseData['full_name'];
-        final apiKey = responseData['message']['api_key'];
-        final sid = responseData['message']['sid'];
-        final branch = responseData['message']['branch'];
+        final message = responseData['message'];
+        final apiKey = message['api_key'];
+        final sid = message['sid'];
+        final branch = message['branch'];
+        final roles = message['roles'];
 
-        // Store full_name in secure storage
+        // Store values in secure storage
         await _secureStorage.write(key: 'full_name', value: fullName);
         await _secureStorage.write(key: 'api_key', value: apiKey);
         await _secureStorage.write(key: 'sid', value: sid);
         await _secureStorage.write(key: "branch", value: branch);
 
-        // Assuming your API returns { "message": "Logged in Successfully" }
-        // You can customize this condition based on your API response structure
-        return responseData['message']['success_key'] == 1;
+        // Convert roles to JSON string and store
+        await _secureStorage.write(key: 'roles', value: jsonEncode(roles));
+
+        return message['success_key'] == 1;
       } else {
         return false;
       }
