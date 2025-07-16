@@ -60,6 +60,15 @@ class CarWashTechnicianHomePage extends StatelessWidget {
             child: const Text("Cancel"),
           ),
           ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red[800], // Background color
+              foregroundColor: Colors.white, // Text color
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              elevation: 6,
+            ),
             onPressed: () {
               Navigator.of(ctx).pop();
               _logout(context);

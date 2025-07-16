@@ -14,7 +14,7 @@ class OilTechnicianHomePage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text(
-            "Oil Technician Dashboard",
+            "Oil Technician",
             style: TextStyle(color: Colors.white),
           ),
           centerTitle: true,

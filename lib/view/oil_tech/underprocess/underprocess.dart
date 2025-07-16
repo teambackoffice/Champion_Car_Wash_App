@@ -629,13 +629,27 @@ class _AddExtraWorkDialogState extends State<AddExtraWorkDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            TextField(
+              decoration: InputDecoration(
+                hintText: 'Search...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                contentPadding: EdgeInsets.symmetric(
+                  vertical: 0,
+                  horizontal: 16,
+                ),
+              ),
+            ),
+
             // Toggle between common and custom work
             Row(children: [
                
               ],
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 5),
 
             if (!_isCustomWork)
               // Common work selection
