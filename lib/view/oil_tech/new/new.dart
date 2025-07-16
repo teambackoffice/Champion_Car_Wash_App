@@ -287,17 +287,18 @@ class BookingCard extends StatelessWidget {
     showDialog(
       context: context,
       builder: (context) {
-        final List<String> litreOptions = [
-          '1.0',
-          '1.5',
-          '2.0',
-          '2.5',
-          '3.0',
-          '3.5',
-          '4.0',
-          '4.5',
-          '5.0',
-        ];
+        final Map<String, bool> litreOptions = {
+          '1.0': true,
+          '1.5': false,
+          '2.0': true,
+          '2.5': true,
+          '3.0': false,
+          '3.5': true,
+          '4.0': true,
+          '4.5': false,
+          '5.0': true,
+        };
+
         String? selectedLitre;
         final List<String> optionalChanges = [
           'Air Filter',
@@ -317,6 +318,8 @@ class BookingCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const Text("Mobil", style: TextStyle(fontSize: 18)),
+                    const SizedBox(height: 10),
                     const Text(
                       'Select Oil Quantity (Litres)',
                       style: TextStyle(fontWeight: FontWeight.w500),
@@ -325,16 +328,52 @@ class BookingCard extends StatelessWidget {
                     DropdownButtonFormField<String>(
                       value: selectedLitre,
                       hint: const Text('Choose litres'),
-                      items: litreOptions.map((value) {
+                      items: litreOptions.entries.map((entry) {
+                        final litre = entry.key;
+                        final isAvailable = entry.value;
+
                         return DropdownMenuItem<String>(
-                          value: value,
-                          child: Text('$value Litres'),
+                          value: isAvailable ? litre : null,
+                          enabled: isAvailable,
+                          child: Row(
+                            children: [
+                              Icon(
+                                isAvailable
+                                    ? Icons.local_gas_station
+                                    : Icons.block,
+                                color: isAvailable
+                                    ? Colors.green[700]
+                                    : Colors.redAccent,
+                                size: 18,
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                isAvailable
+                                    ? '$litre Litres'
+                                    : '$litre Litres - Out of Stock',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: isAvailable
+                                      ? Colors.black87
+                                      : Colors.grey,
+                                  fontStyle: isAvailable
+                                      ? FontStyle.normal
+                                      : FontStyle.italic,
+                                  decoration: isAvailable
+                                      ? null
+                                      : TextDecoration.lineThrough,
+                                ),
+                              ),
+                            ],
+                          ),
                         );
                       }).toList(),
                       onChanged: (value) {
-                        setState(() {
-                          selectedLitre = value;
-                        });
+                        if (value != null) {
+                          setState(() {
+                            selectedLitre = value;
+                          });
+                        }
                       },
                       decoration: const InputDecoration(
                         border: OutlineInputBorder(),
@@ -344,26 +383,8 @@ class BookingCard extends StatelessWidget {
                         ),
                       ),
                     ),
+
                     const SizedBox(height: 20),
-                    const Text(
-                      'Optional Changes',
-                      style: TextStyle(fontWeight: FontWeight.w500),
-                    ),
-                    const SizedBox(height: 8),
-                    ...optionalChanges.map((option) {
-                      return CheckboxListTile(
-                        title: Text(option),
-                        value: selectedOptions[option],
-                        onChanged: (val) {
-                          setState(() {
-                            selectedOptions[option] = val ?? false;
-                          });
-                        },
-                        controlAffinity: ListTileControlAffinity.leading,
-                        dense: true,
-                        contentPadding: EdgeInsets.zero,
-                      );
-                    }),
                   ],
                 ),
               ),

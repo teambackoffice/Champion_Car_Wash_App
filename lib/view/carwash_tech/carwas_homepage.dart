@@ -1,3 +1,6 @@
+import 'package:champion_car_wash_app/view/carwash_tech/completed_wash/completed_wash.dart';
+import 'package:champion_car_wash_app/view/carwash_tech/new_wash/new_wash.dart';
+import 'package:champion_car_wash_app/view/carwash_tech/underprocess_wash/underprocess_wash.dart';
 import 'package:champion_car_wash_app/view/login/login.dart';
 import 'package:flutter/material.dart';
 
@@ -10,12 +13,15 @@ class CarWashTechnicianHomePage extends StatelessWidget {
       length: 3, // Number of tabs
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Car Wash Technician"),
+          title: const Text(
+            "Car Wash Technician",
+            style: TextStyle(color: Colors.white),
+          ),
           centerTitle: true,
-          backgroundColor: Colors.blueAccent,
+          backgroundColor: Colors.red[800],
           actions: [
             IconButton(
-              icon: const Icon(Icons.logout),
+              icon: const Icon(Icons.logout, color: Colors.white),
               onPressed: () => _showLogoutDialog(context),
               tooltip: "Logout",
             ),
@@ -31,7 +37,7 @@ class CarWashTechnicianHomePage extends StatelessWidget {
             ],
           ),
         ),
-        body: const TabBarView(
+        body: TabBarView(
           children: [
             CarWashNewBookings(),
             CarWashUnderProcessing(),
@@ -73,40 +79,5 @@ class CarWashTechnicianHomePage extends StatelessWidget {
       MaterialPageRoute(builder: (_) => const LoginScreen()),
       (route) => false,
     );
-  }
-}
-
-// Dummy LoginScreen - replace with your real one
-
-// Dummy widgets for tabs
-class CarWashNewBookings extends StatefulWidget {
-  const CarWashNewBookings({super.key});
-
-  @override
-  State<CarWashNewBookings> createState() => _CarWashNewBookingsState();
-}
-
-class _CarWashNewBookingsState extends State<CarWashNewBookings> {
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text("New Car Wash Bookings"));
-  }
-}
-
-class CarWashUnderProcessing extends StatelessWidget {
-  const CarWashUnderProcessing({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text("Car Wash Under Processing Bookings"));
-  }
-}
-
-class CarWashCompletedBookings extends StatelessWidget {
-  const CarWashCompletedBookings({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(child: Text("Completed Car Wash Bookings"));
   }
 }
