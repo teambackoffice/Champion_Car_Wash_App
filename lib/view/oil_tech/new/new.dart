@@ -1,3 +1,4 @@
+import 'package:champion_car_wash_app/view/oil_tech/new/view_more/view_more.dart';
 import 'package:flutter/material.dart';
 
 class BookingData {
@@ -150,8 +151,12 @@ class BookingCard extends StatelessWidget {
               // View More button
               TextButton(
                 onPressed: () {
-                  // Handle view more action
-                  _showMoreDetails(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => OilViewMore(bookingData: booking),
+                    ),
+                  );
                 },
                 child: const Text(
                   'View More',
@@ -247,39 +252,6 @@ class BookingCard extends StatelessWidget {
           ),
         ],
       ),
-    );
-  }
-
-  void _showMoreDetails(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Booking Details - ${booking.bookingId}'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Customer: ${booking.userName}'),
-              Text('Vehicle: ${booking.vehicleType} - ${booking.engineModel}'),
-              Text('Contact: ${booking.mobileNo}'),
-              Text('Email: ${booking.email}'),
-              const SizedBox(height: 12),
-              const Text(
-                'Services:',
-                style: TextStyle(fontWeight: FontWeight.bold),
-              ),
-              ...booking.selectedServices.map((service) => Text('• $service')),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Close'),
-            ),
-          ],
-        );
-      },
     );
   }
 
