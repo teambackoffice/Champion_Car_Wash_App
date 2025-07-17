@@ -9,11 +9,13 @@ class GetOilbrandService {
     final uri = Uri.parse(
       "${ApiConstants.baseUrl}api/method/carwash.Api.auth.get_all_oil_brand",
     );
+    print(uri);
 
     try {
       final response = await http.get(uri);
 
       if (response.statusCode == 200) {
+        print(response.body);
         final GetOilBrandList result = getOilBrandListFromJson(response.body);
         return result;
       } else if (response.statusCode == 401) {
@@ -24,6 +26,7 @@ class GetOilbrandService {
         return null;
       }
     } catch (e) {
+      print(e);
       return null;
     }
   }

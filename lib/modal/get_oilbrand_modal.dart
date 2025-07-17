@@ -18,29 +18,44 @@ class GetOilBrandList {
 }
 
 class Message {
-  List<OilBrand> oilBrand;
+  List<OilBrand> oilBrands;
+  List<OilType> oilTypes;
 
-  Message({required this.oilBrand});
+  Message({required this.oilBrands, required this.oilTypes});
 
   factory Message.fromJson(Map<String, dynamic> json) => Message(
-    oilBrand: List<OilBrand>.from(
-      json["oil brand"].map((x) => OilBrand.fromJson(x)),
+    oilBrands: List<OilBrand>.from(
+      (json["oil_brands"] ?? []).map((x) => OilBrand.fromJson(x)),
+    ),
+    oilTypes: List<OilType>.from(
+      (json["oil_types"] ?? []).map((x) => OilType.fromJson(x)),
     ),
   );
 
   Map<String, dynamic> toJson() => {
-    "oil brand": List<dynamic>.from(oilBrand.map((x) => x.toJson())),
+    "oil_brands": List<dynamic>.from(oilBrands.map((x) => x.toJson())),
+    "oil_types": List<dynamic>.from(oilTypes.map((x) => x.toJson())),
   };
 }
 
 class OilBrand {
   String name;
-  double price;
 
-  OilBrand({required this.name, required this.price});
+  OilBrand({required this.name});
 
   factory OilBrand.fromJson(Map<String, dynamic> json) =>
-      OilBrand(name: json["name"], price: (json["price"] as num).toDouble());
+      OilBrand(name: json["name"]);
 
-  Map<String, dynamic> toJson() => {"name": name, "price": price};
+  Map<String, dynamic> toJson() => {"name": name};
+}
+
+class OilType {
+  String name;
+
+  OilType({required this.name});
+
+  factory OilType.fromJson(Map<String, dynamic> json) =>
+      OilType(name: json["name"]);
+
+  Map<String, dynamic> toJson() => {"name": name};
 }

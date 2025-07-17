@@ -195,6 +195,11 @@ class _CreateServicePageState extends State<CreateServicePage> {
 
               _buildTypeDropdown(),
               SizedBox(height: 16),
+              _buildTextField(
+                controller: _addressController,
+                hintText: 'Modal Of Year',
+              ),
+              SizedBox(height: 16),
 
               _buildTextField(
                 controller: _purchaseDateController,
@@ -649,14 +654,14 @@ class _CreateServicePageState extends State<CreateServicePage> {
         ),
         contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
-      validator: isRequired
-          ? (value) {
-              if (value == null || value.isEmpty) {
-                return 'This field is required';
-              }
-              return null;
-            }
-          : null,
+      // validator: isRequired
+      //     ? (value) {
+      //         if (value == null || value.isEmpty) {
+      //           return 'This field is required';
+      //         }
+      //         return null;
+      //       }
+      //     : null,
     );
   }
 

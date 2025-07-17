@@ -11,7 +11,7 @@ class GetOilBrandContrtoller extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   GetOilBrandList? get oilBrand => _getOilBrandList;
 
-  List<OilBrand> get oilbrand => _getOilBrandList?.message.oilBrand ?? [];
+  List<OilBrand> get oilbrand => _getOilBrandList?.message.oilBrands ?? [];
 
   Future<void> fetchOilBrandServices() async {
     _isLoading = true;

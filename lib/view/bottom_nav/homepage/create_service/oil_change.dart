@@ -21,6 +21,7 @@ class _OilChangeScreenState extends State<OilChangeScreen> {
   }
 
   int selectedIndex = 0;
+  String? selectedOilType;
 
   @override
   Widget build(BuildContext context) {
@@ -34,11 +35,11 @@ class _OilChangeScreenState extends State<OilChangeScreen> {
             }
 
             if (controller.oilBrand == null ||
-                controller.oilBrand!.message.oilBrand.isEmpty) {
+                controller.oilBrand!.message.oilBrands.isEmpty) {
               return const Center(child: Text("No oil brands available"));
             }
 
-            final oillist = controller.oilBrand!.message.oilBrand;
+            final oillist = controller.oilBrand!.message.oilBrands;
 
             return Column(
               children: [
@@ -55,10 +56,89 @@ class _OilChangeScreenState extends State<OilChangeScreen> {
 
                       return GestureDetector(
                         onTap: () {
-                          setState(() {
-                            selectedIndex = index;
-                          });
+                          final oilTypes =
+                              controller.oilBrand!.message.oilTypes;
+
+                          if (oilTypes.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('No oil types available'),
+                              ),
+                            );
+                            return;
+                          }
+
+                          String? tempSelectedOilType;
+
+                          showDialog(
+                            context: context,
+                            builder: (context) {
+                              return StatefulBuilder(
+                                builder: (context, setDialogState) {
+                                  return AlertDialog(
+                                    title: const Text('Select Oil Type'),
+                                    content: SizedBox(
+                                      width: double.maxFinite,
+                                      child: ListView.builder(
+                                        shrinkWrap: true,
+                                        itemCount: oilTypes.length,
+                                        itemBuilder: (context, typeIndex) {
+                                          final oilType = oilTypes[typeIndex];
+
+                                          return RadioListTile<String>(
+                                            title: Text(oilType.name),
+                                            value: oilType.name,
+                                            groupValue: tempSelectedOilType,
+                                            onChanged: (value) {
+                                              setDialogState(() {
+                                                tempSelectedOilType = value;
+                                              });
+                                            },
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: const Text('Cancel'),
+                                      ),
+                                      ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(
+                                            0xFFD82332,
+                                          ),
+                                        ),
+                                        onPressed: () {
+                                          if (tempSelectedOilType != null) {
+                                            setState(() {
+                                              selectedIndex = index;
+                                              selectedOilType =
+                                                  tempSelectedOilType;
+                                            });
+                                            Navigator.pop(context);
+                                          } else {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Please select an oil type',
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        },
+                                        child: const Text('Select'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                          );
                         },
+
                         child: Container(
                           margin: const EdgeInsets.symmetric(vertical: 8),
                           padding: const EdgeInsets.all(16),
@@ -123,21 +203,45 @@ class _OilChangeScreenState extends State<OilChangeScreen> {
                                       ),
                                     ),
                                     const SizedBox(height: 4),
+                                    if (isSelected && selectedOilType != null)
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 2,
+                                          horizontal: 6,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: const Color(
+                                            0xFFD82332,
+                                          ).withOpacity(0.1),
+                                          borderRadius: BorderRadius.circular(
+                                            4,
+                                          ),
+                                        ),
+                                        child: Text(
+                                          selectedOilType!,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Color(0xFFD82332),
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
                                   ],
                                 ),
                               ),
+
                               // Price
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
-                                  Text(
-                                    '₹${oilBrand.price.toStringAsFixed(2)}',
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      color: Color(0xFFD82332),
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
+                                  // Text(
+                                  //   '₹${oilBrand.name}',
+                                  //   style: const TextStyle(
+                                  //     fontSize: 18,
+                                  //     color: Color(0xFFD82332),
+                                  //     fontWeight: FontWeight.bold,
+                                  //   ),
+                                  // ),
                                   const SizedBox(height: 4),
                                 ],
                               ),
@@ -167,7 +271,6 @@ class _OilChangeScreenState extends State<OilChangeScreen> {
                         // Create SelectedService object
                         final selectedService = SelectedService(
                           name: selectedOil.name,
-                          price: selectedOil.price,
                           details: 'Oil Change Service',
                         );
 

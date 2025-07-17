@@ -4,13 +4,13 @@ class ServiceItem {
   final String serviceType;
   final String? washType;
   final String? oilBrand;
-  final double price;
+  final double? price;
 
   ServiceItem({
     required this.serviceType,
     this.washType,
     this.oilBrand,
-    required this.price,
+    this.price,
   });
 
   Map<String, dynamic> toJson() {

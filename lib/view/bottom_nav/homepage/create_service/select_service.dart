@@ -100,8 +100,8 @@ class _SelectServiceState extends State<SelectService> {
   // Calculate totals
   double get subtotal {
     double total = 0.0;
-    if (selectedCarWash != null) total += selectedCarWash!.price;
-    if (selectedOilChange != null) total += selectedOilChange!.price;
+    if (selectedCarWash != null) total += selectedCarWash!.price!;
+    // if (selectedOilChange != null) total += selectedOilChange!.price!;
     return total;
   }
 
@@ -229,7 +229,7 @@ class _SelectServiceState extends State<SelectService> {
             _buildSelectedServiceItem(
               'Car Wash',
               selectedCarWash!.name,
-              selectedCarWash!.price,
+              selectedCarWash!.price!,
               () {
                 setState(() {
                   selectedCarWash = null;
@@ -242,7 +242,7 @@ class _SelectServiceState extends State<SelectService> {
             _buildSelectedServiceItem(
               'Oil Change',
               selectedOilChange!.name,
-              selectedOilChange!.price,
+              selectedOilChange!.price!,
               () {
                 setState(() {
                   selectedOilChange = null;
@@ -721,7 +721,7 @@ class _SelectServiceState extends State<SelectService> {
             ServiceItem(
               serviceType: 'Oil Change',
               oilBrand: selectedOilChange!.name,
-              price: selectedOilChange!.price,
+              // price: selectedOilChange!.price,
             ),
           );
         }

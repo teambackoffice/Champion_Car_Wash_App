@@ -1,7 +1,7 @@
 class SelectedService {
   final String name;
-  final double price;
+  final double? price;
   final String? details;
 
-  SelectedService({required this.name, required this.price, this.details});
+  SelectedService({required this.name, this.price, this.details});
 }
