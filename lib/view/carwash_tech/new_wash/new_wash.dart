@@ -131,23 +131,23 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
                     _buildDetailRow('Booking Date', booking.bookingDate),
                     _buildDetailRow('Booking Time', booking.bookingTime),
                     _buildDetailRow('User Name', booking.userName),
-                    _buildDetailRow('Mobile No', booking.mobileNo),
-                    _buildDetailRow('Email ID', booking.email),
-                    _buildDetailRow('Vehicle Type', booking.vehicleType),
-                    _buildDetailRow('Engine Model', booking.engineModel),
+                    // _buildDetailRow('Mobile No', booking.mobileNo),
+                    // _buildDetailRow('Email ID', booking.email),
+                    // _buildDetailRow('Vehicle Type', booking.vehicleType),
+                    // _buildDetailRow('Engine Model', booking.engineModel),
                     const SizedBox(height: 8),
-                    TextButton(
-                      onPressed: () =>
-                          _showMoreDetails(context, booking), // ✅ Fix
-                      child: const Text(
-                        'View More',
-                        style: TextStyle(
-                          color: Colors.red,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+                    // TextButton(
+                    //   onPressed: () =>
+                    //       _showMoreDetails(context, booking), // ✅ Fix
+                    //   child: const Text(
+                    //     'View More',
+                    //     style: TextStyle(
+                    //       color: Colors.red,
+                    //       fontWeight: FontWeight.w500,
+                    //     ),
+                    //   ),
+                    // ),
+                    const SizedBox(height: 8),
                     const Text(
                       'Selected Services',
                       style: TextStyle(

@@ -1,7 +1,7 @@
 import 'package:champion_car_wash_app/controller/create_invoice_controller.dart';
 import 'package:champion_car_wash_app/modal/create_invoice_modal.dart';
 import 'package:champion_car_wash_app/modal/underprocess_modal.dart';
-import 'package:champion_car_wash_app/view/bottom_nav/homepage/under_process/invoice_success.dart';
+import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/invoice_submit.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -45,7 +45,7 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const InvoiceSuccessPage()),
+          MaterialPageRoute(builder: (context) => const InvoiceSubmitPage()),
         );
       }
     } else {

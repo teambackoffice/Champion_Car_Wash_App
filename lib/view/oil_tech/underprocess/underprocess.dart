@@ -287,21 +287,22 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
 
+                  // const SizedBox(height: 8),
                   if (extraWorkItems.isEmpty)
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[50],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.grey[300]!),
-                      ),
-                      child: const Text(
-                        'No extra work added',
-                        style: TextStyle(color: Colors.grey, fontSize: 14),
-                      ),
-                    )
+                    SizedBox()
+                  // Container(
+                  //   padding: const EdgeInsets.all(16),
+                  //   decoration: BoxDecoration(
+                  //     color: Colors.grey[50],
+                  //     borderRadius: BorderRadius.circular(8),
+                  //     border: Border.all(color: Colors.grey[300]!),
+                  //   ),
+                  //   child: const Text(
+                  //     'No extra work added',
+                  //     style: TextStyle(color: Colors.grey, fontSize: 14),
+                  //   ),
+                  // )
                   else
                     ListView.builder(
                       shrinkWrap: true,
@@ -331,14 +332,14 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
                                         color: Colors.black87,
                                       ),
                                     ),
-                                    Text(
-                                      'Cost: AED ${item.cost.toStringAsFixed(2)}',
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.green,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
+                                    // Text(
+                                    //   'Cost: AED ${item.cost.toStringAsFixed(2)}',
+                                    //   style: const TextStyle(
+                                    //     fontSize: 12,
+                                    //     color: Colors.green,
+                                    //     fontWeight: FontWeight.w500,
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                               ),
@@ -361,36 +362,38 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
                     ),
 
                   if (extraWorkItems.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.red[200]!),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Total Extra Work Cost:',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          Text(
-                            'AED ${extraWorkItems.fold(0.0, (sum, item) => sum + item.cost).toStringAsFixed(2)}',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.green,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    // const SizedBox(height: 12),
+                    //   Container(
+                    //     padding: const EdgeInsets.all(12),
+                    //     decoration: BoxDecoration(
+                    //       color: Colors.white,
+                    //       borderRadius: BorderRadius.circular(8),
+                    //       border: Border.all(color: Colors.red[200]!),
+                    //     ),
+                    //     child: Row(
+                    //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //       children: [
+                    //         const Text(
+                    //           'Total Extra Work Cost:',
+                    //           style: TextStyle(
+                    //             fontSize: 14,
+                    //             fontWeight: FontWeight.w600,
+                    //             color: Colors.black87,
+                    //           ),
+                    //         ),
+                    //         Text(
+                    //           'AED ${extraWorkItems.fold(0.0, (sum, item) => sum + item.cost).toStringAsFixed(2)}',
+                    //           style: const TextStyle(
+                    //             fontSize: 14,
+                    //             fontWeight: FontWeight.w600,
+                    //             color: Colors.green,
+                    //           ),
+                    //         ),
+                    //       ],
+                    //     ),
+                    //   ),
+                    // ],
+                    SizedBox(),
                   ],
                 ],
               ),

@@ -182,110 +182,106 @@ class CompletedBookingCard extends StatelessWidget {
       child: Card(
         elevation: 2,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header with booking ID and Completed badge
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      booking.bookingId,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 4,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Text(
-                        'Completed',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                // Car details
-                _buildDetailRow('Booking Date', booking.bookingDate),
-                _buildDetailRow('Booking Time', booking.bookingTime),
-                _buildDetailRow('User Name', booking.userName),
-                _buildDetailRow('Mobile No', booking.mobileNo),
-                _buildDetailRow('Email ID', booking.email),
-                _buildDetailRow('Vehicle Type', booking.vehicleType),
-                _buildDetailRow('Engine Model', booking.engineModel),
-                _buildDetailRow('Completed By', booking.completedBy),
-                _buildDetailRow(
-                  'Completed On',
-                  _formatCompletedDate(booking.completedDate),
-                ),
-
-                const SizedBox(height: 16),
-
-                // Selected Services
-                const Text(
-                  'Selected Services',
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey,
-                  ),
-                ),
-                const SizedBox(height: 8),
-
-                // Services list
-                ...booking.selectedServices.map(
-                  (service) => Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
-                    child: Text(
-                      service,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black87,
-                      ),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header with booking ID and Completed badge
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    booking.bookingId,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
                     ),
                   ),
-                ),
-
-                const SizedBox(height: 16),
-
-                // Tap to view details hint
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.touch_app, size: 16, color: Colors.grey[600]),
-                    const SizedBox(width: 4),
-                    Text(
-                      'Tap to view full details',
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.green,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: const Text(
+                      'Completed',
                       style: TextStyle(
+                        color: Colors.white,
                         fontSize: 12,
-                        color: Colors.grey[600],
-                        fontStyle: FontStyle.italic,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                  ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Car details
+              _buildDetailRow('Booking Date', booking.bookingDate),
+              _buildDetailRow('Booking Time', booking.bookingTime),
+              _buildDetailRow('User Name', booking.userName),
+              // _buildDetailRow('Mobile No', booking.mobileNo),
+              // _buildDetailRow('Email ID', booking.email),
+              // _buildDetailRow('Vehicle Type', booking.vehicleType),
+              // _buildDetailRow('Engine Model', booking.engineModel),
+              // _buildDetailRow('Completed By', booking.completedBy),
+              // _buildDetailRow(
+              //   'Completed On',
+              //   _formatCompletedDate(booking.completedDate),
+              // ),
+
+              // const SizedBox(height: 16),
+
+              // Selected Services
+              const Text(
+                'Selected Services',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey,
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 8),
+
+              // Services list
+              ...booking.selectedServices.map(
+                (service) => Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                  child: Text(
+                    service,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 16),
+
+              // Tap to view details hint
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.center,
+              //   children: [
+              //     Icon(Icons.touch_app, size: 16, color: Colors.grey[600]),
+              //     const SizedBox(width: 4),
+              //     Text(
+              //       'Tap to view full details',
+              //       style: TextStyle(
+              //         fontSize: 12,
+              //         color: Colors.grey[600],
+              //         fontStyle: FontStyle.italic,
+              //       ),
+              //     ),
+              //   ],
+              // ),
+            ],
           ),
         ),
       ),

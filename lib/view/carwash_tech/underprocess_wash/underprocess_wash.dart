@@ -128,13 +128,13 @@ class WashProcessingBookingCard extends StatelessWidget {
               // Booking Info
               _buildDetailRow('Booking Date', booking.bookingDate),
               _buildDetailRow('Booking Time', booking.bookingTime),
-              _buildDetailRow('User Name', booking.userName),
-              _buildDetailRow('Mobile No', booking.mobileNo),
-              _buildDetailRow('Email ID', booking.email),
-              _buildDetailRow('Vehicle Type', booking.vehicleType),
-              _buildDetailRow('Engine Model', booking.engineModel),
 
-              const SizedBox(height: 16),
+              _buildDetailRow('User Name', booking.userName),
+              // _buildDetailRow('Mobile No', booking.mobileNo),
+              // _buildDetailRow('Email ID', booking.email),
+              // _buildDetailRow('Vehicle Type', booking.vehicleType),
+              // _buildDetailRow('Engine Model', booking.engineModel),
+              const SizedBox(height: 8),
               const Text(
                 'Selected Services',
                 style: TextStyle(

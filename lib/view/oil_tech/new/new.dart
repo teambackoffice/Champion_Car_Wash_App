@@ -1,4 +1,3 @@
-import 'package:champion_car_wash_app/view/oil_tech/new/view_more/view_more.dart';
 import 'package:flutter/material.dart';
 
 class BookingData {
@@ -140,33 +139,32 @@ class BookingCard extends StatelessWidget {
               // Booking details
               _buildDetailRow('Booking Date', booking.bookingDate),
               _buildDetailRow('Booking Time', booking.bookingTime),
-              _buildDetailRow('User Name', booking.userName),
-              _buildDetailRow('Mobile No', booking.mobileNo),
-              _buildDetailRow('Email ID', booking.email),
-              _buildDetailRow('Vehicle Type', booking.vehicleType),
-              _buildDetailRow('Engine Model', booking.engineModel),
 
-              const SizedBox(height: 8),
+              // _buildDetailRow('User Name', booking.userName),
+              // _buildDetailRow('Mobile No', booking.mobileNo),
+              // _buildDetailRow('Email ID', booking.email),
+              // _buildDetailRow('Vehicle Type', booking.vehicleType),
+              // _buildDetailRow('Engine Model', booking.engineModel),
+              // const SizedBox(height: 8),
 
-              // View More button
-              TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => OilViewMore(bookingData: booking),
-                    ),
-                  );
-                },
-                child: const Text(
-                  'View More',
-                  style: TextStyle(
-                    color: Colors.red,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ),
-
+              // // View More button
+              // TextButton(
+              //   onPressed: () {
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //         builder: (context) => OilViewMore(bookingData: booking),
+              //       ),
+              //     );
+              //   },
+              //   child: const Text(
+              //     'View More',
+              //     style: TextStyle(
+              //       color: Colors.red,
+              //       fontWeight: FontWeight.w500,
+              //     ),
+              //   ),
+              // ),
               const SizedBox(height: 16),
 
               // Selected Services
@@ -202,8 +200,34 @@ class BookingCard extends StatelessWidget {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
-                    _startService(context, booking.bookingId);
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("Confirmation"),
+                          content: const Text(
+                            "Are you sure you want to start service?",
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop(); // Close the dialog
+                              },
+                              child: const Text("Cancel"),
+                            ),
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop(); // Close the dialog
+                                // Add your logic here
+                              },
+                              child: const Text("Yes"),
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   },
+
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFD32F2F),
                     foregroundColor: Colors.white,
