@@ -10,7 +10,9 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class CreateServicePage extends StatefulWidget {
-  const CreateServicePage({super.key});
+  final dynamic bookings; // Add this to accept bookings
+  final bool isPrebook; // Add this to check if it's a pre-booking
+  const CreateServicePage({super.key, this.bookings, required this.isPrebook});
 
   @override
   _CreateServicePageState createState() => _CreateServicePageState();
@@ -25,8 +27,8 @@ class _CreateServicePageState extends State<CreateServicePage> {
   // Controllers
   final TextEditingController _vehicleNumberController =
       TextEditingController();
-  final TextEditingController _customerNameController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
+  // final TextEditingController _customerNameController = TextEditingController();
+  // final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
@@ -34,8 +36,11 @@ class _CreateServicePageState extends State<CreateServicePage> {
   final TextEditingController _engineNumberController = TextEditingController();
   final TextEditingController _chassisNumberController =
       TextEditingController();
-  final TextEditingController _registrationNumberController =
-      TextEditingController();
+  // final TextEditingController _registrationNumberController =
+  //     TextEditingController();
+  late TextEditingController nameController;
+  late TextEditingController regNumberController;
+  late TextEditingController mobileController;
 
   // Dropdown values
   String? _selectedMake;
@@ -52,6 +57,17 @@ class _CreateServicePageState extends State<CreateServicePage> {
   @override
   void initState() {
     super.initState();
+
+    nameController = TextEditingController(
+      text: widget.bookings?.customerName ?? '',
+    );
+    regNumberController = TextEditingController(
+      text: widget.bookings?.regNumber ?? '',
+    );
+    mobileController = TextEditingController(
+      text: widget.bookings?.phone ?? '',
+    );
+
     _loadMakes();
   }
 
@@ -145,42 +161,6 @@ class _CreateServicePageState extends State<CreateServicePage> {
               ),
 
               SizedBox(height: 24),
-
-              // Customer Details Section
-              _buildSectionTitle('Customer Details'),
-              SizedBox(height: 16),
-
-              _buildTextField(
-                controller: _customerNameController,
-                hintText: 'Customer Name',
-              ),
-              SizedBox(height: 16),
-
-              _buildTextField(
-                controller: _phoneController,
-                hintText: '+971 Phone Number here',
-                keyboardType: TextInputType.phone,
-              ),
-              SizedBox(height: 16),
-
-              _buildTextField(
-                controller: _emailController,
-                hintText: 'email id',
-                keyboardType: TextInputType.emailAddress,
-              ),
-              SizedBox(height: 16),
-
-              _buildTextField(
-                controller: _addressController,
-                hintText: 'Address',
-                suffixIcon: Icons.location_on_outlined,
-              ),
-              SizedBox(height: 16),
-
-              _buildTextField(controller: _cityController, hintText: 'City'),
-
-              SizedBox(height: 24),
-
               // Vehicle Details Section
               _buildSectionTitle('Vehicle Details'),
               SizedBox(height: 16),
@@ -223,9 +203,46 @@ class _CreateServicePageState extends State<CreateServicePage> {
               SizedBox(height: 16),
 
               _buildTextField(
-                controller: _registrationNumberController,
+                controller: regNumberController,
                 hintText: 'Registration Number',
               ),
+              SizedBox(height: 16),
+
+              // Customer Details Section
+              _buildSectionTitle('Customer Details'),
+              SizedBox(height: 16),
+
+              _buildTextField(
+                controller: nameController,
+                hintText: 'Customer Name',
+                readOnly: widget.isPrebook,
+              ),
+              SizedBox(height: 16),
+
+              _buildTextField(
+                controller: mobileController,
+                hintText: '+971 Phone Number here',
+                keyboardType: TextInputType.phone,
+              ),
+              SizedBox(height: 16),
+
+              _buildTextField(
+                controller: _emailController,
+                hintText: 'email id',
+                keyboardType: TextInputType.emailAddress,
+              ),
+              SizedBox(height: 16),
+
+              _buildTextField(
+                controller: _addressController,
+                hintText: 'Address',
+                suffixIcon: Icons.location_on_outlined,
+              ),
+              SizedBox(height: 16),
+
+              _buildTextField(controller: _cityController, hintText: 'City'),
+
+              SizedBox(height: 24),
 
               SizedBox(height: 24),
 
@@ -284,8 +301,8 @@ class _CreateServicePageState extends State<CreateServicePage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => SelectService(
-                            customerName: _customerNameController,
-                            phoneNumber: _phoneController,
+                            customerName: mobileController,
+                            phoneNumber: mobileController,
                             email: _emailController,
                             address: _addressController,
                             city: _cityController,
@@ -295,7 +312,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
                             purchaseDate: _purchaseDateController,
                             engineNumber: _engineNumberController,
                             chasisNumber: _chassisNumberController,
-                            registrationNumber: _registrationNumberController,
+                            registrationNumber: regNumberController,
                             video: _inspectionNeeded,
                             videoPath: _videoPath,
                             selectedMake: _selectedMake,
@@ -777,15 +794,15 @@ class _CreateServicePageState extends State<CreateServicePage> {
   @override
   void dispose() {
     _vehicleNumberController.dispose();
-    _customerNameController.dispose();
-    _phoneController.dispose();
+    nameController.dispose();
+    mobileController.dispose();
     _emailController.dispose();
     _addressController.dispose();
     _cityController.dispose();
     _purchaseDateController.dispose();
     _engineNumberController.dispose();
     _chassisNumberController.dispose();
-    _registrationNumberController.dispose();
+    regNumberController.dispose();
     super.dispose();
   }
 }
@@ -808,6 +825,7 @@ class _VideoCaptureScreenState extends State<VideoCaptureScreen> {
   @override
   void initState() {
     super.initState();
+
     _controller = CameraController(widget.camera, ResolutionPreset.medium);
     _controller.initialize().then((_) {
       if (!mounted) return;

@@ -150,7 +150,8 @@ class _HomePageContentState extends State<HomePageContent> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => CreateServicePage(),
+                        builder: (context) =>
+                            CreateServicePage(isPrebook: false),
                       ),
                     );
                   },

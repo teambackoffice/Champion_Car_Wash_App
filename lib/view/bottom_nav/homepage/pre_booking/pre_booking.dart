@@ -2,6 +2,7 @@ import 'package:champion_car_wash_app/controller/cancel_prebook_controller.dart'
 import 'package:champion_car_wash_app/controller/confirm_prebook_controller.dart';
 import 'package:champion_car_wash_app/controller/get_prebooking_controller.dart';
 import 'package:champion_car_wash_app/modal/get_prebooking_list.dart';
+import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/create_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -715,14 +716,23 @@ class _PreBookingsScreenContainerState
                                   duration: Duration(seconds: 3),
                                 ),
                               );
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CreateServicePage(
+                                    bookings: booking,
+                                    isPrebook: true,
+                                  ),
+                                ),
+                              );
 
                               // If successful, refresh the booking list
-                              if (isSuccess) {
-                                Provider.of<GetPrebookingListController>(
-                                  this.context,
-                                  listen: false,
-                                ).fetchPreBookingList();
-                              }
+                              // if (isSuccess) {
+                              //   Provider.of<GetPrebookingListController>(
+                              //     this.context,
+                              //     listen: false,
+                              //   ).fetchPreBookingList();
+                              // }
                             },
                             child: Text(
                               'Yes',

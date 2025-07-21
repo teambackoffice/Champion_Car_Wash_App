@@ -100,8 +100,9 @@ class _SelectServiceState extends State<SelectService> {
   // Calculate totals
   double get subtotal {
     double total = 0.0;
-    if (selectedCarWash != null) total += selectedCarWash!.price!;
-    // if (selectedOilChange != null) total += selectedOilChange!.price!;
+    if (selectedOilChange != null && selectedOilChange!.price != null) {
+      total += selectedOilChange!.price!;
+    }
     return total;
   }
 
@@ -157,12 +158,11 @@ class _SelectServiceState extends State<SelectService> {
 
               // Selected Services Section
               if (selectedCarWash != null || selectedOilChange != null)
-                // _buildSelectedServicesSection(),
-                const SizedBox(height: 24),
+                _buildSelectedServicesSection(),
+              const SizedBox(height: 24),
 
               // Pricing Section
-              _buildPricingSection(),
-
+              // _buildPricingSection(),
               const SizedBox(height: 24),
 
               // Vehicle Details Section
@@ -242,7 +242,7 @@ class _SelectServiceState extends State<SelectService> {
             _buildSelectedServiceItem(
               'Oil Change',
               selectedOilChange!.name,
-              selectedOilChange!.price!,
+              selectedOilChange!.price ?? 0.0,
               () {
                 setState(() {
                   selectedOilChange = null;
@@ -897,21 +897,28 @@ class _SelectServiceState extends State<SelectService> {
       MaterialPageRoute(builder: (context) => const CarWashScreen()),
     );
 
+    print('DEBUG - CarWash result: $result'); // <-- ADD THIS
     if (result != null) {
+      print(
+        'DEBUG - CarWash name: ${result.name}, price: ${result.price}',
+      ); // <-- ADD THIS
       setState(() {
         selectedCarWash = result;
       });
     }
   }
 
-  // Navigate to OilChange screen and wait for result
   Future<void> _navigateToOilChange() async {
     final result = await Navigator.push<SelectedService>(
       context,
       MaterialPageRoute(builder: (context) => const OilChangeScreen()),
     );
 
+    print('DEBUG - OilChange result: $result'); // <-- ADD THIS
     if (result != null) {
+      print(
+        'DEBUG - OilChange name: ${result.name}, price: ${result.price}',
+      ); // <-- ADD THIS
       setState(() {
         selectedOilChange = result;
       });
