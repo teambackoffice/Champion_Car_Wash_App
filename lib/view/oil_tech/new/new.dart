@@ -206,7 +206,7 @@ class BookingCard extends StatelessWidget {
                         return AlertDialog(
                           title: const Text("Confirmation"),
                           content: const Text(
-                            "Are you sure you want to start service?",
+                            " Are you sure you want to start service ?",
                           ),
                           actions: [
                             TextButton(
@@ -220,6 +220,17 @@ class BookingCard extends StatelessWidget {
                                 Navigator.of(context).pop(); // Close the dialog
                                 // Add your logic here
                               },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red[900],
+                                foregroundColor: Colors.white,
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 12,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
                               child: const Text("Yes"),
                             ),
                           ],
