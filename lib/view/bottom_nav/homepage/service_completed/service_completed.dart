@@ -139,7 +139,9 @@ class _ServiceCompletedScreenState extends State<ServiceCompletedScreen> {
         builder: (context, controller, child) {
           // Show loading indicator
           if (controller.isLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(
+              child: CircularProgressIndicator(color: Colors.red[800]),
+            );
           }
 
           // Show error message

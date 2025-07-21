@@ -152,7 +152,9 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
         child: Consumer<UnderProcessingController>(
           builder: (context, controller, _) {
             if (controller.isLoading) {
-              return const Center(child: CircularProgressIndicator());
+              return Center(
+                child: CircularProgressIndicator(color: Colors.red[800]),
+              );
             }
 
             if (controller.errorMessage != null) {
