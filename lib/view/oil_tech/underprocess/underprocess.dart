@@ -444,7 +444,7 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
                     elevation: 0,
                   ),
                   child: const Text(
-                    'Complete',
+                    'Vehicle Inspection',
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -848,7 +848,7 @@ class _InspectionDialogState extends State<InspectionDialog> {
                               item.isChecked = value ?? false;
                             });
                           },
-                          activeColor: Colors.green,
+                          activeColor: Colors.red[800],
                           controlAffinity: ListTileControlAffinity.leading,
                           contentPadding: const EdgeInsets.symmetric(
                             horizontal: 0,
@@ -873,7 +873,7 @@ class _InspectionDialogState extends State<InspectionDialog> {
               ? () => _completeInspection(context)
               : null,
           style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.green[600],
+            backgroundColor: Colors.red[800],
             foregroundColor: Colors.white,
           ),
           child: const Text('Complete Service'),

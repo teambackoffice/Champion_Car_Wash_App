@@ -296,6 +296,18 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
 
                     // TODO: Call backend API to mark car wash service started
                   },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red[800],
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 14,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    elevation: 6,
+                  ),
                   child: const Text('Start Service'),
                 ),
               ],
