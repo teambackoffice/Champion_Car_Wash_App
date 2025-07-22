@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProcessingBookingData {
   final String bookingId;
@@ -10,7 +13,6 @@ class ProcessingBookingData {
   final String vehicleType;
   final String oilbrand;
   final String vehicleNo;
-
   final String engineModel;
   final List<String> selectedServices;
 
@@ -48,6 +50,47 @@ class ExtraWorkItem {
     required this.description,
     required this.cost,
   });
+
+  // Convert to JSON for storage
+  Map<String, dynamic> toJson() {
+    return {'id': id, 'title': title, 'description': description, 'cost': cost};
+  }
+
+  // Create from JSON
+  factory ExtraWorkItem.fromJson(Map<String, dynamic> json) {
+    return ExtraWorkItem(
+      id: json['id'],
+      title: json['title'],
+      description: json['description'],
+      cost: json['cost'].toDouble(),
+    );
+  }
+}
+
+class OilSelection {
+  final String brand;
+  final String litres;
+  final int quantity;
+
+  OilSelection({
+    required this.brand,
+    required this.litres,
+    required this.quantity,
+  });
+
+  // Convert to JSON for storage
+  Map<String, dynamic> toJson() {
+    return {'brand': brand, 'litres': litres, 'quantity': quantity};
+  }
+
+  // Create from JSON
+  factory OilSelection.fromJson(Map<String, dynamic> json) {
+    return OilSelection(
+      brand: json['brand'],
+      litres: json['litres'],
+      quantity: json['quantity'],
+    );
+  }
 }
 
 class UnderProcessingTab extends StatelessWidget {
@@ -122,6 +165,8 @@ class ProcessingBookingCard extends StatefulWidget {
 
 class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
   List<ExtraWorkItem> extraWorkItems = [];
+  OilSelection? selectedOil;
+  late SharedPreferences _prefs;
 
   // Common extra work items that technicians might add
   final List<ExtraWorkItem> commonExtraWork = [
@@ -163,8 +208,63 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
     ),
   ];
 
-  String? selectedLitres;
-  int? selectedQty;
+  @override
+  void initState() {
+    super.initState();
+    _initSharedPreferences();
+  }
+
+  Future<void> _initSharedPreferences() async {
+    _prefs = await SharedPreferences.getInstance();
+    await _loadSavedData();
+  }
+
+  Future<void> _loadSavedData() async {
+    // Load oil selection
+    final oilData = _prefs.getString('oil_${widget.booking.bookingId}');
+    if (oilData != null) {
+      final oilJson = json.decode(oilData);
+      setState(() {
+        selectedOil = OilSelection.fromJson(oilJson);
+      });
+    }
+
+    // Load extra work items
+    final extraWorkData = _prefs.getString(
+      'extra_work_${widget.booking.bookingId}',
+    );
+    if (extraWorkData != null) {
+      final List<dynamic> extraWorkJson = json.decode(extraWorkData);
+      setState(() {
+        extraWorkItems = extraWorkJson
+            .map((item) => ExtraWorkItem.fromJson(item))
+            .toList();
+      });
+    }
+  }
+
+  Future<void> _saveOilSelection(OilSelection oil) async {
+    await _prefs.setString(
+      'oil_${widget.booking.bookingId}',
+      json.encode(oil.toJson()),
+    );
+  }
+
+  Future<void> _saveExtraWork() async {
+    final extraWorkJson = extraWorkItems.map((item) => item.toJson()).toList();
+    await _prefs.setString(
+      'extra_work_${widget.booking.bookingId}',
+      json.encode(extraWorkJson),
+    );
+  }
+
+  Future<void> _deleteOilSelection() async {
+    await _prefs.remove('oil_${widget.booking.bookingId}');
+    setState(() {
+      selectedOil = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -217,46 +317,105 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
               _buildDetailRow('User Name', widget.booking.userName),
               _buildDetailRow('Oil Brand', widget.booking.oilbrand),
 
-              // Select Oil Litres button
+              // Oil Selection Section
               const SizedBox(height: 8),
-              // Show selected value using _buildDetailRow if selected, else show tap-to-select link
-              selectedLitres != null && selectedQty != null
-                  ? _buildDetailRow(
-                      'Oil Litre',
-                      '$selectedLitres × $selectedQty Qty',
-                    )
-                  : Align(
-                      alignment: Alignment.centerLeft,
-                      child: InkWell(
-                        onTap: () =>
-                            _showOilSelectionDialog(context, widget.booking),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: RichText(
-                            text: TextSpan(
-                              style: const TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black87,
-                              ),
-                              children: const [
-                                TextSpan(
-                                  text: 'Oil Litre: ',
-                                  style: TextStyle(color: Colors.grey),
-                                ),
-                                TextSpan(
-                                  text: 'Select Oil & Quantity',
-                                  style: TextStyle(
-                                    color: Colors.blue,
-                                    decoration: TextDecoration.underline,
-                                  ),
-                                ),
-                              ],
+              if (selectedOil != null)
+                // Show selected oil with delete option
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.red.shade200),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Selected Oil Details:',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
                             ),
                           ),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                onPressed: () => _showOilSelectionDialog(
+                                  context,
+                                  widget.booking,
+                                ),
+                                icon: const Icon(Icons.edit, size: 20),
+                                style: IconButton.styleFrom(
+                                  foregroundColor: Colors.blue,
+                                  padding: const EdgeInsets.all(4),
+                                ),
+                                tooltip: 'Edit Oil Selection',
+                              ),
+                              IconButton(
+                                onPressed: _showDeleteOilConfirmation,
+                                icon: const Icon(Icons.delete, size: 20),
+                                style: IconButton.styleFrom(
+                                  foregroundColor: Colors.red,
+                                  padding: const EdgeInsets.all(4),
+                                ),
+                                tooltip: 'Delete Oil Selection',
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${selectedOil!.brand} - ${selectedOil!.litres} × ${selectedOil!.quantity} Qty',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              else
+                // Show select oil button
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: InkWell(
+                    onTap: () =>
+                        _showOilSelectionDialog(context, widget.booking),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: RichText(
+                        text: const TextSpan(
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black87,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: 'Oil Litre: ',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                            TextSpan(
+                              text: 'Select Oil & Quantity',
+                              style: TextStyle(
+                                color: Colors.blue,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
+                  ),
+                ),
 
               const SizedBox(height: 5),
               Column(
@@ -288,21 +447,8 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
                     ],
                   ),
 
-                  // const SizedBox(height: 8),
                   if (extraWorkItems.isEmpty)
-                    SizedBox()
-                  // Container(
-                  //   padding: const EdgeInsets.all(16),
-                  //   decoration: BoxDecoration(
-                  //     color: Colors.grey[50],
-                  //     borderRadius: BorderRadius.circular(8),
-                  //     border: Border.all(color: Colors.grey[300]!),
-                  //   ),
-                  //   child: const Text(
-                  //     'No extra work added',
-                  //     style: TextStyle(color: Colors.grey, fontSize: 14),
-                  //   ),
-                  // )
+                    const SizedBox()
                   else
                     ListView.builder(
                       shrinkWrap: true,
@@ -332,14 +478,6 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
                                         color: Colors.black87,
                                       ),
                                     ),
-                                    // Text(
-                                    //   'Cost: AED ${item.cost.toStringAsFixed(2)}',
-                                    //   style: const TextStyle(
-                                    //     fontSize: 12,
-                                    //     color: Colors.green,
-                                    //     fontWeight: FontWeight.w500,
-                                    //   ),
-                                    // ),
                                   ],
                                 ),
                               ),
@@ -348,6 +486,7 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
                                   setState(() {
                                     extraWorkItems.removeAt(index);
                                   });
+                                  _saveExtraWork(); // Save after removal
                                 },
                                 icon: const Icon(
                                   Icons.remove_circle,
@@ -361,40 +500,7 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
                       },
                     ),
 
-                  if (extraWorkItems.isNotEmpty) ...[
-                    // const SizedBox(height: 12),
-                    //   Container(
-                    //     padding: const EdgeInsets.all(12),
-                    //     decoration: BoxDecoration(
-                    //       color: Colors.white,
-                    //       borderRadius: BorderRadius.circular(8),
-                    //       border: Border.all(color: Colors.red[200]!),
-                    //     ),
-                    //     child: Row(
-                    //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    //       children: [
-                    //         const Text(
-                    //           'Total Extra Work Cost:',
-                    //           style: TextStyle(
-                    //             fontSize: 14,
-                    //             fontWeight: FontWeight.w600,
-                    //             color: Colors.black87,
-                    //           ),
-                    //         ),
-                    //         Text(
-                    //           'AED ${extraWorkItems.fold(0.0, (sum, item) => sum + item.cost).toStringAsFixed(2)}',
-                    //           style: const TextStyle(
-                    //             fontSize: 14,
-                    //             fontWeight: FontWeight.w600,
-                    //             color: Colors.green,
-                    //           ),
-                    //         ),
-                    //       ],
-                    //     ),
-                    //   ),
-                    // ],
-                    SizedBox(),
-                  ],
+                  if (extraWorkItems.isNotEmpty) const SizedBox(),
                 ],
               ),
 
@@ -456,6 +562,43 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
     );
   }
 
+  void _showDeleteOilConfirmation() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Delete Oil Selection'),
+          content: const Text(
+            'Are you sure you want to delete the selected oil details?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                _deleteOilSelection();
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Oil selection deleted'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void _showAddExtraWorkDialog() {
     showDialog(
       context: context,
@@ -466,6 +609,7 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
             setState(() {
               extraWorkItems.add(item);
             });
+            _saveExtraWork(); // Save after adding
           },
         );
       },
@@ -522,11 +666,17 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
       builder: (BuildContext context) {
         return OilSelectionDialog(
           booking: booking,
-          onConfirm: (litres, qty) {
+          currentSelection: selectedOil,
+          onConfirm: (brand, litres, qty) {
+            final oilSelection = OilSelection(
+              brand: brand,
+              litres: litres,
+              quantity: qty,
+            );
             setState(() {
-              selectedLitres = litres;
-              selectedQty = qty;
+              selectedOil = oilSelection;
             });
+            _saveOilSelection(oilSelection); // Save to SharedPreferences
           },
         );
       },
@@ -537,11 +687,13 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
 // Oil Selection Dialog
 class OilSelectionDialog extends StatefulWidget {
   final ProcessingBookingData booking;
-  final void Function(String litres, int quantity) onConfirm;
+  final OilSelection? currentSelection;
+  final void Function(String brand, String litres, int quantity) onConfirm;
 
   const OilSelectionDialog({
     super.key,
     required this.booking,
+    this.currentSelection,
     required this.onConfirm,
   });
 
@@ -578,20 +730,27 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
   void initState() {
     super.initState();
 
-    // Normalize oil brand from booking
-    final bookingOil = widget.booking.oilbrand.trim();
-
-    // Check if it's exactly in the list
-    if (oilBrands.contains(bookingOil)) {
-      selectedOilBrand = bookingOil;
+    // Load current selection if editing
+    if (widget.currentSelection != null) {
+      selectedOilBrand = widget.currentSelection!.brand;
+      selectedLitres = widget.currentSelection!.litres;
+      quantity = widget.currentSelection!.quantity;
     } else {
-      // Optional: try matching loosely (case-insensitive contains)
-      try {
-        selectedOilBrand = oilBrands.firstWhere(
-          (brand) => brand.toLowerCase().contains(bookingOil.toLowerCase()),
-        );
-      } catch (e) {
-        selectedOilBrand = null;
+      // Normalize oil brand from booking
+      final bookingOil = widget.booking.oilbrand.trim();
+
+      // Check if it's exactly in the list
+      if (oilBrands.contains(bookingOil)) {
+        selectedOilBrand = bookingOil;
+      } else {
+        // Optional: try matching loosely (case-insensitive contains)
+        try {
+          selectedOilBrand = oilBrands.firstWhere(
+            (brand) => brand.toLowerCase().contains(bookingOil.toLowerCase()),
+          );
+        } catch (e) {
+          selectedOilBrand = null;
+        }
       }
     }
   }
@@ -599,9 +758,11 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text(
-        'Select Oil Details',
-        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      title: Text(
+        widget.currentSelection != null
+            ? 'Edit Oil Details'
+            : 'Select Oil Details',
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
       ),
       content: SizedBox(
         width: double.maxFinite,
@@ -743,7 +904,11 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
         ElevatedButton(
           onPressed: selectedOilBrand != null && selectedLitres != null
               ? () {
-                  widget.onConfirm(selectedLitres!, quantity);
+                  widget.onConfirm(
+                    selectedOilBrand!,
+                    selectedLitres!,
+                    quantity,
+                  );
                   Navigator.of(context).pop();
                 }
               : null,
@@ -755,16 +920,6 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
         ),
       ],
     );
-  }
-
-  void _handleOilSelection() {
-    // Handle the oil selection logic here
-    print('Selected Oil Brand: $selectedOilBrand');
-    print('Selected Litres: $selectedLitres');
-    print('Quantity: $quantity');
-
-    // You can add your logic here to save the selection
-    // For example, update the booking data or call an API
   }
 }
 
@@ -920,8 +1075,26 @@ class _AddExtraWorkDialogState extends State<AddExtraWorkDialog> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _costController = TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
 
   final bool _isCustomWork = false;
+  List<ExtraWorkItem> filteredExtraWork = [];
+
+  @override
+  void initState() {
+    super.initState();
+    filteredExtraWork = List.from(widget.commonExtraWork);
+    _searchController.addListener(_filterExtraWork);
+  }
+
+  void _filterExtraWork() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      filteredExtraWork = widget.commonExtraWork
+          .where((item) => item.title.toLowerCase().contains(query))
+          .toList();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -929,102 +1102,89 @@ class _AddExtraWorkDialogState extends State<AddExtraWorkDialog> {
       title: const Text('Add Extra Work'),
       content: SizedBox(
         width: double.maxFinite,
+        height: MediaQuery.of(context).size.height * 0.6,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Search field
             TextField(
+              controller: _searchController,
               decoration: InputDecoration(
-                hintText: 'Search...',
-                prefixIcon: Icon(Icons.search),
+                hintText: 'Search extra work...',
+                prefixIcon: const Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                contentPadding: EdgeInsets.symmetric(
+                contentPadding: const EdgeInsets.symmetric(
                   vertical: 0,
                   horizontal: 16,
                 ),
               ),
             ),
+            const SizedBox(height: 12),
 
-            // Toggle between common and custom work
-            Row(children: [
-               
-              ],
+            // Common work selection
+            Expanded(
+              child: filteredExtraWork.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'No matching extra work found',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: filteredExtraWork.length,
+                      itemBuilder: (context, index) {
+                        final item = filteredExtraWork[index];
+                        return Card(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          child: ListTile(
+                            title: Text(
+                              item.title,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            subtitle: Text(
+                              'AED ${item.cost.toStringAsFixed(2)}',
+                              style: const TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            trailing: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red[800],
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              onPressed: () {
+                                widget.onAddExtraWork(item);
+                                Navigator.of(context).pop();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      '${item.title} added to extra work',
+                                    ),
+                                    backgroundColor: Colors.green,
+                                    duration: const Duration(seconds: 2),
+                                  ),
+                                );
+                              },
+                              child: const Text('Add'),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
             ),
-
-            const SizedBox(height: 5),
-
-            if (!_isCustomWork)
-              // Common work selection
-              Flexible(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: widget.commonExtraWork.length,
-                  itemBuilder: (context, index) {
-                    final item = widget.commonExtraWork[index];
-                    return ListTile(
-                      title: Text(
-                        item.title,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      subtitle: Text('AED ${item.cost.toStringAsFixed(2)}'),
-                      trailing: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red[800], // Background color
-                          foregroundColor: Colors.white, // Text color
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 14,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          elevation: 6,
-                        ),
-                        onPressed: () {
-                          widget.onAddExtraWork(item);
-                          Navigator.of(context).pop();
-                        },
-                        child: const Text('Add'),
-                      ),
-                    );
-                  },
-                ),
-              )
-            else
-              // Custom work form
-              Column(
-                children: [
-                  TextField(
-                    controller: _titleController,
-                    decoration: const InputDecoration(
-                      labelText: 'Work Title',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _descriptionController,
-                    decoration: const InputDecoration(
-                      labelText: 'Description (Optional)',
-                      border: OutlineInputBorder(),
-                    ),
-                    maxLines: 2,
-                  ),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _costController,
-                    decoration: const InputDecoration(
-                      labelText: 'Cost (\$)',
-                      border: OutlineInputBorder(),
-                    ),
-                    keyboardType: TextInputType.number,
-                  ),
-                ],
-              ),
           ],
         ),
       ),
@@ -1033,23 +1193,6 @@ class _AddExtraWorkDialogState extends State<AddExtraWorkDialog> {
           onPressed: () => Navigator.of(context).pop(),
           child: const Text('Cancel'),
         ),
-        if (_isCustomWork)
-          ElevatedButton(
-            onPressed: () {
-              if (_titleController.text.isNotEmpty &&
-                  _costController.text.isNotEmpty) {
-                final customWork = ExtraWorkItem(
-                  id: DateTime.now().millisecondsSinceEpoch.toString(),
-                  title: _titleController.text,
-                  description: _descriptionController.text,
-                  cost: double.tryParse(_costController.text) ?? 0.0,
-                );
-                widget.onAddExtraWork(customWork);
-                Navigator.of(context).pop();
-              }
-            },
-            child: const Text('Add Custom Work'),
-          ),
       ],
     );
   }
@@ -1059,6 +1202,7 @@ class _AddExtraWorkDialogState extends State<AddExtraWorkDialog> {
     _titleController.dispose();
     _descriptionController.dispose();
     _costController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 }

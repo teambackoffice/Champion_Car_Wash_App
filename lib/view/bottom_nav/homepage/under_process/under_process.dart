@@ -2,6 +2,7 @@ import 'package:champion_car_wash_app/controller/underprocess_controller.dart';
 import 'package:champion_car_wash_app/modal/underprocess_modal.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/create_invoice.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class UnderProcessScreen extends StatefulWidget {
@@ -300,15 +301,11 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                                       vertical: 4,
                                     ),
                                     decoration: BoxDecoration(
-                                      color: allServicesComplete
-                                          ? Colors.green
-                                          : Colors.red,
+                                      color: Colors.red,
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Text(
-                                      allServicesComplete
-                                          ? 'Complete'
-                                          : 'Under Processing',
+                                      'Under Processing',
                                       style: const TextStyle(
                                         color: Colors.white,
                                         fontSize: 12,
@@ -356,7 +353,13 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                                 ),
                                 _buildRow(
                                   'Purchase Date',
-                                  booking.purchaseDate,
+                                  DateFormat('dd MMM yyyy').format(
+                                    booking.purchaseDate.toString() == 'null'
+                                        ? DateTime.now()
+                                        : DateTime.parse(
+                                            booking.purchaseDate.toString(),
+                                          ),
+                                  ),
                                 ),
                                 const SizedBox(height: 16),
                               ],
@@ -471,61 +474,70 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                                                         ),
                                                     color: Colors.white,
                                                   ),
-                                                  child: DropdownButton<String>(
-                                                    value: currentStatus,
-                                                    onChanged: (value) {
-                                                      if (value != null) {
-                                                        controller
-                                                            .setServiceStatus(
-                                                              bookingId,
-                                                              service
-                                                                  .serviceType,
-                                                              value,
-                                                            );
-                                                      }
-                                                    },
-                                                    underline: const SizedBox(),
-                                                    items: _statusOptions.map((
-                                                      status,
-                                                    ) {
-                                                      return DropdownMenuItem<
-                                                        String
-                                                      >(
-                                                        value: status,
-                                                        child: Text(
-                                                          status,
-                                                          style: TextStyle(
-                                                            fontSize: 13,
-                                                            color:
-                                                                status ==
-                                                                    'Select Status'
-                                                                ? Colors
-                                                                      .grey[600]
-                                                                : status ==
-                                                                      'Complete'
-                                                                ? Colors.green
-                                                                : status ==
-                                                                      'Started'
-                                                                ? Colors.orange
-                                                                : Colors
-                                                                      .black87,
-                                                            fontWeight:
-                                                                status !=
-                                                                    'Select Status'
-                                                                ? FontWeight
-                                                                      .w600
-                                                                : FontWeight
-                                                                      .normal,
-                                                          ),
-                                                        ),
-                                                      );
-                                                    }).toList(),
-                                                    icon: Icon(
-                                                      Icons.keyboard_arrow_down,
-                                                      color: Colors.grey[600],
-                                                      size: 20,
+                                                  child: Text(
+                                                    "Started",
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: Colors.green,
                                                     ),
                                                   ),
+                                                  //  DropdownButton<String>(
+                                                  //   value: currentStatus,
+                                                  //   onChanged: (value) {
+                                                  //     if (value != null) {
+                                                  //       controller
+                                                  //           .setServiceStatus(
+                                                  //             bookingId,
+                                                  //             service
+                                                  //                 .serviceType,
+                                                  //             value,
+                                                  //           );
+                                                  //     }
+                                                  //   },
+                                                  //   underline: const SizedBox(),
+                                                  //   items: _statusOptions.map((
+                                                  //     status,
+                                                  //   ) {
+                                                  //     return DropdownMenuItem<
+                                                  //       String
+                                                  //     >(
+                                                  //       value: status,
+                                                  //       child: Text(
+                                                  //         status,
+                                                  //         style: TextStyle(
+                                                  //           fontSize: 13,
+                                                  //           color:
+                                                  //               status ==
+                                                  //                   'Select Status'
+                                                  //               ? Colors
+                                                  //                     .grey[600]
+                                                  //               : status ==
+                                                  //                     'Complete'
+                                                  //               ? Colors.green
+                                                  //               : status ==
+                                                  //                     'Started'
+                                                  //               ? Colors.orange
+                                                  //               : Colors
+                                                  //                     .black87,
+                                                  //           fontWeight:
+                                                  //               status !=
+                                                  //                   'Select Status'
+                                                  //               ? FontWeight
+                                                  //                     .w600
+                                                  //               : FontWeight
+                                                  //                     .normal,
+                                                  //         ),
+                                                  //       ),
+                                                  //     );
+                                                  //   }).toList(),
+                                                  //   icon: Icon(
+                                                  //     Icons.keyboard_arrow_down,
+                                                  //     color: Colors.grey[600],
+                                                  //     size: 20,
+                                                  //   ),
+                                                  // ),
                                                 ),
                                               ],
                                             ),
