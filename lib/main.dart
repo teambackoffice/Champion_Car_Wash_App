@@ -10,6 +10,7 @@ import 'package:champion_car_wash_app/controller/get_oil_brand_contrtoller.dart'
 import 'package:champion_car_wash_app/controller/get_prebooking_controller.dart';
 import 'package:champion_car_wash_app/controller/get_services_controller.dart';
 import 'package:champion_car_wash_app/controller/login_controller.dart';
+import 'package:champion_car_wash_app/controller/oil_tech/new_oiltech_controller.dart';
 import 'package:champion_car_wash_app/controller/service_underproccessing_controller.dart';
 import 'package:champion_car_wash_app/controller/underprocess_controller.dart';
 import 'package:champion_car_wash_app/view/splashscreen/splash_screen.dart';
@@ -43,6 +44,7 @@ void main() {
             ChangeNotifierProvider(create: (_) => GetAllbookingController()),
             ChangeNotifierProvider(create: (_) => GetCompletedController()),
             ChangeNotifierProvider(create: (_) => GetNewCarWashController()),
+            ChangeNotifierProvider(create: (_) => NewOilTechController()),
           ],
           child: MyApp(),
         );

@@ -95,6 +95,7 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
                           ],
                         ),
                         const SizedBox(height: 16),
+                        _buildDetailRow('Reg No', data.registrationNumber),
                         _buildDetailRow(
                           'Booking Date',
                           DateFormat('dd MMM yyyy').format(data.purchaseDate),
