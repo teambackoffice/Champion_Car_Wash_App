@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:champion_car_wash_app/controller/oil_tech/extra_work_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProcessingBookingData {
@@ -169,49 +171,17 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
   late SharedPreferences _prefs;
 
   // Common extra work items that technicians might add
-  final List<ExtraWorkItem> commonExtraWork = [
-    ExtraWorkItem(
-      id: "1",
-      title: "Air Filter Replacement",
-      description: "Replaced air filter",
-      cost: 25.0,
-    ),
-    ExtraWorkItem(
-      id: "2",
-      title: "Oil Filter Replacement",
-      description: "Replaced oil filter",
-      cost: 15.0,
-    ),
-    ExtraWorkItem(
-      id: "3",
-      title: "Fuel Filter Replacement",
-      description: "Replaced fuel filter",
-      cost: 35.0,
-    ),
-    ExtraWorkItem(
-      id: "4",
-      title: "Cabin Filter Replacement",
-      description: "Replaced cabin air filter",
-      cost: 20.0,
-    ),
-    ExtraWorkItem(
-      id: "5",
-      title: "Spark Plug Replacement",
-      description: "Replaced spark plugs",
-      cost: 40.0,
-    ),
-    ExtraWorkItem(
-      id: "6",
-      title: "Brake Pad Replacement",
-      description: "Replaced brake pads",
-      cost: 80.0,
-    ),
-  ];
 
   @override
   void initState() {
     super.initState();
     _initSharedPreferences();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<ExtraWorkController>(
+        context,
+        listen: false,
+      ).getExtraWorkServices();
+    });
   }
 
   Future<void> _initSharedPreferences() async {
@@ -418,93 +388,115 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
                 ),
 
               const SizedBox(height: 5),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              Consumer<ExtraWorkController>(
+                builder: (context, extraWorkController, child) {
+                  // Show selected extra work items (local state)
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Extra Work Done',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      TextButton.icon(
-                        onPressed: _showAddExtraWorkDialog,
-                        icon: const Icon(Icons.add, size: 16),
-                        label: const Text('Add'),
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.blue,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Extra Work Done',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                            ),
                           ),
-                        ),
+                          TextButton.icon(
+                            onPressed: _showAddExtraWorkDialog,
+                            icon: const Icon(Icons.add, size: 16),
+                            label: const Text('Add'),
+                            style: TextButton.styleFrom(
+                              foregroundColor: Colors.blue,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
 
-                  if (extraWorkItems.isEmpty)
-                    const SizedBox()
-                  else
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: extraWorkItems.length,
-                      itemBuilder: (context, index) {
-                        final item = extraWorkItems[index];
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.red),
+                      // Display selected extra work items from local state
+                      if (extraWorkItems.isEmpty)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          child: Text(
+                            'No extra work added yet',
+                            style: TextStyle(
+                              color: Colors.grey,
+                              fontStyle: FontStyle.italic,
+                            ),
                           ),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      item.title,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.black87,
-                                      ),
+                        )
+                      else
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: extraWorkItems.length,
+                          itemBuilder: (context, index) {
+                            final item = extraWorkItems[index];
+                            return Container(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.red.shade50,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.red.shade800),
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          item.title,
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black87,
+                                          ),
+                                        ),
+                                        if (item.description.isNotEmpty)
+                                          Text(
+                                            item.description,
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                      ],
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                  IconButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        extraWorkItems.removeAt(index);
+                                      });
+                                      _saveExtraWork(); // Save after removal
+                                    },
+                                    icon: const Icon(
+                                      Icons.remove_circle,
+                                      color: Colors.red,
+                                    ),
+                                    iconSize: 20,
+                                  ),
+                                ],
                               ),
-                              IconButton(
-                                onPressed: () {
-                                  setState(() {
-                                    extraWorkItems.removeAt(index);
-                                  });
-                                  _saveExtraWork(); // Save after removal
-                                },
-                                icon: const Icon(
-                                  Icons.remove_circle,
-                                  color: Colors.red,
-                                ),
-                                iconSize: 20,
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                    ),
+                            );
+                          },
+                        ),
 
-                  if (extraWorkItems.isNotEmpty) const SizedBox(),
-                ],
+                      if (extraWorkItems.isNotEmpty) const SizedBox(height: 8),
+                    ],
+                  );
+                },
               ),
-
-              const SizedBox(height: 5),
 
               // Selected Services
               const Text(
@@ -600,11 +592,19 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
   }
 
   void _showAddExtraWorkDialog() {
+    final extraWorkController = Provider.of<ExtraWorkController>(
+      context,
+      listen: false,
+    );
+    final apiExtraWork =
+        extraWorkController.extraWorkModalClass?.message.extraDetails ?? [];
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AddExtraWorkDialog(
-          commonExtraWork: commonExtraWork,
+          apiExtraWork:
+              apiExtraWork, // Pass API data instead of commonExtraWork
           onAddExtraWork: (item) {
             setState(() {
               extraWorkItems.add(item);
@@ -1058,12 +1058,12 @@ class _InspectionDialogState extends State<InspectionDialog> {
 }
 
 class AddExtraWorkDialog extends StatefulWidget {
-  final List<ExtraWorkItem> commonExtraWork;
+  final List<dynamic> apiExtraWork; // Change type to match API data
   final Function(ExtraWorkItem) onAddExtraWork;
 
   const AddExtraWorkDialog({
     super.key,
-    required this.commonExtraWork,
+    required this.apiExtraWork,
     required this.onAddExtraWork,
   });
 
@@ -1072,26 +1072,21 @@ class AddExtraWorkDialog extends StatefulWidget {
 }
 
 class _AddExtraWorkDialogState extends State<AddExtraWorkDialog> {
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  final TextEditingController _costController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
-
-  final bool _isCustomWork = false;
-  List<ExtraWorkItem> filteredExtraWork = [];
+  List<dynamic> filteredExtraWork = [];
 
   @override
   void initState() {
     super.initState();
-    filteredExtraWork = List.from(widget.commonExtraWork);
+    filteredExtraWork = List.from(widget.apiExtraWork);
     _searchController.addListener(_filterExtraWork);
   }
 
   void _filterExtraWork() {
     final query = _searchController.text.toLowerCase();
     setState(() {
-      filteredExtraWork = widget.commonExtraWork
-          .where((item) => item.title.toLowerCase().contains(query))
+      filteredExtraWork = widget.apiExtraWork
+          .where((item) => item.name.toLowerCase().contains(query))
           .toList();
     });
   }
@@ -1123,31 +1118,31 @@ class _AddExtraWorkDialogState extends State<AddExtraWorkDialog> {
             ),
             const SizedBox(height: 12),
 
-            // Common work selection
+            // API data selection
             Expanded(
               child: filteredExtraWork.isEmpty
                   ? const Center(
                       child: Text(
-                        'No matching extra work found',
+                        'No extra work services available',
                         style: TextStyle(color: Colors.grey),
                       ),
                     )
                   : ListView.builder(
                       itemCount: filteredExtraWork.length,
                       itemBuilder: (context, index) {
-                        final item = filteredExtraWork[index];
+                        final apiItem = filteredExtraWork[index];
                         return Card(
                           margin: const EdgeInsets.only(bottom: 8),
                           child: ListTile(
                             title: Text(
-                              item.title,
+                              apiItem.name ?? 'Unknown Service',
                               style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             subtitle: Text(
-                              'AED ${item.cost.toStringAsFixed(2)}',
+                              'AED ${(apiItem.price ?? 0.0).toStringAsFixed(2)}',
                               style: const TextStyle(
                                 color: Colors.green,
                                 fontWeight: FontWeight.w500,
@@ -1166,12 +1161,24 @@ class _AddExtraWorkDialogState extends State<AddExtraWorkDialog> {
                                 ),
                               ),
                               onPressed: () {
-                                widget.onAddExtraWork(item);
+                                // Convert API item to ExtraWorkItem
+                                final extraWorkItem = ExtraWorkItem(
+                                  id:
+                                      apiItem.name ??
+                                      DateTime.now().millisecondsSinceEpoch
+                                          .toString(),
+                                  title: apiItem.name ?? 'Unknown Service',
+                                  description:
+                                      'AED ${(apiItem.price ?? 0.0).toStringAsFixed(2)}',
+                                  cost: apiItem.price?.toDouble() ?? 0.0,
+                                );
+
+                                widget.onAddExtraWork(extraWorkItem);
                                 Navigator.of(context).pop();
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(
-                                      '${item.title} added to extra work',
+                                      '${extraWorkItem.title} added to extra work',
                                     ),
                                     backgroundColor: Colors.green,
                                     duration: const Duration(seconds: 2),
@@ -1199,9 +1206,6 @@ class _AddExtraWorkDialogState extends State<AddExtraWorkDialog> {
 
   @override
   void dispose() {
-    _titleController.dispose();
-    _descriptionController.dispose();
-    _costController.dispose();
     _searchController.dispose();
     super.dispose();
   }
