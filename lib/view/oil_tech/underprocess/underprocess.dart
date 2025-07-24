@@ -823,7 +823,7 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
                         vertical: 8,
                       ),
                     ),
-                    hint: const Text('Select Oil Brand'),
+                    hint: const Text(' Select Oil Brand'),
                     items: brandNames.map((name) {
                       return DropdownMenuItem<String>(
                         value: name,
