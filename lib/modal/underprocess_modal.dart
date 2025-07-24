@@ -11,8 +11,8 @@ class UnderprocessModal {
 
   factory UnderprocessModal.fromJson(Map<String, dynamic> json) {
     return UnderprocessModal(
-      success: json['message']['success'],
-      count: json['message']['count'],
+      success: json['message']['success'] ?? false,
+      count: json['message']['count'] ?? 0,
       data: (json['message']['data'] as List)
           .map((e) => ServiceCars.fromJson(e))
           .toList(),
@@ -22,6 +22,7 @@ class UnderprocessModal {
 
 class ServiceCars {
   final String serviceId;
+  final String mainStatus;
   final String customerName;
   final String phone;
   final String email;
@@ -44,6 +45,7 @@ class ServiceCars {
 
   ServiceCars({
     required this.serviceId,
+    required this.mainStatus,
     required this.customerName,
     required this.phone,
     required this.email,
@@ -68,6 +70,7 @@ class ServiceCars {
   factory ServiceCars.fromJson(Map<String, dynamic> json) {
     return ServiceCars(
       serviceId: json['service_id'] ?? '',
+      mainStatus: json['main status'] ?? '',
       customerName: json['customer_name'] ?? '',
       phone: json['phone'] ?? '',
       email: json['email'] ?? '',
@@ -98,13 +101,13 @@ class ServiceItem {
   final String serviceType;
   final String? washType;
   final String? oilBrand;
-  final double price;
+  final String? status;
 
   ServiceItem({
     required this.serviceType,
     this.washType,
     this.oilBrand,
-    required this.price,
+    this.status,
   });
 
   factory ServiceItem.fromJson(Map<String, dynamic> json) {
@@ -112,7 +115,7 @@ class ServiceItem {
       serviceType: json['service_type'] ?? '',
       washType: json['wash_type'],
       oilBrand: json['oil_brand'],
-      price: (json['price'] ?? 0).toDouble(),
+      status: json['status'],
     );
   }
 }

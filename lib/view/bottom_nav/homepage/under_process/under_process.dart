@@ -65,6 +65,42 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
 
   final List<String> _statusOptions = ['Select Status', 'Started', 'Complete'];
 
+  // Check if all services in a booking are completed
+  bool _areAllServicesCompleted(ServiceCars booking) {
+    if (booking.services.isEmpty) return false;
+
+    return booking.services.every(
+      (service) =>
+          service.status != null &&
+          service.status!.toLowerCase() == 'completed',
+    );
+  }
+
+  // Check if any service has started
+  bool _hasAnyServiceStarted(ServiceCars booking) {
+    return booking.services.any(
+      (service) =>
+          service.status != null &&
+          (service.status!.toLowerCase() == 'inprogress' ||
+              service.status!.toLowerCase() == 'completed'),
+    );
+  }
+
+  // Calculate progress percentage
+  double _calculateProgress(ServiceCars booking) {
+    if (booking.services.isEmpty) return 0.0;
+
+    int completedServices = booking.services
+        .where(
+          (service) =>
+              service.status != null &&
+              service.status!.toLowerCase() == 'completed',
+        )
+        .length;
+
+    return (completedServices / booking.services.length) * 100;
+  }
+
   // Show completion alert dialog
   void _showCompletionAlert(BuildContext context, String serviceId) {
     final controller = Provider.of<UnderProcessingController>(
@@ -72,7 +108,6 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
       listen: false,
     );
     final booking = controller.getBookingById(serviceId);
-    final bookings = controller.serviceCars;
 
     showDialog(
       context: context,
@@ -93,7 +128,6 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close dialog
-                // You can pass booking data to CreateInvoicePage if needed
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -225,7 +259,6 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                                 },
                               )
                             : null,
-
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
@@ -239,12 +272,12 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                     // Use serviceId as the unique identifier
                     final bookingId = booking.serviceId;
 
-                    final hasServiceStarted = controller.hasAnyServiceStarted(
-                      bookingId,
+                    // Use local methods to check service status
+                    final hasServiceStarted = _hasAnyServiceStarted(booking);
+                    final allServicesComplete = _areAllServicesCompleted(
+                      booking,
                     );
-                    final allServicesComplete = controller
-                        .areAllServicesComplete(bookingId);
-                    final progress = controller.getBookingProgress(bookingId);
+                    final progress = _calculateProgress(booking);
 
                     return Container(
                       margin: const EdgeInsets.only(bottom: 16),
@@ -257,7 +290,7 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                       ),
                       child: Column(
                         children: [
-                          // Header - Only show "Under Processing" if service has started
+                          // Header
                           Container(
                             padding: const EdgeInsets.all(16),
                             child: Row(
@@ -276,43 +309,27 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                                           color: Colors.black87,
                                         ),
                                       ),
-                                      if (hasServiceStarted &&
-                                          !allServicesComplete)
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                            top: 4,
-                                          ),
-                                          child: Text(
-                                            '${progress.toStringAsFixed(0)}% Complete',
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.grey[600],
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ),
                                     ],
                                   ),
                                 ),
-                                if (hasServiceStarted)
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 12,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.red,
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Text(
-                                      'Under Processing',
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                      ),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Text(
+                                    booking.mainStatus,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
+                                ),
                               ],
                             ),
                           ),
@@ -366,7 +383,7 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                             ),
                           ),
 
-                          // Services & dropdown
+                          // Services list
                           if (booking.services.isNotEmpty)
                             Padding(
                               padding: const EdgeInsets.symmetric(
@@ -385,12 +402,6 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                                   ),
                                   const SizedBox(height: 12),
                                   ...booking.services.map((service) {
-                                    final currentStatus = controller
-                                        .getServiceStatus(
-                                          bookingId,
-                                          service.serviceType,
-                                        );
-
                                     return Padding(
                                       padding: const EdgeInsets.only(
                                         bottom: 12,
@@ -406,140 +417,66 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                                             color: Colors.grey[200]!,
                                           ),
                                         ),
-                                        child: Column(
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Expanded(
-                                                  child: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        service.serviceType,
-                                                        style: const TextStyle(
-                                                          fontSize: 14,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
-                                                      ),
-                                                      if (service.washType !=
-                                                          null)
-                                                        Text(
-                                                          'Wash Type: ${service.washType}',
-                                                          style: TextStyle(
-                                                            fontSize: 12,
-                                                            color: Colors
-                                                                .grey[600],
-                                                          ),
-                                                        ),
-                                                      if (service.oilBrand !=
-                                                          null)
-                                                        Text(
-                                                          'Oil Brand: ${service.oilBrand}',
-                                                          style: TextStyle(
-                                                            fontSize: 12,
-                                                            color: Colors
-                                                                .grey[600],
-                                                          ),
-                                                        ),
-                                                      Text(
-                                                        'Price: ₹${service.price.toStringAsFixed(0)}',
-                                                        style: const TextStyle(
-                                                          fontSize: 12,
-                                                          fontWeight:
-                                                              FontWeight.w500,
-                                                          color: Colors.green,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Container(
-                                                  padding:
-                                                      const EdgeInsets.symmetric(
-                                                        horizontal: 12,
-                                                      ),
-                                                  decoration: BoxDecoration(
-                                                    border: Border.all(
-                                                      color: Colors.grey[300]!,
-                                                    ),
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                          6,
-                                                        ),
-                                                    color: Colors.white,
-                                                  ),
-                                                  child: Text(
-                                                    "Started",
-                                                    style: TextStyle(
-                                                      fontSize: 12,
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    service.serviceType,
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
                                                       fontWeight:
-                                                          FontWeight.w500,
-                                                      color: Colors.green,
+                                                          FontWeight.w600,
                                                     ),
                                                   ),
-                                                  //  DropdownButton<String>(
-                                                  //   value: currentStatus,
-                                                  //   onChanged: (value) {
-                                                  //     if (value != null) {
-                                                  //       controller
-                                                  //           .setServiceStatus(
-                                                  //             bookingId,
-                                                  //             service
-                                                  //                 .serviceType,
-                                                  //             value,
-                                                  //           );
-                                                  //     }
-                                                  //   },
-                                                  //   underline: const SizedBox(),
-                                                  //   items: _statusOptions.map((
-                                                  //     status,
-                                                  //   ) {
-                                                  //     return DropdownMenuItem<
-                                                  //       String
-                                                  //     >(
-                                                  //       value: status,
-                                                  //       child: Text(
-                                                  //         status,
-                                                  //         style: TextStyle(
-                                                  //           fontSize: 13,
-                                                  //           color:
-                                                  //               status ==
-                                                  //                   'Select Status'
-                                                  //               ? Colors
-                                                  //                     .grey[600]
-                                                  //               : status ==
-                                                  //                     'Complete'
-                                                  //               ? Colors.green
-                                                  //               : status ==
-                                                  //                     'Started'
-                                                  //               ? Colors.orange
-                                                  //               : Colors
-                                                  //                     .black87,
-                                                  //           fontWeight:
-                                                  //               status !=
-                                                  //                   'Select Status'
-                                                  //               ? FontWeight
-                                                  //                     .w600
-                                                  //               : FontWeight
-                                                  //                     .normal,
-                                                  //         ),
-                                                  //       ),
-                                                  //     );
-                                                  //   }).toList(),
-                                                  //   icon: Icon(
-                                                  //     Icons.keyboard_arrow_down,
-                                                  //     color: Colors.grey[600],
-                                                  //     size: 20,
-                                                  //   ),
-                                                  // ),
+                                                  if (service.washType != null)
+                                                    Text(
+                                                      'Wash Type: ${service.washType}',
+                                                      style: TextStyle(
+                                                        fontSize: 12,
+                                                        color: Colors.grey[600],
+                                                      ),
+                                                    ),
+                                                  if (service.oilBrand != null)
+                                                    Text(
+                                                      'Oil Brand: ${service.oilBrand}',
+                                                      style: TextStyle(
+                                                        fontSize: 12,
+                                                        color: Colors.grey[600],
+                                                      ),
+                                                    ),
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 12,
+                                                    vertical: 6,
+                                                  ),
+                                              decoration: BoxDecoration(
+                                                border: Border.all(
+                                                  color: Colors.grey[300]!,
                                                 ),
-                                              ],
+                                                borderRadius:
+                                                    BorderRadius.circular(6),
+                                                color: Colors.white,
+                                              ),
+                                              child: Text(
+                                                service.status ?? 'Pending',
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: _getStatusColor(
+                                                    service.status,
+                                                  ),
+                                                ),
+                                              ),
                                             ),
                                           ],
                                         ),
@@ -551,7 +488,7 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                               ),
                             ),
 
-                          // Continue button - Only enabled when all services are complete
+                          // Continue button - Only enabled when all services are completed
                           Padding(
                             padding: const EdgeInsets.all(16),
                             child: SizedBox(
@@ -603,6 +540,22 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
         ),
       ),
     );
+  }
+
+  // Helper method to get status color
+  Color _getStatusColor(String? status) {
+    if (status == null) return Colors.black87;
+
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return Colors.green;
+      case 'inprogress':
+        return Colors.orange;
+      case 'pending':
+        return Colors.grey;
+      default:
+        return Colors.black87;
+    }
   }
 
   Widget _buildRow(String label, String value) {

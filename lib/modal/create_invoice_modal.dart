@@ -30,20 +30,20 @@ class CreateInvoiceModal {
 
 class Item {
   final String itemCode;
-  final double price;
+  // final double price;
   final int qty;
 
-  Item({required this.itemCode, required this.price, required this.qty});
+  Item({required this.itemCode, required this.qty});
 
   factory Item.fromJson(Map<String, dynamic> json) {
     return Item(
       itemCode: json['item_code'],
-      price: (json['price'] as num).toDouble(),
+      // price: (json['price'] as num).toDouble(),
       qty: json['qty'],
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {'item_code': itemCode, 'price': price, 'qty': qty};
+    return {'item_code': itemCode, 'qty': qty};
   }
 }

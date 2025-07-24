@@ -83,6 +83,7 @@ class UnderProcessingController extends ChangeNotifier {
         currentOdometerReading: 0.0,
         nextServiceOdometer: 0.0,
         services: [],
+        mainStatus: '',
       ),
     );
 
@@ -121,6 +122,7 @@ class UnderProcessingController extends ChangeNotifier {
         currentOdometerReading: 0.0,
         nextServiceOdometer: 0.0,
         services: [],
+        mainStatus: '',
       ),
     );
 

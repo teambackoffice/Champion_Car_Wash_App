@@ -708,7 +708,7 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
 
   final List<String> oilBrands = [
     'Castrol',
-    'Mobil 1',
+    'Mobil ',
     'Shell',
     'Valvoline',
     'Total',
@@ -717,13 +717,13 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
   ];
 
   final List<String> litreOptions = [
-    '0.5L',
-    '1L',
-    '2L',
-    '3L',
-    '4L',
-    '5L',
-    '10L',
+    'Shell Fully Synthetic (2L Can)',
+    'Mobil Fully Synthetic (4L Can)',
+    'Shell Fully Synthetic (1L Can)',
+    'Mobil Fully Synthetic (3L Can)',
+    'Shell Fully Synthetic (5L Can)',
+    'Mobil Fully Synthetic (2.5L Can)',
+    'Shell Fully Synthetic (6L Can)',
   ];
 
   @override
@@ -808,7 +808,7 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
 
             // Litres Selection
             const Text(
-              'Oil Litres',
+              'Oil Subtypes',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,

@@ -18,7 +18,7 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
   late SalesInvoiceController controller;
 
   List<ServiceItem> get services => widget.booking!.services;
-  double get subtotal => services.fold(0, (sum, s) => sum + s.price);
+  double get subtotal => services.fold(0, (sum, s) => sum);
 
   @override
   void initState() {
@@ -33,7 +33,7 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
       items: services.map((s) {
         return Item(
           itemCode: s.serviceType,
-          price: s.price.toDouble(),
+
           qty: 1, // Assuming qty as 1 for each service, change if needed
         );
       }).toList(),
@@ -160,14 +160,14 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
                                     ],
                                   ),
                                 ),
-                                Text(
-                                  '₹${service.price.toInt()}',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black,
-                                  ),
-                                ),
+                                // Text(
+                                //   '₹${service.price.toInt()}',
+                                //   style: const TextStyle(
+                                //     fontSize: 16,
+                                //     fontWeight: FontWeight.w600,
+                                //     color: Colors.black,
+                                //   ),
+                                // ),
                               ],
                             ),
                           );

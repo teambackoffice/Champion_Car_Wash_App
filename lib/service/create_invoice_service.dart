@@ -25,7 +25,9 @@ class CreateInvoiceService {
       // Print all items before sending
       for (var item in requestData.items) {
         print(
-          'Item -> Code: ${item.itemCode}, Price: ${item.price}, Qty: ${item.qty}',
+          'Item -> Code: ${item.itemCode}, Qty: ${item.qty}',
+
+          //  Price: ${item.price},
         );
       }
 
