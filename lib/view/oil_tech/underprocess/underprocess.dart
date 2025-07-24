@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:champion_car_wash_app/controller/oil_tech/extra_work_controller.dart';
+import 'package:champion_car_wash_app/controller/oil_tech/inspection_list_controller.dart';
+import 'package:champion_car_wash_app/modal/oil_tech/inspection_list_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -933,111 +935,126 @@ class InspectionDialog extends StatefulWidget {
 }
 
 class _InspectionDialogState extends State<InspectionDialog> {
-  List<InspectionItem> inspectionItems = [
-    InspectionItem(title: "Engine Oil Check"),
-    InspectionItem(title: "Brake Fluid Level"),
-    InspectionItem(title: "Tire Pressure"),
-    InspectionItem(title: "Battery Check"),
-    InspectionItem(title: "Lights & Indicators"),
-    InspectionItem(title: "Windshield Wipers"),
-    InspectionItem(title: "Air Filter"),
-  ];
-
-  bool get allItemsChecked => inspectionItems.every((item) => item.isChecked);
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<InspectionListController>(
+        context,
+        listen: false,
+      ).fetchInspectionList('oil change');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Inspection Checklist - ${widget.booking.bookingId}'),
-      content: SizedBox(
-        width: double.maxFinite,
-        height: MediaQuery.of(context).size.height * 0.6,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Vehicle: ${widget.booking.vehicleType} - ${widget.booking.engineModel}',
-              style: const TextStyle(
-                fontSize: 14,
-                color: Colors.grey,
-                fontWeight: FontWeight.w500,
+    return Consumer<InspectionListController>(
+      builder: (context, controller, _) {
+        if (controller.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        if (controller.error != null) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: Text(controller.error!),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Close'),
               ),
-            ),
-            const SizedBox(height: 16),
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Inspection Checklist',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: inspectionItems.length,
-                      itemBuilder: (context, index) {
-                        final item = inspectionItems[index];
-                        return CheckboxListTile(
-                          title: Text(
-                            item.title,
-                            style: TextStyle(
-                              fontSize: 14,
-                              decoration: item.isChecked
-                                  ? TextDecoration.lineThrough
-                                  : null,
-                              color: item.isChecked
-                                  ? Colors.grey
-                                  : Colors.black87,
-                            ),
-                          ),
-                          value: item.isChecked,
-                          onChanged: (bool? value) {
-                            setState(() {
-                              item.isChecked = value ?? false;
-                            });
-                          },
-                          activeColor: Colors.red[800],
-                          controlAffinity: ListTileControlAffinity.leading,
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 0,
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+            ],
+          );
+        }
+
+        final inspectionItems = controller.inspectionItems;
+
+        return AlertDialog(
+          title: Text('Inspection Checklist - ${widget.booking.bookingId}'),
+          content: SizedBox(
+            width: double.maxFinite,
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Vehicle: ${widget.booking.vehicleType} - ${widget.booking.engineModel}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Inspection Checklist',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: inspectionItems.length,
+                    itemBuilder: (context, index) {
+                      final item = inspectionItems[index];
+                      return CheckboxListTile(
+                        title: Text(
+                          item.questions,
+                          style: TextStyle(
+                            fontSize: 14,
+                            decoration: item.isChecked
+                                ? TextDecoration.lineThrough
+                                : null,
+                            color: item.isChecked
+                                ? Colors.grey
+                                : Colors.black87,
+                          ),
+                        ),
+
+                        value: item.isChecked,
+                        onChanged: (bool? value) {
+                          controller.toggleCheck(index, value ?? false);
+                        },
+                        activeColor: Colors.red[800],
+                        controlAffinity: ListTileControlAffinity.leading,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 0,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: controller.allItemsChecked
+                  ? () => _completeInspection(context, inspectionItems)
+                  : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red[800],
+                foregroundColor: Colors.white,
               ),
+              child: const Text('Complete Service'),
             ),
           ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
-        ),
-        ElevatedButton(
-          onPressed: allItemsChecked
-              ? () => _completeInspection(context)
-              : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red[800],
-            foregroundColor: Colors.white,
-          ),
-          child: const Text('Complete Service'),
-        ),
-      ],
+        );
+      },
     );
   }
 
-  void _completeInspection(BuildContext context) {
+  void _completeInspection(
+    BuildContext context,
+    List<Question> inspectionItems,
+  ) {
     Navigator.of(context).pop();
 
     String message = 'Inspection completed for ${widget.booking.bookingId} ✅';
@@ -1050,9 +1067,9 @@ class _InspectionDialogState extends State<InspectionDialog> {
       ),
     );
 
-    // You can handle saving inspection completion to DB here if needed
+    // You can also send this data back to server here
     print(
-      'Inspection completed: ${inspectionItems.map((e) => e.title).join(', ')}',
+      'Inspection completed: ${inspectionItems.map((e) => "${e.questions} (${e.isChecked})").join(', ')}',
     );
   }
 }
