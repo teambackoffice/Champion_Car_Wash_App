@@ -13,6 +13,7 @@ import 'package:champion_car_wash_app/controller/login_controller.dart';
 import 'package:champion_car_wash_app/controller/oil_tech/extra_work_controller.dart';
 import 'package:champion_car_wash_app/controller/oil_tech/inspection_list_controller.dart';
 import 'package:champion_car_wash_app/controller/oil_tech/new_oiltech_controller.dart';
+import 'package:champion_car_wash_app/controller/oilsubtype_byBrand_controller.dart';
 import 'package:champion_car_wash_app/controller/service_underproccessing_controller.dart';
 import 'package:champion_car_wash_app/controller/underprocess_controller.dart';
 import 'package:champion_car_wash_app/view/splashscreen/splash_screen.dart';
@@ -49,6 +50,9 @@ void main() {
             ChangeNotifierProvider(create: (_) => NewOilTechController()),
             ChangeNotifierProvider(create: (_) => ExtraWorkController()),
             ChangeNotifierProvider(create: (_) => InspectionListController()),
+            ChangeNotifierProvider(
+              create: (_) => OilsubtypeBybrandController(),
+            ),
           ],
           child: MyApp(),
         );

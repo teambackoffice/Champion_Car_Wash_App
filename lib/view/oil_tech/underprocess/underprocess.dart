@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:champion_car_wash_app/controller/get_oil_brand_contrtoller.dart';
 import 'package:champion_car_wash_app/controller/oil_tech/extra_work_controller.dart';
 import 'package:champion_car_wash_app/controller/oil_tech/inspection_list_controller.dart';
+import 'package:champion_car_wash_app/controller/oilsubtype_byBrand_controller.dart';
 import 'package:champion_car_wash_app/modal/oil_tech/inspection_list_modal.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -718,19 +720,21 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
     'Liqui Moly',
   ];
 
-  final List<String> litreOptions = [
-    'Shell Fully Synthetic (2L Can)',
-    'Mobil Fully Synthetic (4L Can)',
-    'Shell Fully Synthetic (1L Can)',
-    'Mobil Fully Synthetic (3L Can)',
-    'Shell Fully Synthetic (5L Can)',
-    'Mobil Fully Synthetic (2.5L Can)',
-    'Shell Fully Synthetic (6L Can)',
-  ];
-
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<OilsubtypeBybrandController>(
+        context,
+        listen: false,
+      ).fetchOilSubtypesByBrand(widget.booking.oilbrand.trim());
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<GetOilBrandContrtoller>(
+        context,
+        listen: false,
+      ).fetchOilBrandServices();
+    });
 
     // Load current selection if editing
     if (widget.currentSelection != null) {
@@ -768,132 +772,179 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
       ),
       content: SizedBox(
         width: double.maxFinite,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Oil Brand Selection
-            const Text(
-              'Oil Brand',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey,
-              ),
-            ),
-            const SizedBox(height: 8),
-            DropdownButtonFormField<String>(
-              value: selectedOilBrand,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Oil Brand Selection
+              // Oil Brand Selection
+              const Text(
+                'Oil Brand',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey,
                 ),
               ),
-              hint: const Text('Select Oil Brand'),
-              items: oilBrands.map((String brand) {
-                return DropdownMenuItem<String>(
-                  value: brand,
-                  child: Text(brand),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedOilBrand = newValue;
-                });
-              },
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 8),
+              Consumer<GetOilBrandContrtoller>(
+                builder: (context, brandController, _) {
+                  if (brandController.isLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (brandController.errorMessage != null) {
+                    return Text(
+                      brandController.errorMessage!,
+                      style: const TextStyle(color: Colors.red),
+                    );
+                  }
 
-            // Litres Selection
-            const Text(
-              'Oil Subtypes',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey,
-              ),
-            ),
-            const SizedBox(height: 8),
-            DropdownButtonFormField<String>(
-              value: selectedLitres,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
-                ),
-              ),
-              hint: const Text('Select Litres'),
-              items: litreOptions.map((String litres) {
-                return DropdownMenuItem<String>(
-                  value: litres,
-                  child: Text(litres),
-                );
-              }).toList(),
-              onChanged: (String? newValue) {
-                setState(() {
-                  selectedLitres = newValue;
-                });
-              },
-            ),
-            const SizedBox(height: 16),
+                  // Sanitize & deduplicate
+                  final brandNames = brandController.oilbrand
+                      .map((b) => b.name.trim())
+                      .toSet()
+                      .toList();
 
-            // Quantity Selection
-            const Text(
-              'Quantity',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.grey,
+                  // Ensure selected value exists
+                  if (selectedOilBrand != null &&
+                      !brandNames.contains(selectedOilBrand!.trim())) {
+                    selectedOilBrand = null;
+                  }
+
+                  return DropdownButtonFormField<String>(
+                    value: selectedOilBrand,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                    ),
+                    hint: const Text('Select Oil Brand'),
+                    items: brandNames.map((name) {
+                      return DropdownMenuItem<String>(
+                        value: name,
+                        child: Text(name),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedOilBrand = newValue;
+                        selectedLitres = null;
+                      });
+                      Provider.of<OilsubtypeBybrandController>(
+                        context,
+                        listen: false,
+                      ).fetchOilSubtypesByBrand(newValue ?? "");
+                    },
+                  );
+                },
               ),
-            ),
-            const SizedBox(height: 8),
-            Row(
-              children: [
-                IconButton(
-                  onPressed: quantity > 1
-                      ? () {
-                          setState(() {
-                            quantity--;
-                          });
-                        }
-                      : null,
-                  icon: const Icon(Icons.remove),
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.grey[200],
-                    foregroundColor: Colors.black87,
-                  ),
+
+              // Litres Selection (from API)
+              const Text(
+                'Oil Subtypes',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey,
                 ),
-                const SizedBox(width: 16),
-                Text(
-                  quantity.toString(),
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+              ),
+              const SizedBox(height: 8),
+              Consumer<OilsubtypeBybrandController>(
+                builder: (context, controller, child) {
+                  if (controller.isLoading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (controller.error != null) {
+                    return Text(
+                      controller.error!,
+                      style: const TextStyle(color: Colors.red),
+                    );
+                  }
+                  final subtypes = controller.oilSubtypes;
+                  return DropdownButtonFormField<String>(
+                    value: selectedLitres,
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 8,
+                      ),
+                    ),
+                    hint: const Text('Select Subtype'),
+                    items: subtypes.map((subtype) {
+                      return DropdownMenuItem<String>(
+                        value: subtype.name,
+                        child: Text(subtype.name),
+                      );
+                    }).toList(),
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        selectedLitres = newValue;
+                      });
+                    },
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // Quantity
+              const Text(
+                'Quantity',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey,
                 ),
-                const SizedBox(width: 16),
-                IconButton(
-                  onPressed: () {
-                    setState(() {
-                      quantity++;
-                    });
-                  },
-                  icon: const Icon(Icons.add),
-                  style: IconButton.styleFrom(
-                    backgroundColor: Colors.grey[200],
-                    foregroundColor: Colors.black87,
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: quantity > 1
+                        ? () {
+                            setState(() {
+                              quantity--;
+                            });
+                          }
+                        : null,
+                    icon: const Icon(Icons.remove),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.grey[200],
+                      foregroundColor: Colors.black87,
+                    ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                  const SizedBox(width: 16),
+                  Text(
+                    quantity.toString(),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  IconButton(
+                    onPressed: () {
+                      setState(() {
+                        quantity++;
+                      });
+                    },
+                    icon: const Icon(Icons.add),
+                    style: IconButton.styleFrom(
+                      backgroundColor: Colors.grey[200],
+                      foregroundColor: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
       actions: [

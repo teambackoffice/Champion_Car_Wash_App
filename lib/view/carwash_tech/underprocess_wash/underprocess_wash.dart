@@ -1,4 +1,6 @@
+import 'package:champion_car_wash_app/controller/oil_tech/inspection_list_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ProcessingBookingData {
   final String bookingId;
@@ -169,7 +171,10 @@ class WashProcessingBookingCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: const Text('Complete', style: TextStyle(fontSize: 16)),
+                  child: const Text(
+                    'Vehicle Inspection',
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
               ),
             ],
@@ -227,82 +232,103 @@ class InspectionDialog extends StatefulWidget {
 }
 
 class _InspectionDialogState extends State<InspectionDialog> {
-  final List<InspectionItem> inspectionItems = [
-    InspectionItem(title: "Exterior Wash"),
-    InspectionItem(title: "Interior Cleaning"),
-    InspectionItem(title: "Tire Shine"),
-    InspectionItem(title: "Windows & Mirrors"),
-    InspectionItem(title: "Vacuuming"),
-    InspectionItem(title: "Dashboard Cleaning"),
-    InspectionItem(title: "Mat Cleaning"),
-    InspectionItem(title: "Door Jambs Wipe"),
-  ];
-
-  bool get allItemsChecked => inspectionItems.every((item) => item.isChecked);
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<InspectionListController>(
+        context,
+        listen: false,
+      ).fetchInspectionList('car wash');
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Car Wash Checklist - ${widget.booking.bookingId}'),
-      content: SizedBox(
-        width: double.maxFinite,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Vehicle: ${widget.booking.vehicleType} - ${widget.booking.engineModel}',
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-            const SizedBox(height: 16),
-            Flexible(
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: inspectionItems.length,
-                itemBuilder: (context, index) {
-                  final item = inspectionItems[index];
-                  return CheckboxListTile(
-                    title: Text(
-                      item.title,
-                      style: TextStyle(
-                        fontSize: 14,
-                        decoration: item.isChecked
-                            ? TextDecoration.lineThrough
-                            : null,
-                        color: item.isChecked ? Colors.grey : Colors.black87,
-                      ),
-                    ),
-                    value: item.isChecked,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        item.isChecked = value ?? false;
-                      });
-                    },
-                    activeColor: Colors.red[800],
-                    controlAffinity: ListTileControlAffinity.leading,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 0),
-                  );
-                },
+    return Consumer<InspectionListController>(
+      builder: (context, controller, _) {
+        if (controller.isLoading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (controller.error != null) {
+          return AlertDialog(
+            title: const Text('Error'),
+            content: Text(controller.error!),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Close'),
               ),
+            ],
+          );
+        }
+        final inspectionItems = controller.inspectionItems;
+
+        return AlertDialog(
+          title: Text('Car Wash Checklist - ${widget.booking.bookingId}'),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Vehicle: ${widget.booking.vehicleType} - ${widget.booking.engineModel}',
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+                const SizedBox(height: 16),
+                Flexible(
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: inspectionItems.length,
+                    itemBuilder: (context, index) {
+                      final item = inspectionItems[index];
+                      return CheckboxListTile(
+                        title: Text(
+                          item.questions,
+                          style: TextStyle(
+                            fontSize: 14,
+                            decoration: item.isChecked
+                                ? TextDecoration.lineThrough
+                                : null,
+                            color: item.isChecked
+                                ? Colors.grey
+                                : Colors.black87,
+                          ),
+                        ),
+                        value: item.isChecked,
+                        onChanged: (bool? value) {
+                          controller.toggleCheck(index, value ?? false);
+                        },
+                        activeColor: Colors.red[800],
+                        controlAffinity: ListTileControlAffinity.leading,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 0,
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: controller.allItemsChecked
+                  ? () => _completeInspection(context)
+                  : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red[800],
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Complete Service'),
             ),
           ],
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
-        ),
-        ElevatedButton(
-          onPressed: allItemsChecked
-              ? () => _completeInspection(context)
-              : null,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red[800],
-            foregroundColor: Colors.white,
-          ),
-          child: const Text('Complete Service'),
-        ),
-      ],
+        );
+      },
     );
   }
 
