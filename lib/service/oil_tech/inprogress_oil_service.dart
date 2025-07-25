@@ -11,7 +11,6 @@ class InProgressOilService {
 
   Future<OilInProgressModal> getInProgressOilService() async {
     try {
-      print('Fetching in-progress oil services from: $baseUrl');
       final request = http.Request('GET', Uri.parse(baseUrl));
       final String? sid = await _secureStorage.read(key: 'sid');
       if (sid == null) {
@@ -27,8 +26,6 @@ class InProgressOilService {
       final responseBody = await response.stream.bytesToString();
 
       if (response.statusCode == 200) {
-        print('Successfully fetched in-progress oil services');
-        print('Response Body: $responseBody');
         return oilInProgressModalFromJson(responseBody);
       } else {
         throw Exception(
@@ -36,7 +33,6 @@ class InProgressOilService {
         );
       }
     } catch (e) {
-      print('Error fetching in-progress oil services: $e');
       throw Exception('Error fetching in-progress oil services: $e');
     }
   }
