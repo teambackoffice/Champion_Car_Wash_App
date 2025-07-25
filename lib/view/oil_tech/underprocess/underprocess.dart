@@ -2,10 +2,13 @@ import 'dart:convert';
 
 import 'package:champion_car_wash_app/controller/get_oil_brand_contrtoller.dart';
 import 'package:champion_car_wash_app/controller/oil_tech/extra_work_controller.dart';
+import 'package:champion_car_wash_app/controller/oil_tech/inprogress_oil_controller.dart';
 import 'package:champion_car_wash_app/controller/oil_tech/inspection_list_controller.dart';
 import 'package:champion_car_wash_app/controller/oilsubtype_byBrand_controller.dart';
+import 'package:champion_car_wash_app/modal/oil_tech/inprogress_oil_modal.dart';
 import 'package:champion_car_wash_app/modal/oil_tech/inspection_list_modal.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -99,8 +102,24 @@ class OilSelection {
   }
 }
 
-class UnderProcessingTab extends StatelessWidget {
-  UnderProcessingTab({super.key});
+class UnderProcessingTab extends StatefulWidget {
+  const UnderProcessingTab({super.key});
+
+  @override
+  State<UnderProcessingTab> createState() => _UnderProcessingTabState();
+}
+
+class _UnderProcessingTabState extends State<UnderProcessingTab> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<InProgressOilController>(
+        context,
+        listen: false,
+      ).fetchInProgressOilServices();
+    });
+  }
 
   // Sample data - replace with your actual data source
   final List<ProcessingBookingData> processingBookings = [
@@ -149,11 +168,34 @@ class UnderProcessingTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16.0),
-        itemCount: processingBookings.length,
-        itemBuilder: (context, index) {
-          return ProcessingBookingCard(booking: processingBookings[index]);
+      body: Consumer<InProgressOilController>(
+        builder: (context, inProgressOilController, child) {
+          if (inProgressOilController.isLoading) {
+            return Center(
+              child: CircularProgressIndicator(color: Colors.red[800]),
+            );
+          }
+          if (inProgressOilController.error != null) {
+            return Center(
+              child: Text(
+                'No data available',
+                style: const TextStyle(color: Colors.red, fontSize: 16),
+              ),
+            );
+          }
+          return ListView.builder(
+            padding: const EdgeInsets.all(16.0),
+            itemCount:
+                inProgressOilController.oilInProgressModal!.message.data.length,
+            itemBuilder: (context, index) {
+              return ProcessingBookingCard(
+                booking: inProgressOilController
+                    .oilInProgressModal!
+                    .message
+                    .data[index],
+              );
+            },
+          );
         },
       ),
     );
@@ -161,7 +203,7 @@ class UnderProcessingTab extends StatelessWidget {
 }
 
 class ProcessingBookingCard extends StatefulWidget {
-  final ProcessingBookingData booking;
+  final Datum booking;
 
   const ProcessingBookingCard({super.key, required this.booking});
 
@@ -195,7 +237,7 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
 
   Future<void> _loadSavedData() async {
     // Load oil selection
-    final oilData = _prefs.getString('oil_${widget.booking.bookingId}');
+    final oilData = _prefs.getString('oil_${widget.booking.serviceId}');
     if (oilData != null) {
       final oilJson = json.decode(oilData);
       setState(() {
@@ -205,7 +247,7 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
 
     // Load extra work items
     final extraWorkData = _prefs.getString(
-      'extra_work_${widget.booking.bookingId}',
+      'extra_work_${widget.booking.serviceId}',
     );
     if (extraWorkData != null) {
       final List<dynamic> extraWorkJson = json.decode(extraWorkData);
@@ -219,7 +261,7 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
 
   Future<void> _saveOilSelection(OilSelection oil) async {
     await _prefs.setString(
-      'oil_${widget.booking.bookingId}',
+      'oil_${widget.booking.serviceId}',
       json.encode(oil.toJson()),
     );
   }
@@ -227,13 +269,13 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
   Future<void> _saveExtraWork() async {
     final extraWorkJson = extraWorkItems.map((item) => item.toJson()).toList();
     await _prefs.setString(
-      'extra_work_${widget.booking.bookingId}',
+      'extra_work_${widget.booking.serviceId}',
       json.encode(extraWorkJson),
     );
   }
 
   Future<void> _deleteOilSelection() async {
-    await _prefs.remove('oil_${widget.booking.bookingId}');
+    await _prefs.remove('oil_${widget.booking.serviceId}');
     setState(() {
       selectedOil = null;
     });
@@ -256,7 +298,7 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    widget.booking.bookingId,
+                    widget.booking.serviceId,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -286,10 +328,18 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
               const SizedBox(height: 16),
 
               // Car details
-              _buildDetailRow('Reg No', widget.booking.vehicleNo),
-              _buildDetailRow('Booking Time', widget.booking.bookingTime),
-              _buildDetailRow('User Name', widget.booking.userName),
-              _buildDetailRow('Oil Brand', widget.booking.oilbrand),
+              _buildDetailRow('Reg No', widget.booking.registrationNumber),
+              _buildDetailRow(
+                'Booking Time',
+                DateFormat('dd MMM yyyy').format(
+                  DateTime.parse(widget.booking.purchaseDate.toString()),
+                ),
+              ),
+              _buildDetailRow('User Name', widget.booking.customerName),
+              _buildDetailRow(
+                'Oil Brand',
+                widget.booking.services.first.oilBrand,
+              ),
 
               // Oil Selection Section
               const SizedBox(height: 8),
@@ -514,11 +564,11 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
               const SizedBox(height: 8),
 
               // Services list
-              ...widget.booking.selectedServices.map(
+              ...widget.booking.services.map(
                 (service) => Padding(
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Text(
-                    service,
+                    service.oilBrand,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -649,10 +699,7 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
     );
   }
 
-  void _showInspectionDialog(
-    BuildContext context,
-    ProcessingBookingData booking,
-  ) {
+  void _showInspectionDialog(BuildContext context, Datum booking) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -661,10 +708,7 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
     );
   }
 
-  void _showOilSelectionDialog(
-    BuildContext context,
-    ProcessingBookingData booking,
-  ) {
+  void _showOilSelectionDialog(BuildContext context, Datum booking) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -690,7 +734,7 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
 
 // Oil Selection Dialog
 class OilSelectionDialog extends StatefulWidget {
-  final ProcessingBookingData booking;
+  final Datum booking;
   final OilSelection? currentSelection;
   final void Function(String brand, String litres, int quantity) onConfirm;
 
@@ -727,7 +771,7 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
       Provider.of<OilsubtypeBybrandController>(
         context,
         listen: false,
-      ).fetchOilSubtypesByBrand(widget.booking.oilbrand.trim());
+      ).fetchOilSubtypesByBrand(widget.booking.services.first.oilBrand.trim());
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<GetOilBrandContrtoller>(
@@ -743,7 +787,7 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
       quantity = widget.currentSelection!.quantity;
     } else {
       // Normalize oil brand from booking
-      final bookingOil = widget.booking.oilbrand.trim();
+      final bookingOil = widget.booking.services.first.oilBrand.trim();
 
       // Check if it's exactly in the list
       if (oilBrands.contains(bookingOil)) {
@@ -977,7 +1021,7 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
 }
 
 class InspectionDialog extends StatefulWidget {
-  final ProcessingBookingData booking;
+  final Datum booking;
 
   const InspectionDialog({super.key, required this.booking});
 
@@ -1021,7 +1065,7 @@ class _InspectionDialogState extends State<InspectionDialog> {
         final inspectionItems = controller.inspectionItems;
 
         return AlertDialog(
-          title: Text('Inspection Checklist - ${widget.booking.bookingId}'),
+          title: Text('Inspection Checklist - ${widget.booking.serviceId}'),
           content: SizedBox(
             width: double.maxFinite,
             height: MediaQuery.of(context).size.height * 0.6,
@@ -1029,7 +1073,7 @@ class _InspectionDialogState extends State<InspectionDialog> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Vehicle: ${widget.booking.vehicleType} - ${widget.booking.engineModel}',
+                  'Vehicle: ${widget.booking.make} - ${widget.booking.model}',
                   style: const TextStyle(
                     fontSize: 14,
                     color: Colors.grey,
@@ -1108,7 +1152,7 @@ class _InspectionDialogState extends State<InspectionDialog> {
   ) {
     Navigator.of(context).pop();
 
-    String message = 'Inspection completed for ${widget.booking.bookingId} ✅';
+    String message = 'Inspection completed for ${widget.booking.serviceId} ✅';
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
