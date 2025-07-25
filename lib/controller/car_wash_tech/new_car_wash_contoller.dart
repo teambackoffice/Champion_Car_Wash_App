@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class GetNewCarWashController extends ChangeNotifier {
   final GetNewCarWashService _newCarWashService = GetNewCarWashService();
-  CarWashNewModalClass? _carWashNewModalClass;
+  InnerMessage? _carWashNewModalClass;
 
   bool _isLoading = false;
   String? _error;
@@ -12,15 +12,19 @@ class GetNewCarWashController extends ChangeNotifier {
   // Public getters
   bool get isLoading => _isLoading;
   String? get error => _error;
-  CarWashNewModalClass? get carWashNewModalClass => _carWashNewModalClass;
+  InnerMessage? get carWashNewModalClass => _carWashNewModalClass;
 
   // Method to fetch data
-  Future<CarWashNewModalClass> getNewCarWashServices() async {
+  Future<InnerMessage> getNewCarWashServices({
+    required String serviceType,
+  }) async {
     setIsLoading(true);
     setError(null);
 
     try {
-      _carWashNewModalClass = await _newCarWashService.getNewCarWashService();
+      _carWashNewModalClass = await _newCarWashService.getNewCarWashService(
+        serviceType: serviceType,
+      );
       setIsLoading(false);
       _carWashNewModalClass = _carWashNewModalClass;
     } catch (e) {

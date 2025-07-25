@@ -18,7 +18,7 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
       Provider.of<GetNewCarWashController>(
         context,
         listen: false,
-      ).getNewCarWashServices();
+      ).getNewCarWashServices(serviceType: "car wash");
     });
   }
 
@@ -28,7 +28,9 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
       backgroundColor: Colors.grey[100],
       body: Consumer<GetNewCarWashController>(
         builder: (context, controller, child) {
-          final booking = controller.carWashNewModalClass?.message.data ?? [];
+          final booking =
+              controller.carWashNewModalClass?.data ??
+              []; // ✅ Proper initialization
           if (controller.isLoading) {
             return Center(
               child: CircularProgressIndicator(color: Colors.red[800]),
@@ -132,7 +134,7 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
                           (service) => Padding(
                             padding: const EdgeInsets.only(bottom: 4),
                             child: Text(
-                              service.washType,
+                              service.washType!,
                               style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,

@@ -1,37 +1,54 @@
 // To parse this JSON data, do
 //
-//     final carWashNewModalClass = carWashNewModalClassFromJson(jsonString);
+//     final technicianModal = technicianModalFromJson(jsonString);
 
 import 'dart:convert';
 
-CarWashNewModalClass carWashNewModalClassFromJson(String str) =>
-    CarWashNewModalClass.fromJson(json.decode(str));
+TechnicianModal technicianModalFromJson(String str) =>
+    TechnicianModal.fromJson(json.decode(str));
 
-String carWashNewModalClassToJson(CarWashNewModalClass data) =>
+String technicianModalToJson(TechnicianModal data) =>
     json.encode(data.toJson());
 
-class CarWashNewModalClass {
-  Message message;
+class TechnicianModal {
+  OuterMessage message;
 
-  CarWashNewModalClass({required this.message});
+  TechnicianModal({required this.message});
 
-  factory CarWashNewModalClass.fromJson(Map<String, dynamic> json) =>
-      CarWashNewModalClass(message: Message.fromJson(json["message"]));
+  factory TechnicianModal.fromJson(Map<String, dynamic> json) =>
+      TechnicianModal(message: OuterMessage.fromJson(json["message"]));
 
   Map<String, dynamic> toJson() => {"message": message.toJson()};
 }
 
-class Message {
+class OuterMessage {
+  InnerMessage message;
+
+  OuterMessage({required this.message});
+
+  factory OuterMessage.fromJson(Map<String, dynamic> json) =>
+      OuterMessage(message: InnerMessage.fromJson(json["message"]));
+
+  Map<String, dynamic> toJson() => {"message": message.toJson()};
+}
+
+class InnerMessage {
   bool success;
   int count;
   List<Datum> data;
 
-  Message({required this.success, required this.count, required this.data});
+  InnerMessage({
+    required this.success,
+    required this.count,
+    required this.data,
+  });
 
-  factory Message.fromJson(Map<String, dynamic> json) => Message(
-    success: json["success"],
-    count: json["count"],
-    data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
+  factory InnerMessage.fromJson(Map<String, dynamic> json) => InnerMessage(
+    success: json["success"] ?? false, // <-- default false if null
+    count: json["count"] ?? 0,
+    data: json["data"] != null
+        ? List<Datum>.from(json["data"].map((x) => Datum.fromJson(x)))
+        : [],
   );
 
   Map<String, dynamic> toJson() => {
@@ -45,7 +62,7 @@ class Datum {
   String serviceId;
   String customerName;
   String phone;
-  String email;
+  String? email;
   String address;
   String city;
   String branch;
@@ -62,6 +79,7 @@ class Datum {
   double nextServiceOdometer;
   String? video;
   List<Service> services;
+  String mainStatus;
 
   Datum({
     required this.serviceId,
@@ -84,6 +102,7 @@ class Datum {
     required this.nextServiceOdometer,
     required this.video,
     required this.services,
+    required this.mainStatus,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
@@ -101,14 +120,15 @@ class Datum {
     engineNumber: json["engine_number"],
     chasisNumber: json["chasis_number"],
     registrationNumber: json["registration_number"],
-    fuelLevel: json["fuel_level"],
-    lastServiceOdometer: json["last_service_odometer"],
-    currentOdometerReading: json["current_odometer_reading"],
-    nextServiceOdometer: json["next_service_odometer"],
+    fuelLevel: (json["fuel_level"] ?? 0).toDouble(),
+    lastServiceOdometer: (json["last_service_odometer"] ?? 0).toDouble(),
+    currentOdometerReading: (json["current_odometer_reading"] ?? 0).toDouble(),
+    nextServiceOdometer: (json["next_service_odometer"] ?? 0).toDouble(),
     video: json["video"],
     services: List<Service>.from(
       json["services"].map((x) => Service.fromJson(x)),
     ),
+    mainStatus: json["main_status"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -133,29 +153,44 @@ class Datum {
     "next_service_odometer": nextServiceOdometer,
     "video": video,
     "services": List<dynamic>.from(services.map((x) => x.toJson())),
+    "main_status": mainStatus,
   };
 }
 
 class Service {
   String serviceType;
   String? status;
-  String washType;
+  double price;
+  String? washType;
+  String oilBrand;
+  double? oilQuantity;
 
   Service({
     required this.serviceType,
     required this.status,
+    required this.price,
     required this.washType,
+    required this.oilBrand,
+    required this.oilQuantity,
   });
 
   factory Service.fromJson(Map<String, dynamic> json) => Service(
     serviceType: json["service_type"],
     status: json["status"],
+    price: (json["price"] ?? 0).toDouble(),
     washType: json["wash_type"],
+    oilBrand: json["oil_brand"],
+    oilQuantity: json["oil_quantity"] != null
+        ? (json["oil_quantity"] as num).toDouble()
+        : null,
   );
 
   Map<String, dynamic> toJson() => {
     "service_type": serviceType,
     "status": status,
+    "price": price,
     "wash_type": washType,
+    "oil_brand": oilBrand,
+    "oil_quantity": oilQuantity,
   };
 }

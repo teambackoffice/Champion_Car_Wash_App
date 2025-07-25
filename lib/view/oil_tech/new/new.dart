@@ -18,7 +18,7 @@ class _NewBookingsTabState extends State<NewBookingsTab> {
       Provider.of<NewOilTechController>(
         context,
         listen: false,
-      ).getNewOilTechServices();
+      ).getNewOilTechServices(serviceType: "Oil Change");
     });
   }
   // Sample data - replace with your actual data source
@@ -42,7 +42,7 @@ class _NewBookingsTabState extends State<NewBookingsTab> {
               ),
             );
           }
-          final bookings = controller.oilTechModalClass?.message.data ?? [];
+          final bookings = controller.innerMessage?.data ?? [];
 
           if (bookings.isEmpty) {
             return Center(
