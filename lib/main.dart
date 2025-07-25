@@ -1,5 +1,6 @@
 import 'package:champion_car_wash_app/controller/add_prebooking_controller.dart';
 import 'package:champion_car_wash_app/controller/cancel_prebook_controller.dart';
+import 'package:champion_car_wash_app/controller/car_wash_tech/completed_car_contoller.dart';
 import 'package:champion_car_wash_app/controller/car_wash_tech/inprogress_controller.dart';
 import 'package:champion_car_wash_app/controller/car_wash_tech/new_car_wash_contoller.dart';
 import 'package:champion_car_wash_app/controller/confirm_prebook_controller.dart';
@@ -61,6 +62,7 @@ void main() {
             ),
             ChangeNotifierProvider(create: (_) => InProgressOilController()),
             ChangeNotifierProvider(create: (_) => CompletedOilController()),
+            ChangeNotifierProvider(create: (_) => CompletedCarController()),
           ],
           child: MyApp(),
         );
