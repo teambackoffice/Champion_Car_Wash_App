@@ -84,6 +84,12 @@ class UnderProcessingController extends ChangeNotifier {
         nextServiceOdometer: 0.0,
         services: [],
         mainStatus: '',
+        oilTotal: 0.0,
+        carwashTotal: 0.0,
+        serviceTotal: 0.0,
+        extraWorksTotal: 0.0,
+        grandTotal: 0.0,
+        extraWorkItems: [],
       ),
     );
 
@@ -123,6 +129,12 @@ class UnderProcessingController extends ChangeNotifier {
         nextServiceOdometer: 0.0,
         services: [],
         mainStatus: '',
+        oilTotal: 0.0,
+        carwashTotal: 0.0,
+        serviceTotal: 0.0,
+        extraWorksTotal: 0.0,
+        grandTotal: 0.0,
+        extraWorkItems: [],
       ),
     );
 

@@ -484,51 +484,144 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                                     );
                                   }),
                                   const SizedBox(height: 20),
+                                  if (booking.extraWorkItems.isNotEmpty) ...[
+                                    Text(
+                                      'Extra Work Items',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 10),
+                                    Container(
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(
+                                          color: Colors.grey[200]!,
+                                        ),
+                                      ),
+                                      child: Column(
+                                        children: booking.extraWorkItems.map((
+                                          item,
+                                        ) {
+                                          return Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 6,
+                                            ),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Expanded(
+                                                  child: Text(
+                                                    item.workItem,
+                                                    style: const TextStyle(
+                                                      fontSize: 14,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  '${item.qty} × ₹${item.rate} = ₹${(item.qty * item.rate).toStringAsFixed(2)}',
+                                                  style: const TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                                  ],
+                                  const SizedBox(height: 20),
+
+                                  if (allServicesComplete) ...[
+                                    Container(
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[50],
+                                        borderRadius: BorderRadius.circular(8),
+                                        border: Border.all(
+                                          color: Colors.grey[200]!,
+                                        ),
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          _buildTotalRow(
+                                            'Oil Total',
+                                            booking.oilTotal,
+                                          ),
+                                          _buildTotalRow(
+                                            'Car Wash Total',
+                                            booking.carwashTotal,
+                                          ),
+
+                                          _buildTotalRow(
+                                            'Extra Works Total',
+                                            booking.extraWorksTotal,
+                                          ),
+                                          const Divider(height: 20),
+                                          _buildTotalRow(
+                                            'Grand Total',
+                                            booking.grandTotal,
+                                            isBold: true,
+                                            color: Colors.red,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+
+                                  // Continue button - Only enabled when all services are completed
+                                  Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: SizedBox(
+                                      width: double.infinity,
+                                      child: ElevatedButton(
+                                        onPressed: allServicesComplete
+                                            ? () => _showCompletionAlert(
+                                                context,
+                                                bookingId,
+                                              )
+                                            : null,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: allServicesComplete
+                                              ? Colors.red
+                                              : Colors.grey[300],
+                                          foregroundColor: allServicesComplete
+                                              ? Colors.white
+                                              : Colors.grey[600],
+                                          padding: const EdgeInsets.symmetric(
+                                            vertical: 16,
+                                          ),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                          elevation: 0,
+                                        ),
+                                        child: Text(
+                                          allServicesComplete
+                                              ? 'Continue to Invoice'
+                                              : hasServiceStarted
+                                              ? 'Complete all services first'
+                                              : 'Start Services to Continue',
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
-
-                          // Continue button - Only enabled when all services are completed
-                          Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: allServicesComplete
-                                    ? () => _showCompletionAlert(
-                                        context,
-                                        bookingId,
-                                      )
-                                    : null,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: allServicesComplete
-                                      ? Colors.red
-                                      : Colors.grey[300],
-                                  foregroundColor: allServicesComplete
-                                      ? Colors.white
-                                      : Colors.grey[600],
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 16,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  elevation: 0,
-                                ),
-                                child: Text(
-                                  allServicesComplete
-                                      ? 'Continue to Invoice'
-                                      : hasServiceStarted
-                                      ? 'Complete all services first'
-                                      : 'Start Services to Continue',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
                         ],
                       ),
                     );
@@ -538,6 +631,38 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
             );
           },
         ),
+      ),
+    );
+  }
+
+  Widget _buildTotalRow(
+    String label,
+    double value, {
+    bool isBold = false,
+    Color? color,
+  }) {
+    if (value <= 0) return const SizedBox();
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
+            ),
+          ),
+          Text(
+            '₹${value.toStringAsFixed(2)}',
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
+              color: color ?? Colors.black87,
+            ),
+          ),
+        ],
       ),
     );
   }

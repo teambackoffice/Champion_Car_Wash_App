@@ -41,7 +41,16 @@ class ServiceCars {
   final double currentOdometerReading;
   final double nextServiceOdometer;
   final String? video;
+
+  // New totals
+  final double oilTotal;
+  final double carwashTotal;
+  final double serviceTotal;
+  final double extraWorksTotal;
+  final double grandTotal;
+
   final List<ServiceItem> services;
+  final List<ExtraWorkItem> extraWorkItems;
 
   ServiceCars({
     required this.serviceId,
@@ -64,13 +73,19 @@ class ServiceCars {
     required this.currentOdometerReading,
     required this.nextServiceOdometer,
     this.video,
+    required this.oilTotal,
+    required this.carwashTotal,
+    required this.serviceTotal,
+    required this.extraWorksTotal,
+    required this.grandTotal,
     required this.services,
+    required this.extraWorkItems,
   });
 
   factory ServiceCars.fromJson(Map<String, dynamic> json) {
     return ServiceCars(
       serviceId: json['service_id'] ?? '',
-      mainStatus: json['main status'] ?? '',
+      mainStatus: json['main_status'] ?? '',
       customerName: json['customer_name'] ?? '',
       phone: json['phone'] ?? '',
       email: json['email'] ?? '',
@@ -90,8 +105,16 @@ class ServiceCars {
           .toDouble(),
       nextServiceOdometer: (json['next_service_odometer'] ?? 0).toDouble(),
       video: json['video'],
+      oilTotal: (json['oil_total'] ?? 0).toDouble(),
+      carwashTotal: (json['carwash_total'] ?? 0).toDouble(),
+      serviceTotal: (json['service_total'] ?? 0).toDouble(),
+      extraWorksTotal: (json['extra_works_total'] ?? 0).toDouble(),
+      grandTotal: (json['grand_total'] ?? 0).toDouble(),
       services: (json['services'] as List)
           .map((e) => ServiceItem.fromJson(e))
+          .toList(),
+      extraWorkItems: (json['extra_work_items'] as List)
+          .map((e) => ExtraWorkItem.fromJson(e))
           .toList(),
     );
   }
@@ -101,12 +124,18 @@ class ServiceItem {
   final String serviceType;
   final String? washType;
   final String? oilBrand;
+  final String? oilSubtype;
+  final int qty;
+  final double price;
   final String? status;
 
   ServiceItem({
     required this.serviceType,
     this.washType,
     this.oilBrand,
+    this.oilSubtype,
+    required this.qty,
+    required this.price,
     this.status,
   });
 
@@ -115,7 +144,30 @@ class ServiceItem {
       serviceType: json['service_type'] ?? '',
       washType: json['wash_type'],
       oilBrand: json['oil_brand'],
+      oilSubtype: json['oil_subtype'],
+      qty: (json['qty'] ?? 0).toInt(),
+      price: (json['price'] ?? 0).toDouble(),
       status: json['status'],
+    );
+  }
+}
+
+class ExtraWorkItem {
+  final String workItem;
+  final int qty;
+  final double rate;
+
+  ExtraWorkItem({
+    required this.workItem,
+    required this.qty,
+    required this.rate,
+  });
+
+  factory ExtraWorkItem.fromJson(Map<String, dynamic> json) {
+    return ExtraWorkItem(
+      workItem: json['work_item'] ?? '',
+      qty: (json['qty'] ?? 0).toInt(),
+      rate: (json['rate'] ?? 0).toDouble(),
     );
   }
 }
