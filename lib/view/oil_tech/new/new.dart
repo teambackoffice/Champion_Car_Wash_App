@@ -181,6 +181,16 @@ class _NewBookingsTabState extends State<NewBookingsTab> {
                                                           "Oil Change",
                                                         );
                                                     Navigator.of(context).pop();
+                                                    Provider.of<
+                                                          NewOilTechController
+                                                        >(
+                                                          context,
+                                                          listen: false,
+                                                        )
+                                                        .getNewOilTechServices(
+                                                          serviceType:
+                                                              "Oil Change",
+                                                        );
                                                   },
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor: Colors.red[900],

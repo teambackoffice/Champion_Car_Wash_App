@@ -9,7 +9,7 @@ class ServiceUnderproccessingController extends ChangeNotifier {
   String? responseMessage;
   bool isLoading = false;
 
-  Future<void> markServiceInProgress(
+  Future<bool> markServiceInProgress(
     String serviceId,
     String serviceType,
   ) async {
@@ -22,17 +22,20 @@ class ServiceUnderproccessingController extends ChangeNotifier {
         serviceType,
       );
 
-      if (response!.statusCode == 200) {
+      if (response != null && response.statusCode == 200) {
         final data = jsonDecode(response.body);
         responseMessage = data.toString(); // or extract something specific
         debugPrint('Service updated successfully: $responseMessage');
+        return true; // <-- Success
       } else {
-        responseMessage = 'Error: ${response.statusCode}';
-        debugPrint('Failed to update service: ${response.body}');
+        responseMessage = 'Error: ${response?.statusCode}';
+        debugPrint('Failed to update service: ${response?.body}');
+        return false; // <-- Failed
       }
     } catch (e) {
       responseMessage = 'Exception: $e';
       debugPrint('Exception occurred: $e');
+      return false; // <-- Failed
     } finally {
       isLoading = false;
       notifyListeners();

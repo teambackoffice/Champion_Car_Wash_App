@@ -1,4 +1,5 @@
 import 'package:champion_car_wash_app/controller/car_wash_tech/new_car_wash_contoller.dart';
+import 'package:champion_car_wash_app/controller/service_underproccessing_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -34,6 +35,14 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
           if (controller.isLoading) {
             return Center(
               child: CircularProgressIndicator(color: Colors.red[800]),
+            );
+          }
+          if (booking.isEmpty) {
+            return Center(
+              child: Text(
+                'No new bookings found',
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              ),
             );
           }
 
@@ -104,22 +113,9 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
                         ),
                         _buildDetailRow('User Name', data.customerName),
                         _buildDetailRow('Vehicle', data.make),
-                        // _buildDetailRow('Mobile No', booking.mobileNo),
-                        // _buildDetailRow('Email ID', booking.email),
-                        // _buildDetailRow('Vehicle Type', booking.vehicleType),
-                        // _buildDetailRow('Engine Model', booking.engineModel),
+
                         const SizedBox(height: 8),
-                        // TextButton(
-                        //   onPressed: () =>
-                        //       _showMoreDetails(context, booking), // ✅ Fix
-                        //   child: const Text(
-                        //     'View More',
-                        //     style: TextStyle(
-                        //       color: Colors.red,
-                        //       fontWeight: FontWeight.w500,
-                        //     ),
-                        //   ),
-                        // ),
+
                         const SizedBox(height: 8),
                         const Text(
                           'Selected Services',
@@ -147,7 +143,80 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: const Text("Confirmation"),
+                                    content: const Text(
+                                      " Are you sure you want to start service ?",
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(
+                                            context,
+                                          ).pop(); // Close the dialog
+                                        },
+                                        child: const Text("Cancel"),
+                                      ),
+                                      Consumer<
+                                        ServiceUnderproccessingController
+                                      >(
+                                        builder: (context, controller, child) {
+                                          return ElevatedButton(
+                                            onPressed: controller.isLoading
+                                                ? null
+                                                : () async {
+                                                    await controller
+                                                        .markServiceInProgress(
+                                                          data.serviceId,
+                                                          "Car Wash",
+                                                        );
+                                                    Navigator.of(context).pop();
+                                                    Provider.of<
+                                                          GetNewCarWashController
+                                                        >(
+                                                          context,
+                                                          listen: false,
+                                                        )
+                                                        .getNewCarWashServices(
+                                                          serviceType:
+                                                              "car wash",
+                                                        );
+                                                  },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.red[900],
+                                              foregroundColor: Colors.white,
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: 24,
+                                                vertical: 12,
+                                              ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                            ),
+                                            child: controller.isLoading
+                                                ? SizedBox(
+                                                    height: 20,
+                                                    width: 20,
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                          color: Colors.white,
+                                                          strokeWidth: 2,
+                                                        ),
+                                                  )
+                                                : const Text("Yes"),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
                             // _startService(context, booking.bookingId),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFD32F2F),

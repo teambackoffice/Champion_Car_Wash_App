@@ -44,6 +44,14 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
               child: CircularProgressIndicator(color: Colors.red[800]),
             );
           }
+          if (processingBookings.isEmpty) {
+            return Center(
+              child: Text(
+                'No processing bookings found',
+                style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+              ),
+            );
+          }
 
           if (controller.error != null) {
             return Center(child: Text('Error: ${controller.error}'));

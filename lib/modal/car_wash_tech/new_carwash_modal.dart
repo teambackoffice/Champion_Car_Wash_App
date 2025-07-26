@@ -61,11 +61,11 @@ class InnerMessage {
 class Datum {
   String serviceId;
   String customerName;
-  String phone;
+  String? phone;
   String? email;
-  String address;
-  String city;
-  String branch;
+  String? address;
+  String? city;
+  String? branch;
   String make;
   String model;
   String carType;
@@ -84,11 +84,11 @@ class Datum {
   Datum({
     required this.serviceId,
     required this.customerName,
-    required this.phone,
-    required this.email,
-    required this.address,
-    required this.city,
-    required this.branch,
+    this.phone,
+    this.email,
+    this.address,
+    this.city,
+    this.branch,
     required this.make,
     required this.model,
     required this.carType,
@@ -108,11 +108,11 @@ class Datum {
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
     serviceId: json["service_id"],
     customerName: json["customer_name"],
-    phone: json["phone"],
-    email: json["email"],
-    address: json["address"],
-    city: json["city"],
-    branch: json["branch"],
+    phone: json["phone"] ?? '',
+    email: json["email"] ?? '',
+    address: json["address"] ?? '',
+    city: json["city"] ?? '',
+    branch: json["branch"] ?? '',
     make: json["make"],
     model: json["model"],
     carType: json["car_type"],
@@ -162,7 +162,7 @@ class Service {
   String? status;
   double price;
   String? washType;
-  String oilBrand;
+  String? oilBrand;
   double? oilQuantity;
 
   Service({
@@ -170,7 +170,7 @@ class Service {
     required this.status,
     required this.price,
     required this.washType,
-    required this.oilBrand,
+    this.oilBrand,
     required this.oilQuantity,
   });
 
@@ -179,7 +179,7 @@ class Service {
     status: json["status"],
     price: (json["price"] ?? 0).toDouble(),
     washType: json["wash_type"],
-    oilBrand: json["oil_brand"],
+    oilBrand: json["oil_brand"] ?? '',
     oilQuantity: json["oil_quantity"] != null
         ? (json["oil_quantity"] as num).toDouble()
         : null,
