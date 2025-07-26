@@ -10,7 +10,10 @@ class ServiceUnderprogressService {
 
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
-  Future<http.Response?> updateServiceToInProgress(String serviceId) async {
+  Future<http.Response?> updateServiceToInProgress(
+    String serviceId,
+    String serviceType,
+  ) async {
     try {
       // 🔐 Get SID from secure storage
       final String? sid = await _secureStorage.read(key: 'sid');
@@ -24,7 +27,10 @@ class ServiceUnderprogressService {
         'Content-Type': 'application/json',
         'Cookie': 'sid=$sid', // ✅ Only include SID
       };
-      final body = jsonEncode({"service_id": serviceId});
+      final body = jsonEncode({
+        "service_id": serviceId,
+        "service_type": serviceType,
+      });
 
       // 🔹 Debug logs
 

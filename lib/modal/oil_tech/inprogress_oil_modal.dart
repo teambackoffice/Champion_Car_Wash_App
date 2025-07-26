@@ -46,7 +46,7 @@ class Datum {
   String mainStatus;
   String customerName;
   String phone;
-  String email;
+  String? email;
   String address;
   String city;
   String branch;
@@ -69,7 +69,7 @@ class Datum {
     required this.mainStatus,
     required this.customerName,
     required this.phone,
-    required this.email,
+    this.email,
     required this.address,
     required this.city,
     required this.branch,
@@ -93,7 +93,7 @@ class Datum {
     mainStatus: json["main_status"],
     customerName: json["customer_name"],
     phone: json["phone"],
-    email: json["email"],
+    email: json["email"] ?? '',
     address: json["address"],
     city: json["city"],
     branch: json["branch"],

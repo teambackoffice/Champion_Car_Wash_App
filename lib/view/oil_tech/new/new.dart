@@ -1,4 +1,5 @@
 import 'package:champion_car_wash_app/controller/oil_tech/new_oiltech_controller.dart';
+import 'package:champion_car_wash_app/controller/service_underproccessing_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -114,31 +115,6 @@ class _NewBookingsTabState extends State<NewBookingsTab> {
                         _buildDetailRow('Customer Name', data.customerName),
                         _buildDetailRow('Vehicle', data.make),
 
-                        // _buildDetailRow('User Name', booking.userName),
-                        // _buildDetailRow('Mobile No', booking.mobileNo),
-                        // _buildDetailRow('Email ID', booking.email),
-                        // _buildDetailRow('Vehicle Type', booking.vehicleType),
-                        // _buildDetailRow('Engine Model', booking.engineModel),
-                        // const SizedBox(height: 8),
-
-                        // // View More button
-                        // TextButton(
-                        //   onPressed: () {
-                        //     Navigator.push(
-                        //       context,
-                        //       MaterialPageRoute(
-                        //         builder: (context) => OilViewMore(bookingData: booking),
-                        //       ),
-                        //     );
-                        //   },
-                        //   child: const Text(
-                        //     'View More',
-                        //     style: TextStyle(
-                        //       color: Colors.red,
-                        //       fontWeight: FontWeight.w500,
-                        //     ),
-                        //   ),
-                        // ),
                         const SizedBox(height: 16),
 
                         // Selected Services
@@ -191,27 +167,46 @@ class _NewBookingsTabState extends State<NewBookingsTab> {
                                         },
                                         child: const Text("Cancel"),
                                       ),
-                                      ElevatedButton(
-                                        onPressed: () {
-                                          Navigator.of(
-                                            context,
-                                          ).pop(); // Close the dialog
-                                          // Add your logic here
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.red[900],
-                                          foregroundColor: Colors.white,
-                                          padding: EdgeInsets.symmetric(
-                                            horizontal: 24,
-                                            vertical: 12,
-                                          ),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              8,
+                                      Consumer<
+                                        ServiceUnderproccessingController
+                                      >(
+                                        builder: (context, controller, child) {
+                                          return ElevatedButton(
+                                            onPressed: controller.isLoading
+                                                ? null
+                                                : () async {
+                                                    await controller
+                                                        .markServiceInProgress(
+                                                          data.serviceId,
+                                                          "Oil Change",
+                                                        );
+                                                    Navigator.of(context).pop();
+                                                  },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.red[900],
+                                              foregroundColor: Colors.white,
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: 24,
+                                                vertical: 12,
+                                              ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
                                             ),
-                                          ),
-                                        ),
-                                        child: const Text("Yes"),
+                                            child: controller.isLoading
+                                                ? SizedBox(
+                                                    height: 20,
+                                                    width: 20,
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                          color: Colors.white,
+                                                          strokeWidth: 2,
+                                                        ),
+                                                  )
+                                                : const Text("Yes"),
+                                          );
+                                        },
                                       ),
                                     ],
                                   );
@@ -276,155 +271,5 @@ Widget _buildDetailRow(String label, String value) {
         ),
       ],
     ),
-  );
-}
-
-void _startService(BuildContext context, String bookingId) {
-  showDialog(
-    context: context,
-    builder: (context) {
-      final Map<String, bool> litreOptions = {
-        '1.0': true,
-        '1.5': false,
-        '2.0': true,
-        '2.5': true,
-        '3.0': false,
-        '3.5': true,
-        '4.0': true,
-        '4.5': false,
-        '5.0': true,
-      };
-
-      String? selectedLitre;
-      final List<String> optionalChanges = [
-        'Air Filter',
-        'Brake Pads',
-        'Coolant',
-        'Battery Check',
-      ];
-      final Map<String, bool> selectedOptions = {
-        for (var item in optionalChanges) item: false,
-      };
-
-      return StatefulBuilder(
-        builder: (context, setState) {
-          return AlertDialog(
-            title: Text('Service Details - $bookingId'),
-            content: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text("Mobil", style: TextStyle(fontSize: 18)),
-                  const SizedBox(height: 10),
-                  const Text(
-                    'Select Oil Quantity (Litres)',
-                    style: TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 8),
-                  DropdownButtonFormField<String>(
-                    value: selectedLitre,
-                    hint: const Text('Choose litres'),
-                    items: litreOptions.entries.map((entry) {
-                      final litre = entry.key;
-                      final isAvailable = entry.value;
-
-                      return DropdownMenuItem<String>(
-                        value: isAvailable ? litre : null,
-                        enabled: isAvailable,
-                        child: Row(
-                          children: [
-                            Icon(
-                              isAvailable
-                                  ? Icons.local_gas_station
-                                  : Icons.block,
-                              color: isAvailable
-                                  ? Colors.green[700]
-                                  : Colors.redAccent,
-                              size: 18,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              isAvailable
-                                  ? '$litre Litres'
-                                  : '$litre Litres - Out of Stock',
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: isAvailable
-                                    ? Colors.black87
-                                    : Colors.grey,
-                                fontStyle: isAvailable
-                                    ? FontStyle.normal
-                                    : FontStyle.italic,
-                                decoration: isAvailable
-                                    ? null
-                                    : TextDecoration.lineThrough,
-                              ),
-                            ),
-                          ],
-                        ),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      if (value != null) {
-                        setState(() {
-                          selectedLitre = value;
-                        });
-                      }
-                    },
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Cancel'),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  if (selectedLitre == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Please select oil quantity.'),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                    return;
-                  }
-
-                  List<String> changes = selectedOptions.entries
-                      .where((entry) => entry.value)
-                      .map((entry) => entry.key)
-                      .toList();
-
-                  Navigator.pop(context);
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        'Started service for $bookingId\nOil: $selectedLitre L\nExtras: ${changes.isEmpty ? 'None' : changes.join(', ')}',
-                      ),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-
-                  // TODO: Add your backend logic here
-                },
-                child: const Text('Start Service'),
-              ),
-            ],
-          );
-        },
-      );
-    },
   );
 }

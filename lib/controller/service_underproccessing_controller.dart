@@ -9,12 +9,18 @@ class ServiceUnderproccessingController extends ChangeNotifier {
   String? responseMessage;
   bool isLoading = false;
 
-  Future<void> markServiceInProgress(String serviceId) async {
+  Future<void> markServiceInProgress(
+    String serviceId,
+    String serviceType,
+  ) async {
     try {
       isLoading = true;
       notifyListeners();
 
-      final response = await _apiService.updateServiceToInProgress(serviceId);
+      final response = await _apiService.updateServiceToInProgress(
+        serviceId,
+        serviceType,
+      );
 
       if (response!.statusCode == 200) {
         final data = jsonDecode(response.body);
