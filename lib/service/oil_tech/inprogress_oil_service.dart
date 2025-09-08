@@ -33,6 +33,7 @@ class InProgressOilService {
         );
       }
     } catch (e) {
+      print('Error fetching in-progress oil services: $e');
       throw Exception('Error fetching in-progress oil services: $e');
     }
   }

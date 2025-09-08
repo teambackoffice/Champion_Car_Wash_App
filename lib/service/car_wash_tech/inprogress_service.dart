@@ -10,6 +10,7 @@ class InprogressCarWashService {
 
   Future<CarwashInProgressModal> getInProgressCarWashService() async {
     try {
+      print('Fetching in-progress car wash services from: $baseUrl');
       final request = http.Request('GET', Uri.parse(baseUrl));
       final String? sid = await _secureStorage.read(key: 'sid');
       if (sid == null) {
@@ -25,6 +26,7 @@ class InprogressCarWashService {
       final responseBody = await response.stream.bytesToString();
 
       if (response.statusCode == 200) {
+        print('Response status code: ${response.statusCode}');
         return carwashInProgressModalFromJson(responseBody);
       } else {
         throw Exception(
@@ -32,6 +34,7 @@ class InprogressCarWashService {
         );
       }
     } catch (e) {
+      print('Error fetching in-progress car wash services: $e');
       throw Exception('Error fetching in-progress car wash services: $e');
     }
   }

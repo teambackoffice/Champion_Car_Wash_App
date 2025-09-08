@@ -1,5 +1,4 @@
 import 'package:champion_car_wash_app/controller/create_invoice_controller.dart';
-import 'package:champion_car_wash_app/modal/create_invoice_modal.dart';
 import 'package:champion_car_wash_app/modal/underprocess_modal.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/invoice_submit.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +17,9 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
   late SalesInvoiceController controller;
 
   List<ServiceItem> get services => widget.booking!.services;
-  double get subtotal => services.fold(0, (sum, s) => sum);
+
+  double get subtotal =>
+      services.fold<double>(0, (sum, s) => sum + (s.price ?? 0));
 
   @override
   void initState() {
@@ -27,25 +28,25 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
   }
 
   Future<void> _handleCreateInvoice() async {
-    final invoice = CreateInvoiceModal(
+    await controller.submitInvoice(
       customer: widget.booking!.customerName,
       serviceId: widget.booking!.serviceId,
       items: services.map((s) {
-        return Item(
-          itemCode: s.serviceType,
-
-          qty: 1, // Assuming qty as 1 for each service, change if needed
-        );
+        return {
+          "item_code": s.serviceType,
+          "price": s.price ?? 0,
+          "qty": 1, // Assuming each service is qty = 1
+        };
       }).toList(),
     );
-
-    await controller.submitInvoice(invoice);
 
     if (controller.responseMessage?.contains("successfully") ?? false) {
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const InvoiceSubmitPage()),
+          MaterialPageRoute(
+            builder: (context) => InvoiceSubmitPage(booking: widget.booking),
+          ),
         );
       }
     } else {
@@ -160,14 +161,14 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
                                     ],
                                   ),
                                 ),
-                                // Text(
-                                //   '₹${service.price.toInt()}',
-                                //   style: const TextStyle(
-                                //     fontSize: 16,
-                                //     fontWeight: FontWeight.w600,
-                                //     color: Colors.black,
-                                //   ),
-                                // ),
+                                Text(
+                                  '₹${(service.price ?? 0).toInt()}',
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black,
+                                  ),
+                                ),
                               ],
                             ),
                           );

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:champion_car_wash_app/controller/get_oil_brand_contrtoller.dart';
 import 'package:champion_car_wash_app/controller/oil_tech/extra_work_controller.dart';
 import 'package:champion_car_wash_app/controller/oil_tech/inprogress_oil_controller.dart';
+import 'package:champion_car_wash_app/controller/oil_tech/inprogress_status_chnager_controller.dart';
 import 'package:champion_car_wash_app/controller/oil_tech/inspection_list_controller.dart';
 import 'package:champion_car_wash_app/controller/oilsubtype_byBrand_controller.dart';
 import 'package:champion_car_wash_app/modal/oil_tech/inprogress_oil_modal.dart';
@@ -110,6 +111,8 @@ class UnderProcessingTab extends StatefulWidget {
 }
 
 class _UnderProcessingTabState extends State<UnderProcessingTab> {
+  OilSelection? get selectedOil => selectedOil;
+  List<ExtraWorkItem> get extraWorkItems => extraWorkItems;
   @override
   void initState() {
     super.initState();
@@ -335,10 +338,10 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
                   DateTime.parse(widget.booking.purchaseDate.toString()),
                 ),
               ),
-              _buildDetailRow('User Name', widget.booking.customerName),
+              _buildDetailRow('User Name', widget.booking.customerName!),
               _buildDetailRow(
                 'Oil Brand',
-                widget.booking.services.first.oilBrand,
+                widget.booking.services.first.oilBrand!,
               ),
 
               // Oil Selection Section
@@ -568,7 +571,7 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
                 (service) => Padding(
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Text(
-                    service.oilBrand,
+                    service.oilBrand!,
                     style: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
@@ -703,7 +706,14 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return InspectionDialog(booking: booking);
+        return ChangeNotifierProvider(
+          create: (context) => OilInprogressStatusServiceController(),
+          child: InspectionDialog(
+            booking: booking,
+            selectedOil: selectedOil, // Pass the oil selection
+            extraWorkItems: extraWorkItems, // Pass the extra work items
+          ),
+        );
       },
     );
   }
@@ -771,7 +781,7 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
       Provider.of<OilsubtypeBybrandController>(
         context,
         listen: false,
-      ).fetchOilSubtypesByBrand(widget.booking.services.first.oilBrand.trim());
+      ).fetchOilSubtypesByBrand(widget.booking.services.first.oilBrand!.trim());
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<GetOilBrandContrtoller>(
@@ -787,7 +797,7 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
       quantity = widget.currentSelection!.quantity;
     } else {
       // Normalize oil brand from booking
-      final bookingOil = widget.booking.services.first.oilBrand.trim();
+      final bookingOil = widget.booking.services.first.oilBrand!.trim();
 
       // Check if it's exactly in the list
       if (oilBrands.contains(bookingOil)) {
@@ -1022,8 +1032,15 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
 
 class InspectionDialog extends StatefulWidget {
   final Datum booking;
+  final OilSelection? selectedOil; // Add this
+  final List<ExtraWorkItem> extraWorkItems;
 
-  const InspectionDialog({super.key, required this.booking});
+  const InspectionDialog({
+    super.key,
+    required this.booking,
+    required this.selectedOil, // Add this
+    required this.extraWorkItems,
+  });
 
   @override
   State<InspectionDialog> createState() => _InspectionDialogState();
@@ -1149,23 +1166,118 @@ class _InspectionDialogState extends State<InspectionDialog> {
   void _completeInspection(
     BuildContext context,
     List<Question> inspectionItems,
-  ) {
-    Navigator.of(context).pop();
+  ) async {
+    // Check if oil selection exists
+    if (widget.selectedOil == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select oil details before completing service'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
-    String message = 'Inspection completed for ${widget.booking.serviceId} ✅';
+    // Prepare the data for API call
+    final selectedOil = widget.selectedOil!;
+    final extraWorkItems = widget.extraWorkItems;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 3),
-      ),
+    // Calculate totals
+    double extraWorksTotal = extraWorkItems.fold(
+      0.0,
+      (sum, item) => sum + item.cost,
     );
+    double oilTotal = 50.0 * selectedOil.quantity; // Assuming 50 AED per unit
 
-    // You can also send this data back to server here
-    print(
-      'Inspection completed: ${inspectionItems.map((e) => "${e.questions} (${e.isChecked})").join(', ')}',
-    );
+    // Prepare extra work data for API
+    List<Map<String, dynamic>> extraWorkData = extraWorkItems
+        .map(
+          (item) => {
+            'id': item.id,
+            'title': item.title,
+            'description': item.description,
+            'cost': item.cost,
+          },
+        )
+        .toList();
+
+    // Prepare inspection answers
+    List<Map<String, String>> answers = inspectionItems
+        .map(
+          (item) => {
+            'question': item.questions,
+            'answer': item.isChecked ? 'Yes' : 'No',
+          },
+        )
+        .toList();
+
+    try {
+      // Show loading
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
+      );
+
+      // Call the API
+      final controller = Provider.of<OilInprogressStatusServiceController>(
+        context,
+        listen: false,
+      );
+
+      await controller.submitOilChange(
+        serviceId: widget.booking.serviceId,
+        quantity: selectedOil.quantity,
+        litres: int.parse(selectedOil.litres.replaceAll(RegExp(r'[^0-9]'), '')),
+        price: oilTotal / selectedOil.quantity,
+        subOilType: selectedOil.litres,
+        oilTotal: oilTotal,
+        extraWork: extraWorkData,
+        extraWorksTotal: extraWorksTotal,
+        inspectionType: 'oil change',
+        answers: answers,
+      );
+
+      // Hide loading dialog
+      Navigator.of(context).pop();
+
+      // Close inspection dialog
+      Navigator.of(context).pop();
+
+      if (controller.response != null) {
+        // Success
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              'Service completed successfully for ${widget.booking.serviceId} ✅',
+            ),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+
+        // Refresh the in-progress list
+        Provider.of<InProgressOilController>(
+          context,
+          listen: false,
+        ).fetchInProgressOilServices();
+      } else {
+        // Error
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Failed to complete service. Please try again.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      // Hide loading dialog if still showing
+      Navigator.of(context).pop();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+      );
+    }
   }
 }
 

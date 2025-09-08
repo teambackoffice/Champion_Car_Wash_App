@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:champion_car_wash_app/config/api_constants.dart';
-import 'package:champion_car_wash_app/modal/create_invoice_modal.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
@@ -10,9 +9,12 @@ class CreateInvoiceService {
       '${ApiConstants.baseUrl}api/method/carwash.Api.auth.create_sales_invoice';
   static final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
-  static Future<http.Response?> createSalesInvoice(
-    CreateInvoiceModal requestData,
-  ) async {
+  /// Create Sales Invoice API
+  static Future<http.Response?> createSalesInvoice({
+    required String customer,
+    required String serviceId,
+    required List<Map<String, dynamic>> items,
+  }) async {
     print(_url);
     try {
       // Get SID from secure storage
@@ -23,11 +25,9 @@ class CreateInvoiceService {
       }
 
       // Print all items before sending
-      for (var item in requestData.items) {
+      for (var item in items) {
         print(
-          'Item -> Code: ${item.itemCode}, Qty: ${item.qty}',
-
-          //  Price: ${item.price},
+          'Item -> Code: ${item['item_code']}, Qty: ${item['qty']}, Price: ${item['price']}',
         );
       }
 
@@ -36,7 +36,11 @@ class CreateInvoiceService {
         'Cookie': 'sid=$sid',
       };
 
-      final body = json.encode(requestData.toJson());
+      final body = json.encode({
+        "customer": customer,
+        "service_id": serviceId,
+        "items": items,
+      });
 
       print('Sending Invoice Request Body: $body');
 

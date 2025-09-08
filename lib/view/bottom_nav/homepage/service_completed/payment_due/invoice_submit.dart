@@ -1,28 +1,41 @@
+import 'package:champion_car_wash_app/modal/underprocess_modal.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/payment_success.dart';
 import 'package:flutter/material.dart';
 
 class InvoiceSubmitPage extends StatefulWidget {
-  const InvoiceSubmitPage({super.key});
+  final ServiceCars? booking;
+  const InvoiceSubmitPage({super.key, required this.booking});
 
   @override
   State<InvoiceSubmitPage> createState() => _InvoiceSubmitPageState();
 }
 
 class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
-  String selectedPaymentMethod = 'Card';
+  String selectedPaymentMethod = 'Cash';
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        title: Text('Payment Details'),
+        backgroundColor: const Color(0xFFF9FAF9),
+        elevation: 0,
+      ),
       backgroundColor: const Color(0xFFF9FAF9),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildServiceCard(),
+              _buildCustomerInfo(),
               const SizedBox(height: 16),
+              _buildServicesCard(),
+              const SizedBox(height: 16),
+              if (widget.booking!.extraWorkItems.isNotEmpty) ...[
+                _buildExtraWorksCard(),
+                const SizedBox(height: 16),
+              ],
               _buildTotalCard(),
               const SizedBox(height: 32),
               _buildPaymentOptions(),
@@ -35,7 +48,7 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
     );
   }
 
-  Widget _buildServiceCard() {
+  Widget _buildCustomerInfo() {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -43,10 +56,157 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: Column(
-        children: const [
-          _ServiceItem(title: 'Super Car Wash', amount: '200 AED'),
-          SizedBox(height: 10),
-          _ServiceItem(title: 'Oil Change', amount: '300 AED'),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Service Details',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Service ID',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      widget.booking!.serviceId,
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Customer',
+                      style: TextStyle(
+                        color: Colors.grey[600],
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      widget.booking!.customerName,
+                      style: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            'Registration Number',
+            style: TextStyle(
+              color: Colors.grey[600],
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          SizedBox(height: 4),
+          Text(
+            widget.booking!.registrationNumber,
+            style: TextStyle(
+              color: Colors.black87,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildServicesCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Services',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 12),
+          ...widget.booking!.services.map(
+            (service) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: _ServiceItem(
+                title: _getServiceDisplayName(service),
+                amount: '${service.price.toStringAsFixed(2)} AED',
+                subtitle: _getServiceSubtitle(service),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildExtraWorksCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Extra Works',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 12),
+          ...widget.booking!.extraWorkItems.map(
+            (extraWork) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: _ServiceItem(
+                title: extraWork.workItem,
+                amount:
+                    '${(extraWork.qty * extraWork.rate).toStringAsFixed(2)} AED',
+                subtitle:
+                    'Qty: ${extraWork.qty} × ${extraWork.rate.toStringAsFixed(2)} AED',
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -58,66 +218,124 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
       ),
       child: Column(
-        children: const [
-          _ServiceItem(title: 'Sub Total', amount: '500 AED'),
-          SizedBox(height: 10),
-          _ServiceItem(title: 'Service Charge', amount: '50 AED'),
-          Divider(height: 24),
-          _ServiceItem(title: 'Total', amount: '550 AED', isBold: true),
+        children: [
+          if (widget.booking!.serviceTotal > 0) ...[
+            _ServiceItem(
+              title: 'Service Total',
+              amount: '${widget.booking!.serviceTotal.toStringAsFixed(2)} AED',
+            ),
+            const SizedBox(height: 8),
+          ],
+          if (widget.booking!.oilTotal > 0) ...[
+            _ServiceItem(
+              title: 'Oil Total',
+              amount: '${widget.booking!.oilTotal.toStringAsFixed(2)} AED',
+            ),
+            const SizedBox(height: 8),
+          ],
+          if (widget.booking!.carwashTotal > 0) ...[
+            _ServiceItem(
+              title: 'Car Wash Total',
+              amount: '${widget.booking!.carwashTotal.toStringAsFixed(2)} AED',
+            ),
+            const SizedBox(height: 8),
+          ],
+          if (widget.booking!.extraWorksTotal > 0) ...[
+            _ServiceItem(
+              title: 'Extra Works Total',
+              amount:
+                  '${widget.booking!.extraWorksTotal.toStringAsFixed(2)} AED',
+            ),
+            const SizedBox(height: 8),
+          ],
+          Divider(height: 24, thickness: 1),
+          _ServiceItem(
+            title: 'Grand Total',
+            amount: '${widget.booking!.grandTotal.toStringAsFixed(2)} AED',
+            isBold: true,
+            isTotal: true,
+          ),
         ],
       ),
     );
   }
 
   Widget _buildPaymentOptions() {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
-          child: OutlinedButton(
-            onPressed: () => _selectPaymentMethod('Cash'),
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(
-                color: selectedPaymentMethod == 'Cash'
-                    ? Colors.red
-                    : Colors.grey.shade300,
-              ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              foregroundColor: selectedPaymentMethod == 'Cash'
-                  ? Color(0xFFD32F2F)
-                  : Colors.black,
-              backgroundColor: selectedPaymentMethod == 'Cash'
-                  ? Color(0xFFD32F2F)
-                  : Colors.white,
-            ),
-            child:  Text('Cash',style: TextStyle(color:selectedPaymentMethod == 'Cash'? Colors.white : Colors.black),),
+        Text(
+          'Payment Method',
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Colors.black87,
           ),
         ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: OutlinedButton(
-            onPressed: () => _selectPaymentMethod('Card'),
-            style: OutlinedButton.styleFrom(
-              side: BorderSide(
-                color: selectedPaymentMethod == 'Card'
-                    ? Colors.red
-                    : Colors.grey.shade300,
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => _selectPaymentMethod('Cash'),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(
+                    color: selectedPaymentMethod == 'Cash'
+                        ? Color(0xFFD32F2F)
+                        : Colors.grey.shade300,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  backgroundColor: selectedPaymentMethod == 'Cash'
+                      ? Color(0xFFD32F2F)
+                      : Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                child: Text(
+                  'Cash',
+                  style: TextStyle(
+                    color: selectedPaymentMethod == 'Cash'
+                        ? Colors.white
+                        : Colors.black,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
               ),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              foregroundColor: selectedPaymentMethod == 'Card'
-                  ? Color(0xFFD32F2F)
-                  : Colors.black,
-              backgroundColor: selectedPaymentMethod == 'Card'
-                  ? Color(0xFFD32F2F)
-                  : Colors.white,
             ),
-            child:  Text('Card',style: TextStyle(color:selectedPaymentMethod == 'Card'? Colors.white : Colors.black)),
-          ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => _selectPaymentMethod('Card'),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(
+                    color: selectedPaymentMethod == 'Card'
+                        ? Color(0xFFD32F2F)
+                        : Colors.grey.shade300,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  backgroundColor: selectedPaymentMethod == 'Card'
+                      ? Color(0xFFD32F2F)
+                      : Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                child: Text(
+                  'Card',
+                  style: TextStyle(
+                    color: selectedPaymentMethod == 'Card'
+                        ? Colors.white
+                        : Colors.black,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );
@@ -127,12 +345,12 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
     setState(() {
       selectedPaymentMethod = method;
     });
-    
-    // Optional: Show a brief confirmation
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Payment method selected: $method'),
         duration: const Duration(seconds: 1),
+        backgroundColor: Color(0xFFD32F2F),
       ),
     );
   }
@@ -149,42 +367,123 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
+          elevation: 2,
         ),
-        child: const Text('Submit'),
+        child: Text(
+          'Confirm Payment - ${widget.booking!.grandTotal.toStringAsFixed(2)} AED',
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+        ),
       ),
     );
   }
 
   void _handleSubmit() {
-    // Handle submission based on payment method
-     Navigator.push(context, MaterialPageRoute(builder: (context) => PaymentSuccessScreen()));
+    // Show confirmation dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Payment'),
+          content: Text(
+            'Are you sure you want to process payment of ${widget.booking!.grandTotal.toStringAsFixed(2)} AED via $selectedPaymentMethod?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PaymentSuccessScreen(),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Color(0xFFD32F2F),
+              ),
+              child: Text('Confirm', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
-  
+  String _getServiceDisplayName(ServiceItem service) {
+    if (service.serviceType.toLowerCase().contains('oil')) {
+      return '${service.serviceType} - ${service.oilBrand ?? ''} ${service.oilSubtype ?? ''}';
+    } else if (service.serviceType.toLowerCase().contains('wash')) {
+      return '${service.serviceType} - ${service.washType ?? ''}';
+    }
+    return service.serviceType;
+  }
+
+  String? _getServiceSubtitle(ServiceItem service) {
+    if (service.qty > 1) {
+      return 'Qty: ${service.qty} × ${(service.price / service.qty).toStringAsFixed(2)} AED';
+    }
+    return null;
+  }
 }
 
 class _ServiceItem extends StatelessWidget {
   final String title;
   final String amount;
+  final String? subtitle;
   final bool isBold;
+  final bool isTotal;
 
   const _ServiceItem({
     required this.title,
     required this.amount,
+    this.subtitle,
     this.isBold = false,
+    this.isTotal = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    final style = TextStyle(
-      fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
-      fontSize: 16,
-    );
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: style),
-        Text(amount, style: style.copyWith(fontWeight: FontWeight.bold)),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
+                  fontSize: isTotal ? 18 : 16,
+                  color: isTotal ? Color(0xFFD32F2F) : Colors.black87,
+                ),
+              ),
+            ),
+            Text(
+              amount,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: isTotal ? 18 : 16,
+                color: isTotal ? Color(0xFFD32F2F) : Colors.black87,
+              ),
+            ),
+          ],
+        ),
+        if (subtitle != null) ...[
+          const SizedBox(height: 2),
+          Text(
+            subtitle!,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey[600],
+              fontStyle: FontStyle.italic,
+            ),
+          ),
+        ],
       ],
     );
   }

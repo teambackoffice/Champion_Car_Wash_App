@@ -1,4 +1,3 @@
-import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/invoice_submit.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/service_completed.dart';
 import 'package:flutter/material.dart';
 
@@ -211,40 +210,40 @@ class ServiceCard extends StatelessWidget {
               ],
             ),
             // Create Invoice Button
-            if (showCreateInvoice) ...[
-              SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => InvoiceSubmitPage(),
-                      ),
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Creating invoice for $serviceId'),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFD32F2F),
-                    foregroundColor: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: Text(
-                    'Make Payment',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                ),
-              ),
-            ],
+            // if (showCreateInvoice) ...[
+            //   SizedBox(height: 20),
+            //   SizedBox(
+            //     width: double.infinity,
+            //     child: ElevatedButton(
+            //       onPressed: () {
+            //         Navigator.push(
+            //           context,
+            //           MaterialPageRoute(
+            //             builder: (context) => InvoiceSubmitPage(),
+            //           ),
+            //         );
+            //         ScaffoldMessenger.of(context).showSnackBar(
+            //           SnackBar(
+            //             content: Text('Creating invoice for $serviceId'),
+            //           ),
+            //         );
+            //       },
+            //       style: ElevatedButton.styleFrom(
+            //         backgroundColor: Color(0xFFD32F2F),
+            //         foregroundColor: Colors.white,
+            //         padding: EdgeInsets.symmetric(vertical: 12),
+            //         shape: RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.circular(8),
+            //         ),
+            //         elevation: 0,
+            //       ),
+            //       child: Text(
+            //         'Make Payment',
+            //         style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+            //       ),
+            //     ),
+            //   ),
+            // ],
           ],
         ),
       ),

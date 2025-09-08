@@ -44,7 +44,7 @@ class Message {
 class Datum {
   String serviceId;
   String mainStatus;
-  String customerName;
+  String? customerName;
   String phone;
   String? email;
   String address;
@@ -142,8 +142,8 @@ class Datum {
 
 class Service {
   String serviceType;
-  String status;
-  String oilBrand;
+  String? status;
+  String? oilBrand;
 
   Service({
     required this.serviceType,
@@ -154,7 +154,7 @@ class Service {
   factory Service.fromJson(Map<String, dynamic> json) => Service(
     serviceType: json["service_type"],
     status: json["status"],
-    oilBrand: json["oil_brand"],
+    oilBrand: json["oil_brand"] ?? '',
   );
 
   Map<String, dynamic> toJson() => {
