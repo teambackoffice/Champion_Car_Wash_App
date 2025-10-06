@@ -764,7 +764,7 @@ class _SelectServiceState extends State<SelectService> {
         // Handle response
         if (carWashController.isSuccess) {
           // Show success message
-          _showSuccessDialog(services);
+          _showSuccessDialog(services, branch);
         } else if (carWashController.isError) {
           // Show error message
           _showErrorDialog(
@@ -803,7 +803,7 @@ class _SelectServiceState extends State<SelectService> {
   }
 
   // Show success dialog
-  void _showSuccessDialog(List<ServiceItem> services) {
+  void _showSuccessDialog(List<ServiceItem> services, String locationName) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -842,7 +842,17 @@ class _SelectServiceState extends State<SelectService> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => ServiceSuccessScreen(),
+                      builder: (context) => ServiceSuccessScreen(
+                        customerName: widget.customerName.text,
+                        make: _getSelectedMake(),
+                        model: _getSelectedModel(),
+                        purchaseDate: widget.purchaseDate.text,
+                        engineNumber: widget.engineNumber.text,
+                        serviceType: selectedCarWash!.name,
+                        washType: selectedCarWash!.name,
+                        price: selectedCarWash!.price!,
+                        locationName: locationName,
+                      ),
                     ),
                   );
                 },
