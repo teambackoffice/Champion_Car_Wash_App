@@ -18,7 +18,7 @@ class GenuineStripeNFCService {
   // Stripe credentials
   static const String _publishableKey = '';
   
-  static const String _serverKey = 'sk_test_YOUR';
+  // static const String _serverKey = '';
 
   bool _isInitialized = false;
   bool _isNFCAvailable = false;
@@ -277,22 +277,22 @@ class GenuineStripeNFCService {
   }) async {
     try {
       // Check if we have a valid secret key
-      if (_serverKey.isEmpty || _serverKey == 'sk_test_YOUR_ACTUAL_SECRET_KEY_HERE') {
-        _logGenuine('⚠️ No valid secret key configured');
-        _logGenuine('💡 Using demo mode - no real API calls');
-        
-        // Return demo payment intent for testing
-        await Future.delayed(const Duration(seconds: 1));
-        return {
-          'success': true,
-          'payment_intent_id': 'pi_demo_${DateTime.now().millisecondsSinceEpoch}',
-          'client_secret': 'pi_demo_${DateTime.now().millisecondsSinceEpoch}_secret_demo',
-          'amount': (amount * 100).toInt(),
-          'currency': currency.toLowerCase(),
-          'status': 'requires_confirmation',
-          'demo_mode': true,
-        };
-      }
+      // if (_serverKey.isEmpty || _serverKey == 'sk_test_YOUR_ACTUAL_SECRET_KEY_HERE') {
+      //   _logGenuine('⚠️ No valid secret key configured');
+      //   _logGenuine('💡 Using demo mode - no real API calls');
+      //
+      //   // Return demo payment intent for testing
+      //   await Future.delayed(const Duration(seconds: 1));
+      //   return {
+      //     'success': true,
+      //     'payment_intent_id': 'pi_demo_${DateTime.now().millisecondsSinceEpoch}',
+      //     'client_secret': 'pi_demo_${DateTime.now().millisecondsSinceEpoch}_secret_demo',
+      //     'amount': (amount * 100).toInt(),
+      //     'currency': currency.toLowerCase(),
+      //     'status': 'requires_confirmation',
+      //     'demo_mode': true,
+      //   };
+      // }
 
       _logGenuine('🔗 Making HTTP request to Stripe API...');
       
@@ -305,7 +305,7 @@ class GenuineStripeNFCService {
       // Prepare request headers
       final headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': 'Bearer $_serverKey',
+        // 'Authorization': 'Bearer $_serverKey',
       };
 
       // Prepare request body
@@ -500,7 +500,7 @@ class GenuineStripeNFCService {
       // Prepare request headers
       final headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': 'Bearer $_serverKey',
+        // 'Authorization': 'Bearer $_serverKey',
       };
 
       // Prepare request body
