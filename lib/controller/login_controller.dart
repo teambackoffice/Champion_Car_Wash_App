@@ -50,6 +50,7 @@ class LoginController with ChangeNotifier {
     // Clear login status from SharedPreferences
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLoggedIn', false);
+    await _authService.logout();
     
     // Clear any user data if needed
     // You might want to clear other stored user data here

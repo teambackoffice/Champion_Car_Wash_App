@@ -2,6 +2,8 @@ import 'package:champion_car_wash_app/controller/get_prebooking_controller.dart'
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/booking_status.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/create_service.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/pre_booking_now/pre_book.dart';
+import 'package:champion_car_wash_app/view/splashscreen/splash_screen.dart';
+import 'package:champion_car_wash_app/view/test/payment_history_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
@@ -232,6 +234,140 @@ class _HomePageContentState extends State<HomePageContent> {
                       const SizedBox(width: 10),
                       const Text(
                         "Pre Book Now",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Test buttons row 1
+              // Row(
+              //   children: [
+              //     // Real NFC Test Button (Tap Payments)
+              //     Expanded(
+              //       child: SizedBox(
+              //         height: 55,
+              //         child: ElevatedButton(
+              //           onPressed: () {
+              //             Navigator.push(
+              //               context,
+              //               MaterialPageRoute(
+              //                 builder: (context) => const RealNFCPaymentTest(),
+              //               ),
+              //             );
+              //           },
+              //           style: ElevatedButton.styleFrom(
+              //             backgroundColor: Colors.purple,
+              //             foregroundColor: Colors.white,
+              //             elevation: 3,
+              //             shape: RoundedRectangleBorder(
+              //               borderRadius: BorderRadius.circular(15),
+              //             ),
+              //           ),
+              //           child: Column(
+              //             mainAxisAlignment: MainAxisAlignment.center,
+              //             children: const [
+              //               Icon(Icons.nfc, size: 18),
+              //               Text(
+              //                 "🧪 Tap NFC",
+              //                 style: TextStyle(
+              //                   fontSize: 12,
+              //                   fontWeight: FontWeight.w600,
+              //                 ),
+              //               ),
+              //             ],
+              //           ),
+              //         ),
+              //       ),
+              //     ),
+              //     const SizedBox(width: 12),
+              //     // Genuine Stripe NFC Test Button
+              //     Expanded(
+              //       child: SizedBox(
+              //         height: 55,
+              //         child: ElevatedButton(
+              //           onPressed: () {
+              //             Navigator.push(
+              //               context,
+              //               MaterialPageRoute(
+              //                 builder: (context) => const SplashScreen(),
+              //               ),
+              //             );
+              //           },
+              //           style: ElevatedButton.styleFrom(
+              //             backgroundColor: Colors.blue,
+              //             foregroundColor: Colors.white,
+              //             elevation: 3,
+              //             shape: RoundedRectangleBorder(
+              //               borderRadius: BorderRadius.circular(15),
+              //             ),
+              //           ),
+              //           child: Column(
+              //             mainAxisAlignment: MainAxisAlignment.center,
+              //             children: const [
+              //               Icon(Icons.contactless, size: 18),
+              //               Text(
+              //                 "💳 Stripe NFC",
+              //                 style: TextStyle(
+              //                   fontSize: 12,
+              //                   fontWeight: FontWeight.w600,
+              //                 ),
+              //               ),
+              //             ],
+              //           ),
+              //         ),
+              //       ),
+              //     ),
+              //   ],
+              // ),
+
+              const SizedBox(height: 12),
+
+              // Payment History Button
+              SizedBox(
+                width: double.infinity,
+                height: 55,
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const PaymentHistoryViewer(),
+                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.white, width: 2),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Icon(
+                          Icons.history,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      const Text(
+                        "📊 Payment History",
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,

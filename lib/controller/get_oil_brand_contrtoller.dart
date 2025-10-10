@@ -14,9 +14,16 @@ class GetOilBrandContrtoller extends ChangeNotifier {
   List<OilBrand> get oilbrand => _getOilBrandList?.message.oilBrands ?? [];
 
   Future<void> fetchOilBrandServices() async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+    // Only notify if we're not in the initial state
+    if (_getOilBrandList != null || _errorMessage != null) {
+      _isLoading = true;
+      _errorMessage = null;
+      notifyListeners();
+    } else {
+      // Initial load - set loading state without notifying
+      _isLoading = true;
+      _errorMessage = null;
+    }
 
     try {
       final result = await GetOilbrandService.getOilBrandList();

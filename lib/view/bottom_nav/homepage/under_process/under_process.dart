@@ -21,19 +21,31 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
   @override
   void initState() {
     super.initState();
-    final controller = Provider.of<UnderProcessingController>(
-      context,
-      listen: false,
-    );
-    controller.fetchUnderProcessingBookings().then((_) {
-      setState(() {
-        _filteredBookings = controller.serviceCars;
-      });
-    });
 
     _searchController.addListener(() {
       _filterBookings(_searchController.text);
     });
+
+    // Fetch data after the first frame is built
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final controller = Provider.of<UnderProcessingController>(
+        context,
+        listen: false,
+      );
+      controller.fetchUnderProcessingBookings().then((_) {
+        if (mounted) {
+          setState(() {
+            _filteredBookings = controller.serviceCars;
+          });
+        }
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   void _filterBookings(String query) {

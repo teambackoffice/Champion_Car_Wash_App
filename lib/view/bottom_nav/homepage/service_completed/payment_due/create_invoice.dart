@@ -17,9 +17,13 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
   late SalesInvoiceController controller;
 
   List<ServiceItem> get services => widget.booking!.services;
+  List<ExtraWorkItem> get extraWorkItems => widget.booking!.extraWorkItems;
 
-  double get subtotal =>
-      services.fold<double>(0, (sum, s) => sum + (s.price ?? 0));
+  double get subtotal {
+    double servicesTotal = services.fold<double>(0, (sum, s) => sum + (s.price ?? 0));
+    double extraWorksTotal = extraWorkItems.fold<double>(0, (sum, item) => sum + (item.qty * item.rate));
+    return servicesTotal + extraWorksTotal;
+  }
 
   @override
   void initState() {
@@ -28,16 +32,53 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
   }
 
   Future<void> _handleCreateInvoice() async {
+    // Prepare items list combining services and extra work items
+    List<Map<String, dynamic>> items = [];
+
+    // Add service items
+    for (var service in services) {
+      // Build item description based on service details
+      String itemDescription = service.serviceType;
+      if (service.washType != null && service.washType!.isNotEmpty) {
+        itemDescription += ' - ${service.washType}';
+      }
+      if (service.oilBrand != null && service.oilBrand!.isNotEmpty) {
+        itemDescription += ' - ${service.oilBrand}';
+        if (service.oilSubtype != null && service.oilSubtype!.isNotEmpty) {
+          itemDescription += ' (${service.oilSubtype})';
+        }
+      }
+
+      items.add({
+        "item_code": service.serviceType, // Backend should map this to actual item
+        "item_name": itemDescription,
+        "qty": service.qty > 0 ? service.qty : 1,
+        "rate": service.price ?? 0,
+        "price": service.price ?? 0,
+      });
+    }
+
+    // Add extra work items
+    for (var extraWork in widget.booking!.extraWorkItems) {
+      items.add({
+        "item_code": extraWork.workItem,
+        "item_name": extraWork.workItem,
+        "qty": extraWork.qty > 0 ? extraWork.qty : 1,
+        "rate": extraWork.rate,
+        "price": extraWork.rate,
+      });
+    }
+
+    // Log items being sent
+    print('Total items to send: ${items.length}');
+    for (var item in items) {
+      print('Item: ${item['item_code']}, Qty: ${item['qty']}, Price: ${item['price']}');
+    }
+
     await controller.submitInvoice(
       customer: widget.booking!.customerName,
       serviceId: widget.booking!.serviceId,
-      items: services.map((s) {
-        return {
-          "item_code": s.serviceType,
-          "price": s.price ?? 0,
-          "qty": 1, // Assuming each service is qty = 1
-        };
-      }).toList(),
+      items: items,
     );
 
     if (controller.responseMessage?.contains("successfully") ?? false) {
@@ -109,7 +150,7 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
 
                     const SizedBox(height: 16),
 
-                    // Services List
+                    // Services and Extra Work Items List
                     Container(
                       height: 200,
                       width: double.infinity,
@@ -117,15 +158,12 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: ListView.builder(
+                      child: ListView(
                         padding: const EdgeInsets.all(24.0),
-                        itemCount: services.length,
-                        itemBuilder: (context, index) {
-                          final service = services[index];
-                          return Padding(
-                            padding: EdgeInsets.only(
-                              bottom: index == services.length - 1 ? 0 : 16,
-                            ),
+                        children: [
+                          // Services
+                          ...services.map((service) => Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -161,18 +199,86 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
                                     ],
                                   ),
                                 ),
-                                Text(
-                                  '₹${(service.price ?? 0).toInt()}',
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.black,
-                                  ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    if (service.qty > 1)
+                                      Text(
+                                        '${service.qty} × ₹${(service.price ?? 0).toInt()}',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    Text(
+                                      '₹${(service.price ?? 0).toInt()}',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
-                          );
-                        },
+                          )),
+
+                          // Extra Work Items
+                          if (extraWorkItems.isNotEmpty) ...[
+                            const Divider(),
+                            const Padding(
+                              padding: EdgeInsets.only(bottom: 12, top: 8),
+                              child: Text(
+                                'Extra Work Items',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ),
+                            ...extraWorkItems.map((item) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      item.workItem,
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      if (item.qty > 1)
+                                        Text(
+                                          '${item.qty} × ₹${item.rate.toInt()}',
+                                          style: const TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
+                                      Text(
+                                        '₹${(item.qty * item.rate).toInt()}',
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            )),
+                          ],
+                        ],
                       ),
                     ),
 

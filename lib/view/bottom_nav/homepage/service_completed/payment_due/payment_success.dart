@@ -1,12 +1,35 @@
 import 'package:champion_car_wash_app/view/bottom_nav/bottom_nav.dart';
 import 'package:flutter/material.dart';
 
-class PaymentSuccessScreen extends StatelessWidget {
+class PaymentSuccessScreen extends StatefulWidget {
   const PaymentSuccessScreen({Key? key}) : super(key: key);
 
   @override
+  State<PaymentSuccessScreen> createState() => _PaymentSuccessScreenState();
+}
+
+class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
+  @override
+  void initState() {
+    super.initState();
+    print('PaymentSuccessScreen: Screen initialized');
+  }
+
+  @override
+  void dispose() {
+    print('PaymentSuccessScreen: Screen disposed');
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    print('PaymentSuccessScreen: Building UI');
+    return WillPopScope(
+      onWillPop: () async {
+        // Prevent back button, force user to use "Back to Home"
+        return false;
+      },
+      child: Scaffold(
       backgroundColor: const Color(0xFFF8F8F8),
       body: SafeArea(
         child: Padding(
@@ -91,7 +114,7 @@ class PaymentSuccessScreen extends StatelessWidget {
                     // Handle back to home
                     Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => BottomNavigation(),
+                            builder: (context) => const BottomNavigation(),
                           ),
                           (route) => false,
                         );
@@ -121,26 +144,13 @@ class PaymentSuccessScreen extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
-  
+
   void _shareToWhatsApp() {
     // Implement WhatsApp sharing logic here
     // You can use url_launcher package or share_plus package
     print('Share to WhatsApp pressed');
-  }
-}
-
-// Usage example:
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Payment Success',
-      theme: ThemeData(
-        primarySwatch: Colors.green,
-      ),
-      home: const PaymentSuccessScreen(),
-    );
   }
 }

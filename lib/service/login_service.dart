@@ -1,5 +1,6 @@
 // services/auth_service.dart
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:champion_car_wash_app/config/api_constants.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -12,12 +13,14 @@ class LoginService {
 
   Future<bool> login(String username, String password) async {
     final url = Uri.parse('$baseUrl?usr=$username&pwd=$password');
+    log('Login request: $url');
 
     try {
       final response = await http.get(url);
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
+        log('Login successful: $responseData');
         final fullName = responseData['full_name'];
         final message = responseData['message'];
         final apiKey = message['api_key'];
@@ -36,12 +39,16 @@ class LoginService {
 
         return message['success_key'] == 1;
       } else {
+        log('Login failed: ${response.statusCode} ${response.body}');
         return false;
       }
     } catch (e) {
+      log('Login error: $e');
       return false;
     }
   }
+
+
 
   Future<String?> getFullName() async {
     return await _secureStorage.read(key: 'full_name');

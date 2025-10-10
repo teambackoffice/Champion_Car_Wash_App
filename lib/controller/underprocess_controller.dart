@@ -18,9 +18,16 @@ class UnderProcessingController extends ChangeNotifier {
 
   /// Fetch in-progress bookings
   Future<void> fetchUnderProcessingBookings() async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+    // Only notify if we're not in the initial state
+    if (_underProcessData != null || _errorMessage != null) {
+      _isLoading = true;
+      _errorMessage = null;
+      notifyListeners();
+    } else {
+      // Initial load - set loading state without notifying
+      _isLoading = true;
+      _errorMessage = null;
+    }
 
     try {
       final result = await _service.getunderprocessing();

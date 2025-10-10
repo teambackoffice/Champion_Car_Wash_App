@@ -20,18 +20,44 @@ import 'package:champion_car_wash_app/controller/oil_tech/new_oiltech_controller
 import 'package:champion_car_wash_app/controller/oilsubtype_byBrand_controller.dart';
 import 'package:champion_car_wash_app/controller/service_underproccessing_controller.dart';
 import 'package:champion_car_wash_app/controller/underprocess_controller.dart';
+import 'package:champion_car_wash_app/service/car_wash_tech/inprogress_to_complete_service.dart';
 import 'package:champion_car_wash_app/view/splashscreen/splash_screen.dart';
-import 'package:device_preview/device_preview.dart';
-import 'package:flutter/foundation.dart';
+import 'package:champion_car_wash_app/service/payment_history_service.dart' as history;
+// import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_stripe/flutter_stripe.dart';
 
-void main() {
+void main() async {
+  // Ensure Flutter is initialized
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Stripe with error handling
+  try {
+    print('Initializing Stripe...');
+    Stripe.publishableKey = 'pk_test_51SGD8nHo7XikuWyrTuFFoTOxuwXat9VZXlQqteyyu4YlIduMwymv8sGylntJMGVkEJFJk1EAymMEz5kjd4PzyEmU00gzlJ2fjB';
+    Stripe.merchantIdentifier = 'merchant.com.championcarwash.ae';
+    
+    // Apply Stripe settings
+    await Stripe.instance.applySettings();
+    print('Stripe initialized successfully');
+  } catch (e) {
+    print('Stripe initialization failed: $e');
+    print('App will continue without Stripe functionality');
+    // App continues to run even if Stripe fails to initialize
+  }
+
+  // Initialize Payment History Service
+  try {
+    print('Initializing Payment History Service...');
+    await history.PaymentHistoryService.instance.initialize();
+    print('Payment History Service initialized successfully');
+  } catch (e) {
+    print('Payment History Service initialization failed: $e');
+    print('App will continue without payment history functionality');
+  }
   runApp(
-    DevicePreview(
-      enabled: !kReleaseMode,
-      builder: (context) {
-        return MultiProvider(
+      MultiProvider(
           providers: [
             ChangeNotifierProvider(create: (_) => LoginController()),
             ChangeNotifierProvider(
@@ -63,11 +89,11 @@ void main() {
             ChangeNotifierProvider(create: (_) => InProgressOilController()),
             ChangeNotifierProvider(create: (_) => CompletedOilController()),
             ChangeNotifierProvider(create: (_) => CompletedCarController()),
+            ChangeNotifierProvider(create: (_) => CarWashInProgressToCompleteController()),
           ],
           child: MyApp(),
-        );
-      },
-    ),
+      )
+
   );
 }
 
@@ -78,14 +104,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      useInheritedMediaQuery: true, // 👈 Important for device_preview
-      locale: DevicePreview.locale(context), // 👈 Use the preview locale
-      builder: DevicePreview.appBuilder,
+      // Your theme isn't set to use Theme.AppCompat or Theme.MaterialComponents.
+      // locale: DevicePreview.locale(context), // 👈 Use the preview locale
+      // builder: DevicePreview.appBuilder,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'Sarabun',
         // You can customize further if needed
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+
 
       home: SplashScreen(),
     );

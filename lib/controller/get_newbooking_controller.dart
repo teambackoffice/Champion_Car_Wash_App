@@ -17,9 +17,16 @@ class GetNewbookingController extends ChangeNotifier {
 
   // Fetch booking list
   Future<void> fetchBookingList() async {
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
+    // Only notify if we're not in the initial state
+    if (_bookingList != null || _error != null) {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+    } else {
+      // Initial load - set loading state without notifying
+      _isLoading = true;
+      _error = null;
+    }
 
     try {
       _bookingList = await _service.getnewbookinglist();

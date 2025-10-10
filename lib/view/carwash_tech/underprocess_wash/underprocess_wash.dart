@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
+import '../../../service/car_wash_tech/inprogress_to_complete_service.dart';
+
 class InspectionItem {
   final String title;
   bool isChecked;
@@ -129,7 +131,7 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                         ),
                         const SizedBox(height: 8),
                         ...booking.services.map(
-                          (service) => Padding(
+                              (service) => Padding(
                             padding: const EdgeInsets.only(bottom: 4),
                             child: Text(
                               service.washType,
@@ -317,15 +319,99 @@ class _InspectionDialogState extends State<InspectionDialog> {
     );
   }
 
-  void _completeInspection(BuildContext context) {
-    Navigator.of(context).pop();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Car wash completed for ${widget.booking.serviceId}'),
-        backgroundColor: Colors.green,
-        duration: const Duration(seconds: 2),
-      ),
+  void _completeInspection(BuildContext context) async {
+    final inspectionController = Provider.of<InspectionListController>(
+      context,
+      listen: false,
     );
-    // ✅ TODO: Add backend completion logic if needed
+    final completeController =
+    Provider.of<CarWashInProgressToCompleteController>(
+      context,
+      listen: false,
+    );
+
+    // Prepare answers from inspection items
+    List<Map<String, dynamic>> answers = inspectionController.inspectionItems
+        .map(
+          (item) => {
+        "question": item.questions,
+        "answer": item.isChecked ? "Yes" : "No",
+        "is_checked": item.isChecked,
+      },
+    )
+        .toList();
+
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(child: CircularProgressIndicator()),
+      );
+
+      // Call the API
+      await completeController.submitCarwash(
+        serviceId: widget.booking.serviceId,
+        price: 200, // Adjust as needed
+        carwashTotal: widget.booking.services.length,
+        inspectionType: 'car wash',
+        answers: answers,
+      );
+
+      // Close loading dialog
+      if (context.mounted) Navigator.of(context).pop();
+
+      // Close inspection dialog
+      if (context.mounted) Navigator.of(context).pop();
+
+      if (completeController.errorMessage != null) {
+        // Show error message
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Error: ${completeController.errorMessage}'),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 3),
+            ),
+          );
+        }
+      } else {
+        // Show success message
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Car wash completed for ${widget.booking.serviceId}',
+              ),
+              backgroundColor: Colors.green,
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+
+        // Refresh the list
+        if (context.mounted) {
+          Provider.of<InprogressCarWashController>(
+            context,
+            listen: false,
+          ).fetchInProgressServices();
+        }
+      }
+    } catch (e) {
+      // Close loading dialog if still open
+      if (context.mounted) Navigator.of(context).pop();
+
+      // Show error message
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error completing service: $e'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
+    }
   }
 }
+

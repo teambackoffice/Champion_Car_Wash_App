@@ -17,9 +17,16 @@ class GetCompletedController extends ChangeNotifier {
 
   // Fetch booking list
   Future<void> fetchcompletedlist() async {
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
+    // Only notify if we're not in the initial state
+    if (completedservices != null || _error != null) {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+    } else {
+      // Initial load - set loading state without notifying
+      _isLoading = true;
+      _error = null;
+    }
 
     try {
       completedservices = await _service.getcompleted();

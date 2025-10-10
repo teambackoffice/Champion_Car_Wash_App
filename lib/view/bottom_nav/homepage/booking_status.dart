@@ -32,15 +32,17 @@ class _BookingStatusState extends State<BookingStatus> {
         context,
         listen: false,
       ).fetchBookingList();
+
+      Provider.of<UnderProcessingController>(
+        context,
+        listen: false,
+      ).fetchUnderProcessingBookings();
+
+      Provider.of<GetCompletedController>(
+        context,
+        listen: false,
+      ).fetchcompletedlist();
     });
-    Provider.of<UnderProcessingController>(
-      context,
-      listen: false,
-    ).fetchUnderProcessingBookings();
-    Provider.of<GetCompletedController>(
-      context,
-      listen: false,
-    ).fetchcompletedlist();
   }
 
   @override

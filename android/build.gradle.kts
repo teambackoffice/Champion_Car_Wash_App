@@ -14,6 +14,11 @@ subprojects {
 }
 subprojects {
     project.evaluationDependsOn(":app")
+
+    // Suppress Java 8 obsolete warnings from dependencies
+    tasks.withType<JavaCompile> {
+        options.compilerArgs.add("-Xlint:-options")
+    }
 }
 
 tasks.register<Delete>("clean") {

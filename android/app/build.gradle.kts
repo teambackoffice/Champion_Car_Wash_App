@@ -42,3 +42,8 @@ android {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    // Material Components for Android (required for Stripe)
+    implementation("com.google.android.material:material:1.11.0")
+}

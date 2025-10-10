@@ -1,5 +1,7 @@
 import 'package:champion_car_wash_app/modal/underprocess_modal.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/payment_success.dart';
+import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/tap_checkout.dart';
+import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/stripe_payment_page.dart';
 import 'package:flutter/material.dart';
 
 class InvoiceSubmitPage extends StatefulWidget {
@@ -276,6 +278,7 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
           ),
         ),
         const SizedBox(height: 12),
+        // First Row: Cash and Tap
         Row(
           children: [
             Expanded(
@@ -306,32 +309,111 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
                 ),
               ),
             ),
-            const SizedBox(width: 16),
+            const SizedBox(width: 12),
             Expanded(
               child: OutlinedButton(
-                onPressed: () => _selectPaymentMethod('Card'),
+                onPressed: () => _selectPaymentMethod('Tap'),
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(
-                    color: selectedPaymentMethod == 'Card'
+                    color: selectedPaymentMethod == 'Tap'
                         ? Color(0xFFD32F2F)
                         : Colors.grey.shade300,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  backgroundColor: selectedPaymentMethod == 'Card'
+                  backgroundColor: selectedPaymentMethod == 'Tap'
                       ? Color(0xFFD32F2F)
                       : Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
                 child: Text(
-                  'Card',
+                  'Tap',
                   style: TextStyle(
-                    color: selectedPaymentMethod == 'Card'
+                    color: selectedPaymentMethod == 'Tap'
                         ? Colors.white
                         : Colors.black,
                     fontWeight: FontWeight.w500,
                   ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        // Second Row: Stripe Card and Stripe NFC
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () => _selectPaymentMethod('Stripe Card'),
+                icon: Icon(
+                  Icons.credit_card,
+                  size: 20,
+                  color: selectedPaymentMethod == 'Stripe Card'
+                      ? Colors.white
+                      : Color(0xFF635BFF),
+                ),
+                label: Text(
+                  'Stripe Card',
+                  style: TextStyle(
+                    color: selectedPaymentMethod == 'Stripe Card'
+                        ? Colors.white
+                        : Color(0xFF635BFF),
+                    fontWeight: FontWeight.w500,
+                    fontSize: 13,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(
+                    color: selectedPaymentMethod == 'Stripe Card'
+                        ? Color(0xFF635BFF)
+                        : Colors.grey.shade300,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  backgroundColor: selectedPaymentMethod == 'Stripe Card'
+                      ? Color(0xFF635BFF)
+                      : Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () => _selectPaymentMethod('Stripe NFC'),
+                icon: Icon(
+                  Icons.contactless,
+                  size: 20,
+                  color: selectedPaymentMethod == 'Stripe NFC'
+                      ? Colors.white
+                      : Color(0xFF635BFF),
+                ),
+                label: Text(
+                  'Stripe NFC',
+                  style: TextStyle(
+                    color: selectedPaymentMethod == 'Stripe NFC'
+                        ? Colors.white
+                        : Color(0xFF635BFF),
+                    fontWeight: FontWeight.w500,
+                    fontSize: 13,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: BorderSide(
+                    color: selectedPaymentMethod == 'Stripe NFC'
+                        ? Color(0xFF635BFF)
+                        : Colors.grey.shade300,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  backgroundColor: selectedPaymentMethod == 'Stripe NFC'
+                      ? Color(0xFF635BFF)
+                      : Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
               ),
             ),
@@ -395,15 +477,56 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => PaymentSuccessScreen(),
-                  ),
-                );
+
+                // Route based on selected payment method
+                if (selectedPaymentMethod == 'Tap') {
+                  Navigator.push(
+                    context,
+
+                    MaterialPageRoute(
+                      builder: (context) => StripePaymentPage(
+                        booking: widget.booking,
+                        paymentMethod: 'nfc',
+                      ),
+                    ),
+                    // MaterialPageRoute(
+                    //   builder: (context) => TapCheckoutScreen(booking: widget.booking),
+                    // ),
+                  );
+                } else if (selectedPaymentMethod == 'Stripe Card') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => StripePaymentPage(
+                        booking: widget.booking,
+                        paymentMethod: 'card',
+                      ),
+                    ),
+                  );
+                } else if (selectedPaymentMethod == 'Stripe NFC') {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => StripePaymentPage(
+                        booking: widget.booking,
+                        paymentMethod: 'nfc',
+                      ),
+                    ),
+                  );
+                } else {
+                  // Cash payment - go directly to success
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => PaymentSuccessScreen(),
+                    ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFFD32F2F),
+                backgroundColor: selectedPaymentMethod.contains('Stripe')
+                    ? Color(0xFF635BFF)
+                    : Color(0xFFD32F2F),
               ),
               child: Text('Confirm', style: TextStyle(color: Colors.white)),
             ),

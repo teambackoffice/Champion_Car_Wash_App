@@ -14,9 +14,16 @@ class CarwashServiceController extends ChangeNotifier {
   List<WashType> get washTypes => _carwashList?.message.washType ?? [];
 
   Future<void> fetchCarwashServices() async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+    // Only notify if we're not in the initial state
+    if (_carwashList != null || _errorMessage != null) {
+      _isLoading = true;
+      _errorMessage = null;
+      notifyListeners();
+    } else {
+      // Initial load - set loading state without notifying
+      _isLoading = true;
+      _errorMessage = null;
+    }
 
     try {
       final result = await GetCarwashService.getCarwashList();
