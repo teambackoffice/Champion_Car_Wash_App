@@ -20,7 +20,7 @@ class GenuineStripeNFCService {
   
   // ✅ Your actual Stripe SECRET key
   static const String _secretKey = '';
-  
+
   bool _isInitialized = false;
   bool _isNFCAvailable = false;
   final List<String> _logs = [];
