@@ -18,8 +18,7 @@ class GenuineStripeNFCService {
   // Stripe credentials
   static const String _publishableKey = '';
   
-  // ✅ Your actual Stripe SECRET key
-  static const String _secretKey = '';
+  static const String _serverKey = 'sk_test_YOUR';
 
   bool _isInitialized = false;
   bool _isNFCAvailable = false;
@@ -278,7 +277,7 @@ class GenuineStripeNFCService {
   }) async {
     try {
       // Check if we have a valid secret key
-      if (_secretKey.isEmpty || _secretKey == 'sk_test_YOUR_ACTUAL_SECRET_KEY_HERE') {
+      if (_serverKey.isEmpty || _serverKey == 'sk_test_YOUR_ACTUAL_SECRET_KEY_HERE') {
         _logGenuine('⚠️ No valid secret key configured');
         _logGenuine('💡 Using demo mode - no real API calls');
         
@@ -306,7 +305,7 @@ class GenuineStripeNFCService {
       // Prepare request headers
       final headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': 'Bearer $_secretKey',
+        'Authorization': 'Bearer $_serverKey',
       };
 
       // Prepare request body
@@ -501,7 +500,7 @@ class GenuineStripeNFCService {
       // Prepare request headers
       final headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': 'Bearer $_secretKey',
+        'Authorization': 'Bearer $_serverKey',
       };
 
       // Prepare request body
