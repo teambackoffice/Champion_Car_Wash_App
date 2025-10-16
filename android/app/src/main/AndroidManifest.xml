@@ -49,6 +49,14 @@
                 android:name="android.nfc.action.TECH_DISCOVERED"
                 android:resource="@xml/nfc_tech_filter" />
         </activity>
+
+        <!-- PERFORMANCE: Disable Impeller rendering on low-spec MediaTek devices -->
+        <!-- Impeller's Vulkan backend can cause frame drops on older GPUs -->
+        <!-- Set to "true" to re-enable if needed -->
+        <meta-data
+            android:name="io.flutter.embedding.android.EnableImpeller"
+            android:value="false" />
+
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

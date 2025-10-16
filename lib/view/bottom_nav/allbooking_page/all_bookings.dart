@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:champion_car_wash_app/controller/get_allbooking_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -14,6 +15,13 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
   final TextEditingController _searchController = TextEditingController();
   DateTime? _selectedDate;
   String _searchQuery = '';
+  
+  // OPTIMIZATION: Debouncing and caching for search
+  Timer? _debounceTimer;
+  final Map<String, List<dynamic>> _searchCache = {};
+  List<dynamic>? _cachedFilteredResults;
+  String _lastSearchQuery = '';
+  DateTime? _lastSelectedDate;
 
   @override
   void initState() {
@@ -26,18 +34,32 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
       ).fetchBookingList();
     });
 
-    // Listen to search controller changes
-    _searchController.addListener(() {
-      setState(() {
-        _searchQuery = _searchController.text.toLowerCase();
-      });
-    });
+    // OPTIMIZATION: Listen to search controller changes with debouncing
+    _searchController.addListener(_onSearchChanged);
   }
 
   @override
   void dispose() {
+    // MEMORY LEAK FIX: Properly dispose all resources
+    _debounceTimer?.cancel();
+    _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
+    _searchCache.clear();
     super.dispose();
+  }
+
+  // OPTIMIZATION: Debounced search with 300ms delay
+  void _onSearchChanged() {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      final newQuery = _searchController.text.toLowerCase();
+      if (newQuery != _searchQuery) {
+        setState(() {
+          _searchQuery = newQuery;
+          _cachedFilteredResults = null; // Clear cache when search changes
+        });
+      }
+    });
   }
 
   Color _getStatusColor(String status) {
@@ -130,23 +152,45 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
     });
   }
 
-  // Filter bookings based on search query and date
+  // OPTIMIZATION: Cached filtering with performance improvements
   List<dynamic> _filterBookings(List<dynamic> bookings) {
-    return bookings.where((booking) {
+    // Check if we can use cached results
+    final currentQuery = _searchQuery;
+    final currentDate = _selectedDate;
+    
+    if (_cachedFilteredResults != null && 
+        _lastSearchQuery == currentQuery && 
+        _lastSelectedDate == currentDate) {
+      return _cachedFilteredResults!;
+    }
+    
+    // Create cache key for this filter combination
+    final cacheKey = '${currentQuery}_${currentDate?.toIso8601String() ?? 'null'}';
+    
+    // Check if we have this combination cached
+    if (_searchCache.containsKey(cacheKey)) {
+      _cachedFilteredResults = _searchCache[cacheKey]!;
+      _lastSearchQuery = currentQuery;
+      _lastSelectedDate = currentDate;
+      return _cachedFilteredResults!;
+    }
+    
+    // Perform filtering
+    final filtered = bookings.where((booking) {
       // Search filter - check registration number
       bool matchesSearch =
-          _searchQuery.isEmpty ||
-          booking.registrationNumber.toLowerCase().contains(_searchQuery);
+          currentQuery.isEmpty ||
+          booking.registrationNumber.toLowerCase().contains(currentQuery);
 
       // Date filter - check purchase date
       bool matchesDate = true;
-      if (_selectedDate != null) {
+      if (currentDate != null) {
         try {
           // Parse the purchase date from API (adjust format as needed)
           DateTime bookingDate = DateTime.parse(booking.purchaseDate);
           matchesDate =
               DateFormat('yyyy-MM-dd').format(bookingDate) ==
-              DateFormat('yyyy-MM-dd').format(_selectedDate!);
+              DateFormat('yyyy-MM-dd').format(currentDate);
         } catch (e) {
           // If date parsing fails, include the booking
           matchesDate = true;
@@ -155,6 +199,17 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
 
       return matchesSearch && matchesDate;
     }).toList();
+    
+    // Cache the results (limit cache size to prevent memory issues)
+    if (_searchCache.length > 20) {
+      _searchCache.clear(); // Clear cache if it gets too large
+    }
+    _searchCache[cacheKey] = filtered;
+    _cachedFilteredResults = filtered;
+    _lastSearchQuery = currentQuery;
+    _lastSelectedDate = currentDate;
+    
+    return filtered;
   }
 
   @override

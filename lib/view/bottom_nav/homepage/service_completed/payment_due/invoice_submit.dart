@@ -1,7 +1,7 @@
 import 'package:champion_car_wash_app/modal/underprocess_modal.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/payment_success.dart';
-import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/tap_checkout.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/stripe_payment_page.dart';
+import 'package:champion_car_wash_app/widgets/common/custom_back_button.dart';
 import 'package:flutter/material.dart';
 
 class InvoiceSubmitPage extends StatefulWidget {
@@ -19,9 +19,10 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Payment Details'),
+        title: const Text('Payment Details'),
         backgroundColor: const Color(0xFFF9FAF9),
         elevation: 0,
+        leading: const AppBarBackButton(),
       ),
       backgroundColor: const Color(0xFFF9FAF9),
       body: SafeArea(
@@ -480,39 +481,35 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
 
                 // Route based on selected payment method
                 if (selectedPaymentMethod == 'Tap') {
-                  Navigator.push(
-                    context,
-
-                    MaterialPageRoute(
-                      builder: (context) => StripePaymentPage(
-                        booking: widget.booking,
-                        paymentMethod: 'nfc',
-                      ),
-                    ),
-                    // MaterialPageRoute(
-                    //   builder: (context) => TapCheckoutScreen(booking: widget.booking),
-                    // ),
-                  );
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => StripePaymentPage(
+                  //       booking: widget.booking,
+                  //     ),
+                  //   ),
+                  //   // MaterialPageRoute(
+                  //   //   builder: (context) => TapCheckoutScreen(booking: widget.booking),
+                  //   // ),
+                  // );
                 } else if (selectedPaymentMethod == 'Stripe Card') {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => StripePaymentPage(
-                        booking: widget.booking,
-                        paymentMethod: 'card',
-                      ),
-                    ),
-                  );
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => StripePaymentPage(
+                  //       booking: widget.booking,
+                  //     ),
+                  //   ),
+                  // );
                 } else if (selectedPaymentMethod == 'Stripe NFC') {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => StripePaymentPage(
-                        booking: widget.booking,
-                        paymentMethod: 'nfc',
-                      ),
-                    ),
-                  );
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(
+                  //     builder: (context) => StripePaymentPage(
+                  //       booking: widget.booking,
+                  //     ),
+                  //   ),
+                  // );
                 } else {
                   // Cash payment - go directly to success
                   Navigator.pushReplacement(

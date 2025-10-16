@@ -9,6 +9,11 @@ class GetPrebookingListController extends ChangeNotifier {
   bool _isLoading = false;
   String? _error;
 
+  // OPTIMIZATION: Enhanced caching with configurable TTL
+  DateTime? _lastFetchTime;
+  static const Duration _cacheValidDuration = Duration(minutes: 5); // Increased TTL
+  static const Duration _backgroundRefreshThreshold = Duration(minutes: 3); // Background refresh
+
   // Getters
   GetPreBookingList? get preBookingList => _preBookingList;
   bool get isLoading => _isLoading;
@@ -16,7 +21,23 @@ class GetPrebookingListController extends ChangeNotifier {
   List<Datum> get bookingData => _preBookingList?.message.data ?? [];
 
   // Fetch pre-booking list
-  Future<void> fetchPreBookingList() async {
+  Future<void> fetchPreBookingList({bool forceRefresh = false}) async {
+    final now = DateTime.now();
+    
+    // OPTIMIZATION: Enhanced caching logic with background refresh
+    if (!forceRefresh && _lastFetchTime != null && _preBookingList != null) {
+      final timeSinceLastFetch = now.difference(_lastFetchTime!);
+      
+      // If cache is still valid, return immediately
+      if (timeSinceLastFetch < _cacheValidDuration) {
+        // If approaching expiry, trigger background refresh
+        if (timeSinceLastFetch > _backgroundRefreshThreshold) {
+          _backgroundRefresh();
+        }
+        return; // Use cached data
+      }
+    }
+
     // Only notify if we're not in the initial state
     if (_preBookingList != null || _error != null) {
       _isLoading = true;
@@ -30,6 +51,7 @@ class GetPrebookingListController extends ChangeNotifier {
 
     try {
       _preBookingList = await _service.getPreBookingList();
+      _lastFetchTime = DateTime.now(); // OPTIMIZATION: Update cache timestamp
       _error = null;
     } catch (e) {
       _error = e.toString();
@@ -42,7 +64,7 @@ class GetPrebookingListController extends ChangeNotifier {
 
   // Refresh data
   Future<void> refreshData() async {
-    await fetchPreBookingList();
+    await fetchPreBookingList(forceRefresh: true); // OPTIMIZATION: Force refresh
   }
 
   // Filter bookings by status
@@ -63,6 +85,31 @@ class GetPrebookingListController extends ChangeNotifier {
   }
 
   // Search bookings by customer name or phone
+
+  // OPTIMIZATION: Background refresh for seamless user experience
+  Future<void> _backgroundRefresh() async {
+    try {
+      final freshData = await _service.getPreBookingList();
+      _preBookingList = freshData;
+      _lastFetchTime = DateTime.now();
+      _error = null;
+      notifyListeners(); // Update UI with fresh data
+    } catch (e) {
+      // Silently fail background refresh, keep existing data
+    }
+  }
+
+  // Check if cache is expired
+  bool get isCacheExpired {
+    if (_lastFetchTime == null) return true;
+    return DateTime.now().difference(_lastFetchTime!) >= _cacheValidDuration;
+  }
+
+  // Get cache age in minutes
+  int get cacheAgeMinutes {
+    if (_lastFetchTime == null) return -1;
+    return DateTime.now().difference(_lastFetchTime!).inMinutes;
+  }
 
   // Clear error
   void clearError() {

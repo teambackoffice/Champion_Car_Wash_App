@@ -1,12 +1,9 @@
-import 'package:champion_car_wash_app/controller/get_prebooking_controller.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/booking_status.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/create_service.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/pre_booking_now/pre_book.dart';
-import 'package:champion_car_wash_app/view/splashscreen/splash_screen.dart';
 import 'package:champion_car_wash_app/view/test/payment_history_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:provider/provider.dart';
 
 // Extract your existing HomePage content into this widget
 class HomePageContent extends StatefulWidget {
@@ -25,16 +22,36 @@ class _HomePageContentState extends State<HomePageContent> {
   void initState() {
     super.initState();
 
+    // OPTIMIZATION: Removed duplicate fetchPreBookingList() call
+    // The BookingStatus widget already fetches this data
+    // OPTIMIZATION: Load user profile data asynchronously after first frame
+    // Use parallel loading for better performance
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<GetPrebookingListController>(
-        context,
-        listen: false,
-      ).fetchPreBookingList();
+      _loadUserData(); // Load both fullname and branch in parallel
+      // Precache the profile image to prevent frame drops on first render
+      _precacheImages();
     });
-    _loadFullname();
-    loadbranch();
   }
 
+  // OPTIMIZATION: Precache images to prevent UI jank
+  void _precacheImages() {
+    precacheImage(const AssetImage("assets/person.jpeg"), context);
+  }
+
+  // OPTIMIZATION: Load both storage values in parallel instead of sequentially
+  Future<void> _loadUserData() async {
+    final results = await Future.wait([
+      storage.read(key: "full_name"),
+      storage.read(key: "branch"),
+    ]);
+    
+    setState(() {
+      fullname = results[0] ?? '';
+      branch = results[1] ?? '';
+    });
+  }
+
+  // Keep individual methods for backward compatibility
   Future<void> _loadFullname() async {
     final storedName = await storage.read(key: "full_name");
     setState(() {
@@ -47,6 +64,12 @@ class _HomePageContentState extends State<HomePageContent> {
     setState(() {
       branch = storedBranch ?? '';
     });
+  }
+
+  @override
+  void dispose() {
+    // MEMORY LEAK FIX: No controllers to dispose, but good practice
+    super.dispose();
   }
 
   @override
@@ -64,20 +87,24 @@ class _HomePageContentState extends State<HomePageContent> {
           child: Column(
             children: [
               // User Profile Section
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
+              // OPTIMIZATION: RepaintBoundary isolates this widget from parent repaints
+              RepaintBoundary(
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                // OPTIMIZATION: Using const where possible reduces widget rebuilds
+                decoration: const BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.all(Radius.circular(20)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.08),
+                      color: Color(0x14000000), // 0.08 alpha as hex
                       blurRadius: 10,
-                      offset: const Offset(0, 2),
+                      offset: Offset(0, 2),
                     ),
                   ],
                 ),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     Container(
                       width: 70,
@@ -134,12 +161,17 @@ class _HomePageContentState extends State<HomePageContent> {
                     ),
                   ],
                 ),
+                ),
               ),
 
               const SizedBox(height: 20),
 
               // Booking Statistics
-              BookingStatus(),
+              // OPTIMIZATION: RepaintBoundary prevents this complex widget from
+              // causing repaints in parent/sibling widgets
+              RepaintBoundary(
+                child: BookingStatus(),
+              ),
 
               const SizedBox(height: 30),
 
@@ -246,6 +278,108 @@ class _HomePageContentState extends State<HomePageContent> {
 
               const SizedBox(height: 20),
 
+              // Stripe Payment Test Button
+              // SizedBox(
+              //   width: double.infinity,
+              //   height: 55,
+              //   child: ElevatedButton(
+              //     onPressed: () {
+              //       Navigator.push(
+              //         context,
+              //         MaterialPageRoute(
+              //           builder: (context) => const StripePaymentTest(),
+              //         ),
+              //       );
+              //     },
+              //     style: ElevatedButton.styleFrom(
+              //       backgroundColor: const Color(0xFF635BFF), // Stripe purple
+              //       foregroundColor: Colors.white,
+              //       elevation: 3,
+              //       shape: RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.circular(15),
+              //       ),
+              //     ),
+              //     child: Row(
+              //       mainAxisAlignment: MainAxisAlignment.center,
+              //       children: [
+              //         Container(
+              //           padding: const EdgeInsets.all(4),
+              //           decoration: BoxDecoration(
+              //             border: Border.all(color: Colors.white, width: 2),
+              //             borderRadius: BorderRadius.circular(20),
+              //           ),
+              //           child: const Icon(
+              //             Icons.contactless,
+              //             color: Colors.white,
+              //             size: 20,
+              //           ),
+              //         ),
+              //         const SizedBox(width: 10),
+              //         const Text(
+              //           "Test Stripe Payment",
+              //           style: TextStyle(
+              //             fontSize: 16,
+              //             fontWeight: FontWeight.w600,
+              //           ),
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
+
+              // const SizedBox(height: 20),
+
+              // Stripe Terminal POS Test Button
+              // SizedBox(
+              //   width: double.infinity,
+              //   height: 55,
+              //   child: ElevatedButton(
+              //     onPressed: () {
+              //       // Navigator.push(
+              //       //   context,
+              //       //   MaterialPageRoute(
+              //       //     builder: (context) => const StripeTerminalTest(),
+              //       //   ),
+              //       // );
+              //     },
+              //     style: ElevatedButton.styleFrom(
+              //       backgroundColor: Colors.deepPurple,
+              //       foregroundColor: Colors.white,
+              //       elevation: 3,
+              //       shape: RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.circular(15),
+              //       ),
+              //     ),
+              //     child: Row(
+              //       mainAxisAlignment: MainAxisAlignment.center,
+              //       children: [
+              //         Container(
+              //           padding: const EdgeInsets.all(4),
+              //           decoration: BoxDecoration(
+              //             border: Border.all(color: Colors.white, width: 2),
+              //             borderRadius: BorderRadius.circular(20),
+              //           ),
+              //           child: const Icon(
+              //             Icons.nfc,
+              //             color: Colors.white,
+              //             size: 20,
+              //           ),
+              //         ),
+              //         const SizedBox(width: 10),
+              //         const Text(
+              //           "Test POS Terminal (NFC)",
+              //           style: TextStyle(
+              //             fontSize: 16,
+              //             fontWeight: FontWeight.w600,
+              //           ),
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
+
+              // const SizedBox(height: 20),
+
               // Test buttons row 1
               // Row(
               //   children: [
@@ -327,56 +461,56 @@ class _HomePageContentState extends State<HomePageContent> {
               //   ],
               // ),
 
-              const SizedBox(height: 12),
+              // const SizedBox(height: 12),
 
               // Payment History Button
-              SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const PaymentHistoryViewer(),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                    elevation: 3,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white, width: 2),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: const Icon(
-                          Icons.history,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      const Text(
-                        "📊 Payment History",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+              // SizedBox(
+              //   width: double.infinity,
+              //   height: 55,
+              //   child: ElevatedButton(
+              //     onPressed: () {
+              //       Navigator.push(
+              //         context,
+              //         MaterialPageRoute(
+              //           builder: (context) => const PaymentHistoryViewer(),
+              //         ),
+              //       );
+              //     },
+              //     style: ElevatedButton.styleFrom(
+              //       backgroundColor: Colors.green,
+              //       foregroundColor: Colors.white,
+              //       elevation: 3,
+              //       shape: RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.circular(15),
+              //       ),
+              //     ),
+              //     child: Row(
+              //       mainAxisAlignment: MainAxisAlignment.center,
+              //       children: [
+              //         Container(
+              //           padding: const EdgeInsets.all(4),
+              //           decoration: BoxDecoration(
+              //             border: Border.all(color: Colors.white, width: 2),
+              //             borderRadius: BorderRadius.circular(20),
+              //           ),
+              //           child: const Icon(
+              //             Icons.history,
+              //             color: Colors.white,
+              //             size: 20,
+              //           ),
+              //         ),
+              //         const SizedBox(width: 10),
+              //         const Text(
+              //           "📊 Payment History",
+              //           style: TextStyle(
+              //             fontSize: 16,
+              //             fontWeight: FontWeight.w600,
+              //           ),
+              //         ),
+              //       ],
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),

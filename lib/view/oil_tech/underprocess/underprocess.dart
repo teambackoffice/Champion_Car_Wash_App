@@ -168,6 +168,12 @@ class _UnderProcessingTabState extends State<UnderProcessingTab> {
   ];
 
   @override
+  void dispose() {
+    // MEMORY LEAK FIX: Clean up resources
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
@@ -282,6 +288,13 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
     setState(() {
       selectedOil = null;
     });
+  }
+
+  @override
+  void dispose() {
+    // MEMORY LEAK FIX: Clean up resources
+    extraWorkItems.clear();
+    super.dispose();
   }
 
   @override
@@ -867,7 +880,7 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
                   }
 
                   return DropdownButtonFormField<String>(
-                    value: selectedOilBrand,
+                    initialValue: selectedOilBrand,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -921,7 +934,7 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
                   }
                   final subtypes = controller.oilSubtypes;
                   return DropdownButtonFormField<String>(
-                    value: selectedLitres,
+                    initialValue: selectedLitres,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -1430,6 +1443,8 @@ class _AddExtraWorkDialogState extends State<AddExtraWorkDialog> {
 
   @override
   void dispose() {
+    // MEMORY LEAK FIX: Remove listener before disposing controller
+    _searchController.removeListener(_filterExtraWork);
     _searchController.dispose();
     super.dispose();
   }

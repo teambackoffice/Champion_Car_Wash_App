@@ -3,6 +3,7 @@ import 'package:champion_car_wash_app/controller/confirm_prebook_controller.dart
 import 'package:champion_car_wash_app/controller/get_prebooking_controller.dart';
 import 'package:champion_car_wash_app/modal/get_prebooking_list.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/create_service.dart';
+import 'package:champion_car_wash_app/widgets/common/custom_back_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -56,21 +57,9 @@ class _PreBookingsScreenContainerState
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: Container(
-          margin: EdgeInsets.all(16),
-          decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-          child: IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: Icon(
-              Icons.arrow_back_ios_new_outlined,
-              color: Colors.white,
-              size: 16,
-            ),
-            padding: EdgeInsets.zero,
-          ),
-        ),
-        title: Text(
-          'Pre Bookings',
+        leading: const AppBarBackButton(),
+        title: const Text(
+          'xPre Bookings',
           style: TextStyle(
             color: Colors.black,
             fontSize: 18,

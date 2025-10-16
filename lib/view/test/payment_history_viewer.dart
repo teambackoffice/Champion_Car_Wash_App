@@ -341,7 +341,7 @@ class _PaymentHistoryViewerState extends State<PaymentHistoryViewer> {
               // Status filter
               Expanded(
                 child: DropdownButtonFormField<PaymentStatus?>(
-                  value: _statusFilter,
+                  initialValue: _statusFilter,
                   decoration: const InputDecoration(
                     labelText: 'Status',
                     border: OutlineInputBorder(),
@@ -365,7 +365,7 @@ class _PaymentHistoryViewerState extends State<PaymentHistoryViewer> {
               // Method filter
               Expanded(
                 child: DropdownButtonFormField<String?>(
-                  value: _methodFilter,
+                  initialValue: _methodFilter,
                   decoration: const InputDecoration(
                     labelText: 'Method',
                     border: OutlineInputBorder(),
@@ -428,6 +428,8 @@ class _PaymentHistoryViewerState extends State<PaymentHistoryViewer> {
 
   Widget _buildPaymentList() {
     return ListView.builder(
+      // OPTIMIZATION: Cache items outside viewport for smoother scrolling
+      cacheExtent: 500,
       itemCount: _filteredPayments.length,
       itemBuilder: (context, index) {
         final payment = _filteredPayments[index];
@@ -440,7 +442,9 @@ class _PaymentHistoryViewerState extends State<PaymentHistoryViewer> {
     final statusColor = _getStatusColor(payment.status);
     final statusIcon = _getStatusIcon(payment.status);
     
-    return Card(
+    return RepaintBoundary(
+      key: ValueKey(payment.id),
+      child: Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: ExpansionTile(
         leading: Icon(statusIcon, color: statusColor),
@@ -523,6 +527,7 @@ class _PaymentHistoryViewerState extends State<PaymentHistoryViewer> {
           ),
         ],
       ),
+    ),
     );
   }
 

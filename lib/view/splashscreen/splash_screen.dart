@@ -24,7 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkLoginStatus() async {
-    await Future.delayed(const Duration(seconds: 3));
+    // await Future.delayed(const Duration(seconds: 3));
 
     // Check if user is logged in by checking API key or SID
     String? apiKey = await _secureStorage.read(key: 'api_key');
@@ -44,6 +44,7 @@ class _SplashScreenState extends State<SplashScreen> {
             context,
             MaterialPageRoute(builder: (_) => OilTechnicianHomePage()),
           );
+          return;
         } else if (roles.contains('supervisors')) {
           Navigator.pushReplacement(
             context,
@@ -64,6 +65,12 @@ class _SplashScreenState extends State<SplashScreen> {
         );
       }
     }
+  }
+
+  @override
+  void dispose() {
+    // MEMORY LEAK FIX: No controllers to dispose, but good practice
+    super.dispose();
   }
 
   @override

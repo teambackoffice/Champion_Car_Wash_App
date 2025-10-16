@@ -1,0 +1,1119 @@
+{
+	"info": {
+		"_postman_id": "champion-carwash-api-2025",
+		"name": "Champion Car Wash API",
+		"description": "Complete API collection for Champion Car Wash Application with 31 endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "🔐 Authentication",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"sid\", jsonData.message.sid);",
+									"    pm.environment.set(\"api_key\", jsonData.message.api_key);",
+									"    pm.environment.set(\"branch\", jsonData.message.branch);",
+									"    pm.environment.set(\"full_name\", jsonData.full_name);",
+									"    console.log(\"✅ Login successful! SID saved to environment.\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.user_login?usr={{username}}&pwd={{password}}",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.user_login"],
+							"query": [
+								{
+									"key": "usr",
+									"value": "{{username}}",
+									"description": "Username or email"
+								},
+								{
+									"key": "pwd",
+									"value": "{{password}}",
+									"description": "Password"
+								}
+							]
+						},
+						"description": "Authenticate user and get session ID (SID) for subsequent requests"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "📋 Service Management",
+			"item": [
+				{
+					"name": "Get Service Types",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.get_service_type",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.get_service_type"]
+						},
+						"description": "Get list of available service types (Car Wash, Oil Change, etc.)"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Service (Supervisor)",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "sid={{sid}}",
+								"type": "text",
+								"description": "Session ID from login"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "customer_name",
+									"value": "John Doe",
+									"type": "text",
+									"description": "Customer full name"
+								},
+								{
+									"key": "phone",
+									"value": "+971501234567",
+									"type": "text",
+									"description": "Customer phone number with country code"
+								},
+								{
+									"key": "email",
+									"value": "john.doe@example.com",
+									"type": "text",
+									"description": "Customer email address"
+								},
+								{
+									"key": "address",
+									"value": "123 Sheikh Zayed Road, Dubai",
+									"type": "text",
+									"description": "Customer address"
+								},
+								{
+									"key": "city",
+									"value": "Dubai",
+									"type": "text",
+									"description": "City name"
+								},
+								{
+									"key": "branch",
+									"value": "Qatar",
+									"type": "text",
+									"description": "Branch location (Qatar/Dubai)"
+								},
+								{
+									"key": "make",
+									"value": "Toyota",
+									"type": "text",
+									"description": "Car manufacturer/make"
+								},
+								{
+									"key": "model",
+									"value": "Camry",
+									"type": "text",
+									"description": "Car model"
+								},
+								{
+									"key": "car_type",
+									"value": "Sedan",
+									"type": "text",
+									"description": "Type of car (Sedan, SUV, etc.)"
+								},
+								{
+									"key": "purchase_date",
+									"value": "2020-05-15",
+									"type": "text",
+									"description": "Vehicle purchase date (YYYY-MM-DD)"
+								},
+								{
+									"key": "engine_number",
+									"value": "1NX-FE-123456",
+									"type": "text",
+									"description": "Engine number"
+								},
+								{
+									"key": "chasis_number",
+									"value": "JTD123456789",
+									"type": "text",
+									"description": "Chassis number"
+								},
+								{
+									"key": "registration_number",
+									"value": "DXB-A-12345",
+									"type": "text",
+									"description": "Vehicle registration/plate number"
+								},
+								{
+									"key": "fuel_level",
+									"value": "75",
+									"type": "text",
+									"description": "Fuel level percentage (0-100)"
+								},
+								{
+									"key": "last_service_odometer",
+									"value": "25000",
+									"type": "text",
+									"description": "Last service odometer reading in KM"
+								},
+								{
+									"key": "current_odometer_reading",
+									"value": "30000",
+									"type": "text",
+									"description": "Current odometer reading in KM"
+								},
+								{
+									"key": "next_service_odometer",
+									"value": "35000",
+									"type": "text",
+									"description": "Next service odometer reading in KM"
+								},
+								{
+									"key": "services",
+									"value": "[{\"service_type\":\"Car Wash\",\"wash_type\":\"Premium Wash\",\"price\":50.0},{\"service_type\":\"Oil Change\",\"oil_brand\":\"Mobil 1\",\"price\":100.0}]",
+									"type": "text",
+									"description": "JSON array of services"
+								},
+								{
+									"key": "service_total",
+									"value": "150.00",
+									"type": "text",
+									"description": "Total service amount"
+								},
+								{
+									"key": "video",
+									"type": "file",
+									"src": [],
+									"disabled": true,
+									"description": "Optional inspection video file"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.create_service_by_supervisor",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.create_service_by_supervisor"]
+						},
+						"description": "Create a new service booking with complete customer and vehicle details.\n\n**Services JSON Format:**\n```json\n[\n  {\n    \"service_type\": \"Car Wash\",\n    \"wash_type\": \"Premium Wash\",\n    \"price\": 50.0\n  },\n  {\n    \"service_type\": \"Oil Change\",\n    \"oil_brand\": \"Mobil 1\",\n    \"price\": 100.0\n  }\n]\n```\n\n**Success Response (200):**\n```json\n{\n  \"message\": {\n    \"service_id\": \"SRV-2024-00123\",\n    \"customer_name\": \"John Doe\",\n    \"status\": \"New\",\n    \"total_amount\": 150.0\n  }\n}\n```"
+					},
+					"response": [
+						{
+							"name": "Success Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Cookie",
+										"value": "sid=example_session_id",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{base_url}}/api/method/carwash.Api.auth.create_service_by_supervisor",
+									"host": ["{{base_url}}"],
+									"path": ["api", "method", "carwash.Api.auth.create_service_by_supervisor"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": {\n        \"service_id\": \"SRV-2024-00123\",\n        \"customer_name\": \"John Doe\",\n        \"vehicle_registration\": \"DXB-A-12345\",\n        \"services\": [\n            {\n                \"service_type\": \"Car Wash\",\n                \"wash_type\": \"Premium Wash\",\n                \"price\": 50.0\n            },\n            {\n                \"service_type\": \"Oil Change\",\n                \"oil_brand\": \"Mobil 1\",\n                \"price\": 100.0\n            }\n        ],\n        \"total_amount\": 150.0,\n        \"status\": \"New\",\n        \"created_at\": \"2024-01-15 10:30:00\",\n        \"branch\": \"Qatar\"\n    }\n}"
+						},
+						{
+							"name": "Error - Missing Fields",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Cookie",
+										"value": "sid=example_session_id",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{base_url}}/api/method/carwash.Api.auth.create_service_by_supervisor",
+									"host": ["{{base_url}}"],
+									"path": ["api", "method", "carwash.Api.auth.create_service_by_supervisor"]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Invalid input data\",\n    \"exception\": \"ValidationError: customer_name is required\",\n    \"exc_type\": \"ValidationError\"\n}"
+						},
+						{
+							"name": "Error - Unauthorized",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": []
+								},
+								"url": {
+									"raw": "{{base_url}}/api/method/carwash.Api.auth.create_service_by_supervisor",
+									"host": ["{{base_url}}"],
+									"path": ["api", "method", "carwash.Api.auth.create_service_by_supervisor"]
+								}
+							},
+							"status": "Unauthorized",
+							"code": 401,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json"
+								}
+							],
+							"cookie": [],
+							"body": "{\n    \"message\": \"Authentication required\",\n    \"exception\": \"Unauthorized: Please login first\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Open Service Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "sid={{sid}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.get_open_service_details",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.get_open_service_details"]
+						},
+						"description": "Get list of all open/new service bookings"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Service Bookings",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "sid={{sid}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.get_all_service_bookings",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.get_all_service_bookings"]
+						},
+						"description": "Get all service bookings (open, in-progress, completed)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Service to In-Progress",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "sid={{sid}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"service_id\": \"SRV-001\",\n  \"service_type\": \"Car Wash\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.update_service_to_inprogress",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.update_service_to_inprogress"]
+						},
+						"description": "Change service status from Open to In Progress"
+					},
+					"response": []
+				},
+				{
+					"name": "Get In-Progress Service Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "sid={{sid}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.get_Inprogress_service_details",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.get_Inprogress_service_details"]
+						},
+						"description": "Get list of services currently in progress"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Completed Service Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "sid={{sid}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.get_completed_service_details",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.get_completed_service_details"]
+						},
+						"description": "Get list of completed services"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "📅 Pre-Booking",
+			"item": [
+				{
+					"name": "Get Pre-Booking List",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "sid={{sid}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.get_pre_booking_list",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.get_pre_booking_list"]
+						},
+						"description": "Get list of pre-bookings (future appointments)"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Pre-Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "sid={{sid}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customer_name\": \"Jane Doe\",\n  \"customer_phone\": \"+971509876543\",\n  \"vehicle_make\": \"Honda\",\n  \"vehicle_model\": \"Accord\",\n  \"plate_number\": \"XYZ-456\",\n  \"service_type\": \"Oil Change\",\n  \"booking_date\": \"2025-10-15\",\n  \"booking_time\": \"14:00\",\n  \"branch\": \"{{branch}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.create_pre_booking",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.create_pre_booking"]
+						},
+						"description": "Create a new pre-booking/appointment"
+					},
+					"response": []
+				},
+				{
+					"name": "Confirm Pre-Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"pre_book_id\": \"PB-001\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.prebooking_confirm?pre_book_id=PB-001",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.prebooking_confirm"],
+							"query": [
+								{
+									"key": "pre_book_id",
+									"value": "PB-001"
+								}
+							]
+						},
+						"description": "Confirm a pre-booking and convert it to active service"
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Pre-Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"pre_book_id\": \"PB-001\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.prebooking_cancel",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.prebooking_cancel"]
+						},
+						"description": "Cancel a pre-booking"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🚗 Car Wash Technician",
+			"item": [
+				{
+					"name": "Get Child Open Service Details (Car Wash)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "sid={{sid}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.get_child_open_service_details?service_type=Car Wash",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.get_child_open_service_details"],
+							"query": [
+								{
+									"key": "service_type",
+									"value": "Car Wash"
+								}
+							]
+						},
+						"description": "Get open car wash services assigned to technician"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Car Wash Child In-Progress Services",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "sid={{sid}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.get_carwash_child_inprogress_services",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.get_carwash_child_inprogress_services"]
+						},
+						"description": "Get car wash services in progress for technician"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Car Wash Child Completed Services",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "sid={{sid}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.get_carwash_child_completed_service",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.get_carwash_child_completed_service"]
+						},
+						"description": "Get completed car wash services by technician"
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Car Wash Details",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "sid={{sid}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"service_id\": \"SRV-001\",\n  \"wash_type\": \"Premium Wash\",\n  \"work_completed\": [\n    \"Exterior Wash\",\n    \"Interior Vacuum\",\n    \"Tire Shine\",\n    \"Window Cleaning\"\n  ],\n  \"notes\": \"Vehicle cleaned thoroughly. Customer satisfied.\",\n  \"completion_time\": \"2025-10-13T12:30:00\",\n  \"images\": []\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.submit_carwash_details",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.submit_carwash_details"]
+						},
+						"description": "Complete car wash service and submit details"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🛢️ Oil Change Technician",
+			"item": [
+				{
+					"name": "Get Child Open Service Details (Oil)",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "sid={{sid}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.get_child_open_service_details?service_type=Oil Change",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.get_child_open_service_details"],
+							"query": [
+								{
+									"key": "service_type",
+									"value": "Oil Change"
+								}
+							]
+						},
+						"description": "Get open oil change services assigned to technician"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Oil Child In-Progress Services",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "sid={{sid}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.get_oil_child_inprogress_services",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.get_oil_child_inprogress_services"]
+						},
+						"description": "Get oil change services in progress for technician"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Oil Child Completed Services",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "sid={{sid}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.get_oil_child_completed_service",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.get_oil_child_completed_service"]
+						},
+						"description": "Get completed oil change services by technician"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Inspection Questions",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "sid={{sid}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.get_inspection_questions?inspection_type=Oil Change",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.get_inspection_questions"],
+							"query": [
+								{
+									"key": "inspection_type",
+									"value": "Oil Change"
+								}
+							]
+						},
+						"description": "Get list of inspection questions for vehicle inspection checklist"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Extra Work",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "sid={{sid}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.get_extra_work",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.get_extra_work"]
+						},
+						"description": "Get list of additional work items that can be performed"
+					},
+					"response": []
+				},
+				{
+					"name": "Submit Oil Change Details",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "sid={{sid}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"service_id\": \"SRV-050\",\n  \"oil_brand\": \"Mobil 1\",\n  \"oil_type\": \"Synthetic 5W-30\",\n  \"oil_quantity\": \"5 Liters\",\n  \"oil_filter_changed\": true,\n  \"air_filter_checked\": true,\n  \"air_filter_condition\": \"Good\",\n  \"current_mileage\": 50000,\n  \"next_service_mileage\": 55000,\n  \"inspection_results\": [\n    {\n      \"question\": \"Engine oil level\",\n      \"answer\": \"Normal\"\n    },\n    {\n      \"question\": \"Brake fluid level\",\n      \"answer\": \"Normal\"\n    },\n    {\n      \"question\": \"Tire pressure\",\n      \"answer\": \"All tires at 32 PSI\"\n    }\n  ],\n  \"extra_work_performed\": [],\n  \"notes\": \"Oil change completed. All fluids checked.\",\n  \"completion_time\": \"2025-10-13T13:00:00\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.submit_oil_change_details",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.submit_oil_change_details"]
+						},
+						"description": "Complete oil change service and submit inspection details"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "🏎️ Vehicle Data",
+			"item": [
+				{
+					"name": "Get All Makes",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.get_all_makes",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.get_all_makes"]
+						},
+						"description": "Get list of all car manufacturers/makes"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Models by Make",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.get_models_by_make?make=Toyota",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.get_models_by_make"],
+							"query": [
+								{
+									"key": "make",
+									"value": "Toyota",
+									"description": "Car manufacturer name"
+								}
+							]
+						},
+						"description": "Get list of car models for a specific manufacturer"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Wash Types",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.get_wash_type",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.get_wash_type"]
+						},
+						"description": "Get list of available car wash service types"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Oil Brands",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.get_all_oil_brand",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.get_all_oil_brand"]
+						},
+						"description": "Get list of available oil brands"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Oil Subtypes by Brand",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "sid={{sid}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.get_oil_subtypes_by_brand?brand=Mobil 1",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.get_oil_subtypes_by_brand"],
+							"query": [
+								{
+									"key": "brand",
+									"value": "Mobil 1",
+									"description": "Oil brand name"
+								}
+							]
+						},
+						"description": "Get oil types/grades for a specific brand"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "💰 Invoicing & Payment",
+			"item": [
+				{
+					"name": "Create Sales Invoice",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Cookie",
+								"value": "sid={{sid}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customer\": \"John Smith\",\n  \"service_id\": \"SRV-001\",\n  \"items\": [\n    {\n      \"item_code\": \"CARWASH-PREMIUM\",\n      \"item_name\": \"Premium Wash\",\n      \"qty\": 1,\n      \"price\": 100.00\n    },\n    {\n      \"item_code\": \"EW-001\",\n      \"item_name\": \"Air Filter Replacement\",\n      \"qty\": 1,\n      \"price\": 50.00\n    }\n  ]\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/api/method/carwash.Api.auth.create_sales_invoice",
+							"host": ["{{base_url}}"],
+							"path": ["api", "method", "carwash.Api.auth.create_sales_invoice"]
+						},
+						"description": "Create sales invoice for completed service"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "💳 Stripe Payment (External)",
+			"item": [
+				{
+					"name": "Create Payment Intent",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.environment.set(\"payment_intent_id\", jsonData.id);",
+									"    pm.environment.set(\"client_secret\", jsonData.client_secret);",
+									"    console.log(\"✅ Payment Intent created! ID saved to environment.\");",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{stripe_secret_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "amount",
+									"value": "15000",
+									"description": "Amount in cents (150.00 AED)",
+									"type": "text"
+								},
+								{
+									"key": "currency",
+									"value": "aed",
+									"description": "Currency code",
+									"type": "text"
+								},
+								{
+									"key": "payment_method_types[]",
+									"value": "card",
+									"description": "Payment method type",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "Payment for service SRV-001",
+									"description": "Payment description",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://api.stripe.com/v1/payment_intents",
+							"protocol": "https",
+							"host": ["api", "stripe", "com"],
+							"path": ["v1", "payment_intents"]
+						},
+						"description": "Create Stripe payment intent for processing card payment (External Stripe API)"
+					},
+					"response": []
+				},
+				{
+					"name": "Confirm Payment Intent",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{stripe_secret_key}}",
+								"type": "text"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "payment_method",
+									"value": "pm_card_visa",
+									"description": "Test card payment method",
+									"type": "text"
+								},
+								{
+									"key": "return_url",
+									"value": "https://championcarwash.com/success",
+									"description": "Return URL after payment",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "https://api.stripe.com/v1/payment_intents/{{payment_intent_id}}/confirm",
+							"protocol": "https",
+							"host": ["api", "stripe", "com"],
+							"path": ["v1", "payment_intents", "{{payment_intent_id}}", "confirm"]
+						},
+						"description": "Confirm payment with card details (External Stripe API)\n\nTest Cards:\n- Success: 4242 4242 4242 4242\n- Decline: 4000 0000 0000 0002"
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Set current timestamp for requests that need it",
+					"pm.environment.set(\"current_timestamp\", new Date().toISOString());"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://carwash.tbo365.cloud",
+			"type": "string"
+		}
+	]
+}

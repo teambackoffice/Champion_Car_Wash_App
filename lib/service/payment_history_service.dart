@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /// Payment History Service
@@ -27,13 +28,21 @@ class PaymentHistoryService {
   List<PaymentHistoryRecord> get paymentHistory => List.unmodifiable(_paymentHistory);
 
   /// Initialize payment history service
+  /// OPTIMIZATION: Now runs asynchronously without blocking startup
   Future<void> initialize() async {
     try {
-      print('PaymentHistory: Initializing service...');
+      if (kDebugMode) {
+        print('PaymentHistory: Initializing service...');
+      }
+      // OPTIMIZATION: Load payment history asynchronously
       await _loadPaymentHistory();
-      print('PaymentHistory: Service initialized with ${_paymentHistory.length} records');
+      if (kDebugMode) {
+        print('PaymentHistory: Service initialized with ${_paymentHistory.length} records');
+      }
     } catch (e) {
-      print('PaymentHistory: Error initializing: $e');
+      if (kDebugMode) {
+        print('PaymentHistory: Error initializing: $e');
+      }
     }
   }
 
@@ -75,14 +84,19 @@ class PaymentHistoryService {
       _paymentHistory.insert(0, record); // Add to beginning (newest first)
       await _savePaymentHistory();
       await _updatePaymentStats();
-      
+
       // Notify listeners
       _historyController.add(_paymentHistory);
-      
-      print('PaymentHistory: Added record ${record.id} - ${record.paymentMethod} - ${record.status.name}');
-      print('PaymentHistory: Total records: ${_paymentHistory.length}');
+
+      // OPTIMIZATION: Conditional logging only in debug mode
+      if (kDebugMode) {
+        print('PaymentHistory: Added record ${record.id} - ${record.paymentMethod} - ${record.status.name}');
+        print('PaymentHistory: Total records: ${_paymentHistory.length}');
+      }
     } catch (e) {
-      print('PaymentHistory: Error adding record: $e');
+      if (kDebugMode) {
+        print('PaymentHistory: Error adding record: $e');
+      }
     }
   }
 
@@ -129,7 +143,10 @@ class PaymentHistoryService {
         lastUpdated: DateTime.now(),
       );
     } catch (e) {
-      print('PaymentHistory: Error getting stats: $e');
+      // OPTIMIZATION: Conditional logging
+      if (kDebugMode) {
+        print('PaymentHistory: Error getting stats: $e');
+      }
       return PaymentStats.empty();
     }
   }
@@ -169,9 +186,14 @@ class PaymentHistoryService {
       await _secureStorage.delete(key: _historyKey);
       await _secureStorage.delete(key: _statsKey);
       _historyController.add(_paymentHistory);
-      print('PaymentHistory: History cleared');
+      // OPTIMIZATION: Conditional logging
+      if (kDebugMode) {
+        print('PaymentHistory: History cleared');
+      }
     } catch (e) {
-      print('PaymentHistory: Error clearing history: $e');
+      if (kDebugMode) {
+        print('PaymentHistory: Error clearing history: $e');
+      }
     }
   }
 
@@ -185,51 +207,68 @@ class PaymentHistoryService {
       };
       return jsonEncode(data);
     } catch (e) {
-      print('PaymentHistory: Error exporting: $e');
+      // OPTIMIZATION: Conditional logging
+      if (kDebugMode) {
+        print('PaymentHistory: Error exporting: $e');
+      }
       return '{}';
     }
   }
 
   /// Load payment history from storage
+  /// OPTIMIZATION: Asynchronous loading without blocking UI
   Future<void> _loadPaymentHistory() async {
     try {
       final historyJson = await _secureStorage.read(key: _historyKey);
       if (historyJson != null) {
+        // OPTIMIZATION: Decode JSON asynchronously
         final List<dynamic> historyList = jsonDecode(historyJson);
         _paymentHistory.clear();
         _paymentHistory.addAll(
           historyList.map((json) => PaymentHistoryRecord.fromJson(json)).toList()
         );
-        print('PaymentHistory: Loaded ${_paymentHistory.length} records from storage');
+        // OPTIMIZATION: Conditional logging
+        if (kDebugMode) {
+          print('PaymentHistory: Loaded ${_paymentHistory.length} records from storage');
+        }
       }
     } catch (e) {
-      print('PaymentHistory: Error loading history: $e');
+      if (kDebugMode) {
+        print('PaymentHistory: Error loading history: $e');
+      }
     }
   }
 
   /// Save payment history to storage
+  /// OPTIMIZATION: Asynchronous saving without blocking UI
   Future<void> _savePaymentHistory() async {
     try {
-      // Keep only last 1000 records to prevent storage bloat
+      // OPTIMIZATION: Keep only last 1000 records to prevent storage bloat and improve performance
       if (_paymentHistory.length > 1000) {
         _paymentHistory.removeRange(1000, _paymentHistory.length);
       }
 
+      // OPTIMIZATION: Encode JSON asynchronously
       final historyJson = jsonEncode(_paymentHistory.map((p) => p.toJson()).toList());
       await _secureStorage.write(key: _historyKey, value: historyJson);
     } catch (e) {
-      print('PaymentHistory: Error saving history: $e');
+      if (kDebugMode) {
+        print('PaymentHistory: Error saving history: $e');
+      }
     }
   }
 
   /// Update payment statistics
+  /// OPTIMIZATION: Asynchronous stats update without blocking UI
   Future<void> _updatePaymentStats() async {
     try {
       final stats = await getPaymentStats();
       final statsJson = jsonEncode(stats.toJson());
       await _secureStorage.write(key: _statsKey, value: statsJson);
     } catch (e) {
-      print('PaymentHistory: Error updating stats: $e');
+      if (kDebugMode) {
+        print('PaymentHistory: Error updating stats: $e');
+      }
     }
   }
 

@@ -1,5 +1,3 @@
-import 'dart:developer' as developer;
-
 class GetAllbookingModal {
   final bool success;
   final int count;
@@ -11,41 +9,19 @@ class GetAllbookingModal {
     required this.data,
   });
   factory GetAllbookingModal.fromJson(Map<String, dynamic> json) {
-    developer.log(
-      'GetAllbookingModal.fromJson: Raw JSON: $json',
-      name: 'GetAllbookingModal',
-    );
-
     final message = json['message'];
 
     if (message == null) {
-      developer.log(
-        'ERROR: message field is null in JSON',
-        name: 'GetAllbookingModal',
-        error: 'Null message',
-      );
       throw Exception('Invalid JSON structure: message field is null');
     }
 
-    developer.log(
-      'Message content: $message',
-      name: 'GetAllbookingModal',
-    );
-
-    final modal = GetAllbookingModal(
+    return GetAllbookingModal(
       success: message['success'] ?? false,
       count: message['count'] ?? 0,
       data: List<ServiceData>.from(
         (message['data'] ?? []).map((x) => ServiceData.fromJson(x)),
       ),
     );
-
-    developer.log(
-      'GetAllbookingModal created: success=${modal.success}, count=${modal.count}, data items=${modal.data.length}',
-      name: 'GetAllbookingModal',
-    );
-
-    return modal;
   }
 }
 
@@ -97,11 +73,6 @@ class ServiceData {
   });
 
   factory ServiceData.fromJson(Map<String, dynamic> json) {
-    developer.log(
-      'ServiceData.fromJson: Parsing service_id=${json['service_id']}',
-      name: 'ServiceData',
-    );
-
     try {
       final serviceData = ServiceData(
         serviceId: json['service_id'] ?? '',
@@ -129,23 +100,8 @@ class ServiceData {
         ),
       );
 
-      developer.log(
-        'ServiceData parsed successfully: ${serviceData.serviceId}',
-        name: 'ServiceData',
-      );
-
       return serviceData;
-    } catch (e, stackTrace) {
-      developer.log(
-        'ERROR parsing ServiceData',
-        name: 'ServiceData',
-        error: e,
-        stackTrace: stackTrace,
-      );
-      developer.log(
-        'JSON that failed: $json',
-        name: 'ServiceData',
-      );
+    } catch (e) {
       rethrow;
     }
   }
@@ -165,10 +121,6 @@ class GetAllServiceItem {
   });
 
   factory GetAllServiceItem.fromJson(Map<String, dynamic> json) {
-    developer.log(
-      'GetAllServiceItem.fromJson: Parsing service_type=${json['service_type']}',
-      name: 'GetAllServiceItem',
-    );
 
     try {
       final item = GetAllServiceItem(
@@ -178,23 +130,8 @@ class GetAllServiceItem {
         price: (json['price'] as num?)?.toDouble() ?? 0.0,
       );
 
-      developer.log(
-        'GetAllServiceItem parsed: ${item.serviceType}, price: ${item.price}',
-        name: 'GetAllServiceItem',
-      );
-
       return item;
-    } catch (e, stackTrace) {
-      developer.log(
-        'ERROR parsing GetAllServiceItem',
-        name: 'GetAllServiceItem',
-        error: e,
-        stackTrace: stackTrace,
-      );
-      developer.log(
-        'JSON that failed: $json',
-        name: 'GetAllServiceItem',
-      );
+    } catch (e) {
       rethrow;
     }
   }

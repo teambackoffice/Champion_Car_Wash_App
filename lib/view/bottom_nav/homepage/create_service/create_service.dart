@@ -6,6 +6,7 @@ import 'package:champion_car_wash_app/controller/get_makes_by_modal_controller.d
 import 'package:champion_car_wash_app/modal/get_all_makes_modal.dart';
 import 'package:champion_car_wash_app/modal/get_make_modal.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/select_service.dart';
+import 'package:champion_car_wash_app/widgets/common/custom_back_button.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -96,22 +97,8 @@ class _CreateServicePageState extends State<CreateServicePage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: IconButton(
-          icon: Container(
-            padding: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.red,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(
-              Icons.arrow_back_ios_new_outlined,
-              color: Colors.white,
-              size: 16,
-            ),
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
+        leading: const AppBarBackButton(),
+        title: const Text(
           'Create Service',
           style: TextStyle(
             color: Colors.black,
@@ -455,14 +442,19 @@ class _CreateServicePageState extends State<CreateServicePage> {
     }
 
     if (_makesController.makes.isEmpty) {
-      return _buildErrorDropdown('Failed to load makes', () {
-        setState(() => _isLoadingMakes = true);
-        _loadMakes();
-      });
+      // Check if there's an error message to show error UI or just empty state
+      if (_makesController.errorMessage.isNotEmpty) {
+        return _buildErrorDropdown('Failed to load makes', () {
+          setState(() => _isLoadingMakes = true);
+          _loadMakes();
+        });
+      } else {
+        return _buildInfoDropdown('No makes found');
+      }
     }
 
     return DropdownButtonFormField<String>(
-      value: _selectedMake,
+      initialValue: _selectedMake,
       hint: Text('Select Make', style: TextStyle(color: Colors.grey[400])),
       items: _makesController.makes.map((CarMake make) {
         return DropdownMenuItem<String>(
@@ -501,7 +493,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
         }
 
         return DropdownButtonFormField<String>(
-          value: _selectedModel,
+          initialValue: _selectedModel,
           hint: Text('Select Model', style: TextStyle(color: Colors.grey[400])),
           items: _modelsController.models.map((CarModel model) {
             return DropdownMenuItem<String>(
@@ -542,7 +534,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
     }
 
     return DropdownButtonFormField<String>(
-      value: _selectedType,
+      initialValue: _selectedType,
       hint: Text('Select Car Type', style: TextStyle(color: Colors.grey[400])),
       items: [selectedCarModel.carType].map((type) {
         return DropdownMenuItem<String>(value: type, child: Text(type));
@@ -610,6 +602,24 @@ class _CreateServicePageState extends State<CreateServicePage> {
           Icon(Icons.info_outline, color: Colors.grey[400], size: 20),
           SizedBox(width: 12),
           Text(text, style: TextStyle(color: Colors.grey[400])),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoDropdown(String text) {
+    return Container(
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.blue[50],
+        border: Border.all(color: Colors.blue[200]!),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.info_outline, color: Colors.blue[700], size: 20),
+          SizedBox(width: 12),
+          Text(text, style: TextStyle(color: Colors.blue[700])),
         ],
       ),
     );
@@ -793,6 +803,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
 
   @override
   void dispose() {
+    // MEMORY LEAK FIX: Dispose all text editing controllers
     _vehicleNumberController.dispose();
     nameController.dispose();
     mobileController.dispose();
@@ -803,6 +814,12 @@ class _CreateServicePageState extends State<CreateServicePage> {
     _engineNumberController.dispose();
     _chassisNumberController.dispose();
     regNumberController.dispose();
+
+    // MEMORY LEAK FIX: Dispose custom controllers (ChangeNotifiers)
+    _makesController.dispose();
+    _modelsController.dispose();
+    _typeController.dispose();
+
     super.dispose();
   }
 }

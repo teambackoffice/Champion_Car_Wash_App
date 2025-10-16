@@ -1,6 +1,7 @@
 import 'package:champion_car_wash_app/controller/get_completed_controller.dart';
 import 'package:champion_car_wash_app/modal/get_completed_modal.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/payment_due.dart';
+import 'package:champion_car_wash_app/widgets/common/custom_back_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -76,24 +77,7 @@ class _ServiceCompletedScreenState extends State<ServiceCompletedScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: Container(
-          margin: const EdgeInsets.all(5),
-          decoration: const BoxDecoration(
-            color: Colors.red,
-            shape: BoxShape.circle,
-          ),
-          child: IconButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            icon: const Icon(
-              Icons.arrow_back_ios_new_outlined,
-              color: Colors.white,
-              size: 16,
-            ),
-            padding: EdgeInsets.zero,
-          ),
-        ),
+        leading: const AppBarBackButton(),
         title: const Text(
           'Service Completed',
           style: TextStyle(

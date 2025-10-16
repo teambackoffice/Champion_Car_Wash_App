@@ -7,6 +7,7 @@ import 'package:champion_car_wash_app/modal/selected_service_modal.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/car_wash.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/oil_change.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/service_success.dart';
+import 'package:champion_car_wash_app/widgets/common/custom_back_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
@@ -90,10 +91,15 @@ class _SelectServiceState extends State<SelectService> {
 
   @override
   void dispose() {
+    // MEMORY LEAK FIX: Dispose all TextEditingControllers
     _lastServiceController.dispose();
     _currentOdometerController.dispose();
     _nextServiceController.dispose();
-    _carWashController.dispose(); // Dispose controller
+
+    // MEMORY LEAK FIX: Dispose all ChangeNotifier controllers
+    _controller.dispose(); // ServiceTypeController - CRITICAL FIX
+    _carWashController.dispose(); // CarWashController
+
     super.dispose();
   }
 
@@ -122,20 +128,7 @@ class _SelectServiceState extends State<SelectService> {
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
-          leading: Container(
-            margin: const EdgeInsets.all(9),
-            decoration: BoxDecoration(
-              color: Colors.red,
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              icon: const Icon(
-                Icons.arrow_back_ios_new_outlined,
-                color: Colors.white,
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
-          ),
+          leading: const AppBarBackButton(),
           title: const Text(
             'Services',
             style: TextStyle(

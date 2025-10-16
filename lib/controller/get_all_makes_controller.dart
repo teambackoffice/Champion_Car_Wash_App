@@ -4,24 +4,34 @@ import 'package:flutter/material.dart';
 
 class CarMakesController extends ChangeNotifier {
   final CarMakesService _service = CarMakesService();
-  
+
   List<CarMake> _makes = [];
   String _errorMessage = '';
+  bool _isLoading = false;
 
   // Getters
   List<CarMake> get makes => _makes;
   String get errorMessage => _errorMessage;
   bool get hasData => _makes.isNotEmpty;
+  bool get isLoading => _isLoading;
 
   // Methods
   Future<void> fetchMakes() async {
-    
+    _isLoading = true;
+    _errorMessage = '';
+    notifyListeners();
+
     try {
       final response = await _service.getAllMakes();
       _makes = response.makes;
+      _errorMessage = '';
     } catch (e) {
+      _makes = [];
       _errorMessage = e.toString();
       debugPrint('Error fetching car makes: $e');
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 

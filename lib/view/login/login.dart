@@ -333,12 +333,12 @@ class _LoginScreenState extends State<LoginScreen> {
             ElevatedButton.icon(
               onPressed: () {
                 Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const StripePaymentTest(),
-                  ),
-                );
+                // Navigator.push(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => const StripePaymentTest(),
+                //   ),
+                // );
               },
               icon: const Icon(Icons.payment),
               label: const Text('💎 STRIPE PAYMENT (BEST - NFC READY)'),

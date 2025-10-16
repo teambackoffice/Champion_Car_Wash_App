@@ -9,6 +9,11 @@ class UnderProcessingController extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
 
+  // OPTIMIZATION: Enhanced caching with time-based expiration
+  DateTime? _lastFetchTime;
+  static const Duration _cacheValidDuration = Duration(minutes: 3); // Shorter for active data
+  static const Duration _backgroundRefreshThreshold = Duration(minutes: 2);
+
   // Add service status management
   final Map<String, Map<String, String>> _serviceStatuses = {};
 
@@ -16,8 +21,24 @@ class UnderProcessingController extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  /// Fetch in-progress bookings
-  Future<void> fetchUnderProcessingBookings() async {
+  /// OPTIMIZATION: Enhanced fetch with time-based caching
+  Future<void> fetchUnderProcessingBookings({bool forceRefresh = false}) async {
+    final now = DateTime.now();
+    
+    // Check cache validity
+    if (!forceRefresh && _lastFetchTime != null && _underProcessData != null) {
+      final timeSinceLastFetch = now.difference(_lastFetchTime!);
+      
+      // If cache is still valid, return immediately
+      if (timeSinceLastFetch < _cacheValidDuration) {
+        // If approaching expiry, trigger background refresh
+        if (timeSinceLastFetch > _backgroundRefreshThreshold) {
+          _backgroundRefresh();
+        }
+        return; // Use cached data
+      }
+    }
+
     // Only notify if we're not in the initial state
     if (_underProcessData != null || _errorMessage != null) {
       _isLoading = true;
@@ -32,12 +53,31 @@ class UnderProcessingController extends ChangeNotifier {
     try {
       final result = await _service.getunderprocessing();
       _underProcessData = result;
+      _lastFetchTime = now;
     } catch (e) {
       _errorMessage = e.toString();
     } finally {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  /// OPTIMIZATION: Background refresh for seamless user experience
+  Future<void> _backgroundRefresh() async {
+    try {
+      final freshData = await _service.getunderprocessing();
+      _underProcessData = freshData;
+      _lastFetchTime = DateTime.now();
+      _errorMessage = null;
+      notifyListeners(); // Update UI with fresh data
+    } catch (e) {
+      // Silently fail background refresh, keep existing data
+    }
+  }
+
+  /// Refresh data (force refresh)
+  Future<void> refreshData() async {
+    await fetchUnderProcessingBookings(forceRefresh: true);
   }
 
   /// Optionally, get count of bookings

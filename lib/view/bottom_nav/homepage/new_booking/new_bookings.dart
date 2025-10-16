@@ -1,6 +1,7 @@
 import 'package:champion_car_wash_app/controller/get_newbooking_controller.dart';
 import 'package:champion_car_wash_app/modal/get_newbooking_modal.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/new_booking/view_More.dart';
+import 'package:champion_car_wash_app/widgets/common/custom_back_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -46,24 +47,19 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
   }
 
   @override
+  void dispose() {
+    // MEMORY LEAK FIX: Dispose TextEditingController
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[100],
       appBar: AppBar(
         backgroundColor: Colors.white,
-        leading: Container(
-          margin: EdgeInsets.all(16),
-          decoration: BoxDecoration(color: Colors.red, shape: BoxShape.circle),
-          child: IconButton(
-            onPressed: () => Navigator.pop(context),
-            icon: Icon(
-              Icons.arrow_back_ios_new_outlined,
-              color: Colors.white,
-              size: 16,
-            ),
-            padding: EdgeInsets.zero,
-          ),
-        ),
+        leading: const AppBarBackButton(),
         title: const Text(
           'New Bookings',
           style: TextStyle(

@@ -1,13 +1,10 @@
-import 'package:champion_car_wash_app/controller/get_completed_controller.dart';
-import 'package:champion_car_wash_app/controller/get_newbooking_controller.dart';
-import 'package:champion_car_wash_app/controller/get_prebooking_controller.dart';
-import 'package:champion_car_wash_app/controller/underprocess_controller.dart';
+import 'package:champion_car_wash_app/controller/service_counts_controller.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/new_booking/new_bookings.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/pre_booking/pre_booking.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/service_completed.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/under_process/under_process.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
+// import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:provider/provider.dart';
 
 class BookingStatus extends StatefulWidget {
@@ -17,337 +14,216 @@ class BookingStatus extends StatefulWidget {
   State<BookingStatus> createState() => _BookingStatusState();
 }
 
-class _BookingStatusState extends State<BookingStatus> {
+class _BookingStatusState extends State<BookingStatus> with AutomaticKeepAliveClientMixin {
+  // OPTIMIZATION: Keep widget alive to prevent unnecessary rebuilds
+  @override
+  bool get wantKeepAlive => true;
   @override
   void initState() {
     super.initState();
+    // OPTIMIZATION: Single API call to fetch all counts at once
+    // This replaces 4 separate API calls with 1 unified call
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<GetPrebookingListController>(
+      Provider.of<ServiceCountsController>(
         context,
         listen: false,
-      ).fetchPreBookingList();
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<GetNewbookingController>(
-        context,
-        listen: false,
-      ).fetchBookingList();
-
-      Provider.of<UnderProcessingController>(
-        context,
-        listen: false,
-      ).fetchUnderProcessingBookings();
-
-      Provider.of<GetCompletedController>(
-        context,
-        listen: false,
-      ).fetchcompletedlist();
+      ).fetchServiceCounts();
     });
   }
 
   @override
+  void dispose() {
+    // MEMORY LEAK FIX: No controllers to dispose, but good practice to implement
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
+    // OPTIMIZATION: Call super.build for AutomaticKeepAliveClientMixin
+    super.build(context);
+    return Consumer<ServiceCountsController>(
+      builder: (context, countsController, child) {
+        return Column(
           children: [
-            Consumer<GetNewbookingController>(
-              builder: (context, controller, child) {
-                final newbook = controller.bookingList;
-                return Expanded(
-                  child: InkWell(
+            Row(
+              children: [
+                // New Booking Card
+                Expanded(
+                  child: _buildStatusCard(
+                    context: context,
+                    title: 'New Booking',
+                    count: countsController.openServiceCount,
+                    icon: Icons.calendar_month,
+                    color: Colors.blue,
+                    isLoading: countsController.isLoading,
                     onTap: () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => NewBookingsScreen(),
+                          builder: (context) => const NewBookingsScreen(),
                         ),
                       );
                     },
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.blue,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Icon(
-                              Icons.calendar_month,
-                              color: Colors.white,
-                              size: 24,
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          const Text(
-                            "New Booking",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          controller.isLoading || newbook == null
-                              ? const SpinKitThreeBounce(
-                                  color: Colors.blue,
-                                  size: 20,
-                                )
-                              : Text(
-                                  newbook.count.toString(),
-                                  style: TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.blue,
-                                  ),
-                                ),
-                        ],
-                      ),
-                    ),
                   ),
-                );
-              },
+                ),
+                const SizedBox(width: 15),
+                // Pre Booking Card
+                Expanded(
+                  child: _buildStatusCard(
+                    context: context,
+                    title: 'Pre Booking',
+                    count: countsController.prebookingCount,
+                    icon: Icons.event_available,
+                    color: Colors.red,
+                    isLoading: countsController.isLoading,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PreBookingsScreenContainer(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+          ],
+        ),
+            const SizedBox(height: 15),
+            Row(
+              children: [
+                // Under Processing Card
+                Expanded(
+                  child: _buildStatusCard(
+                    context: context,
+                    title: 'Under Processing',
+                    count: countsController.inprogressServiceCount,
+                    icon: Icons.hourglass_empty,
+                    color: const Color(0xFFFFCF6F),
+                    isLoading: countsController.isLoading,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const UnderProcessScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                const SizedBox(width: 15),
+                // Service Completed Card
+                Expanded(
+                  child: _buildStatusCard(
+                    context: context,
+                    title: 'Service Completed',
+                    count: countsController.completedServiceCount,
+                    icon: Icons.verified,
+                    color: const Color(0xFF30CDBC),
+                    isLoading: countsController.isLoading,
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ServiceCompletedScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(width: 15),
-            Consumer<GetPrebookingListController>(
-              builder: (context, controller, child) {
-                final prebook = controller.preBookingList;
+          ],
+        );
+      },
+    );
+  }
 
-                return Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => PreBookingsScreenContainer(),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.red,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Icon(
-                              Icons.event_available,
-                              color: Colors.white,
-                              size: 24,
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          const Text(
-                            "Pre Booking",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          controller.isLoading || prebook == null
-                              ? const SpinKitThreeBounce(
-                                  color: Colors.red,
-                                  size: 20,
-                                )
-                              : Text(
-                                  prebook.message.totalPreBookingCount
-                                      .toString(),
-                                  style: const TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red,
-                                  ),
-                                ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
+  /// Build a status card widget
+  /// Reusable widget for displaying count cards
+  Widget _buildStatusCard({
+    required BuildContext context,
+    required String title,
+    required int count,
+    required IconData icon,
+    required Color color,
+    required bool isLoading,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(15),
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(15),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.08),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
-        const SizedBox(height: 15),
-        Row(
+        child: Column(
           children: [
-            Consumer<UnderProcessingController>(
-              builder: (context, controller, child) {
-                final count = controller.bookingCount;
-                return Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => UnderProcessScreen(),
+            RepaintBoundary(
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: color,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  icon,
+                  color: Colors.white,
+                  size: 24,
+                ),
+              ),
+            ),
+            const SizedBox(height: 15),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                fontSize: 12,
+                color: Colors.black,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 8),
+            isLoading
+                ? Column(
+                    children: [
+                      Container(
+                        height: 32,
+                        width: 60,
+                        decoration: BoxDecoration(
+                          color: color.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(6),
                         ),
-                      );
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: LinearProgressIndicator(
+                            backgroundColor: Colors.transparent,
+                            valueColor: AlwaysStoppedAnimation<Color>(color.withOpacity(0.3)),
+                            minHeight: 32,
                           ),
-                        ],
+                        ),
                       ),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Color(0xFFFFCF6F),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Icon(
-                              Icons.hourglass_empty,
-                              color: Colors.white,
-                              size: 24,
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          const Text(
-                            "Under Processing",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          controller.isLoading
-                              ? const SpinKitThreeBounce(
-                                  color: Colors.yellow,
-                                  size: 20,
-                                )
-                              : Text(
-                                  count.toString(),
-                                  style: TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFFFFCF6F),
-                                  ),
-                                ),
-                        ],
-                      ),
+                    ],
+                  )
+                : Text(
+                    count.toString(),
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: color,
                     ),
                   ),
-                );
-              },
-            ),
-            const SizedBox(width: 15),
-            Consumer<GetCompletedController>(
-              builder: (context, controller, child) {
-                final completedcount = controller.completed?.count ?? 0;
-                return Expanded(
-                  child: InkWell(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ServiceCompletedScreen(),
-                        ),
-                      );
-                    },
-
-                    child: Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(15),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.08),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFF30CDBC),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: const Icon(
-                              Icons.verified,
-                              color: Colors.white,
-                              size: 24,
-                            ),
-                          ),
-                          const SizedBox(height: 15),
-                          const Text(
-                            "Service Completed",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          controller.isLoading
-                              ? const SpinKitThreeBounce(
-                                  color: Color(0xFF30CDBC),
-                                  size: 20,
-                                )
-                              : Text(
-                                  completedcount.toString(),
-                                  style: TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold,
-                                    color: Color(0xFF30CDBC),
-                                  ),
-                                ),
-                        ],
-                      ),
-                    ),
-                  ),
-                );
-              },
-            ),
           ],
         ),
-      ],
+      ),
     );
   }
 }
