@@ -28,8 +28,8 @@ class ServiceUnderprogressService {
         'Cookie': 'sid=$sid', // ✅ Only include SID
       };
       final body = jsonEncode({
-        "service_id": serviceId,
-        "service_type": serviceType,
+        'service_id': serviceId,
+        'service_type': serviceType,
       });
 
       // 🔹 Debug logs

@@ -289,7 +289,7 @@ class _InspectionDialogState extends State<InspectionDialog> {
                         activeColor: Colors.red[800],
                         controlAffinity: ListTileControlAffinity.leading,
                         contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 0,
+                          
                         ),
                       );
                     },
@@ -334,9 +334,9 @@ class _InspectionDialogState extends State<InspectionDialog> {
     List<Map<String, dynamic>> answers = inspectionController.inspectionItems
         .map(
           (item) => {
-        "question": item.questions,
-        "answer": item.isChecked ? "Yes" : "No",
-        "is_checked": item.isChecked,
+        'question': item.questions,
+        'answer': item.isChecked ? 'Yes' : 'No',
+        'is_checked': item.isChecked,
       },
     )
         .toList();

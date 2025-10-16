@@ -12,9 +12,9 @@ class GetPreBookingList {
   GetPreBookingList({required this.message});
 
   factory GetPreBookingList.fromJson(Map<String, dynamic> json) =>
-      GetPreBookingList(message: Message.fromJson(json["message"]));
+      GetPreBookingList(message: Message.fromJson(json['message']));
 
-  Map<String, dynamic> toJson() => {"message": message.toJson()};
+  Map<String, dynamic> toJson() => {'message': message.toJson()};
 }
 
 class Message {
@@ -29,15 +29,15 @@ class Message {
   });
 
   factory Message.fromJson(Map<String, dynamic> json) => Message(
-    successKey: json["success_key"],
-    data: List<Datum>.from(json["data"].map((x) => Datum.fromJson(x))),
-    totalPreBookingCount: json["total pre_booking count"],
+    successKey: json['success_key'],
+    data: List<Datum>.from(json['data'].map((x) => Datum.fromJson(x))),
+    totalPreBookingCount: json['total pre_booking count'],
   );
 
   Map<String, dynamic> toJson() => {
-    "success_key": successKey,
-    "data": List<dynamic>.from(data.map((x) => x.toJson())),
-    "total pre_booking count": totalPreBookingCount,
+    'success_key': successKey,
+    'data': List<dynamic>.from(data.map((x) => x.toJson())),
+    'total pre_booking count': totalPreBookingCount,
   };
 }
 
@@ -65,29 +65,29 @@ class Datum {
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-    name: json["name"],
-    customerName: json["customer_name"],
-    phone: json["phone"],
-    regNumber: json["reg_number"],
-    date: DateTime.parse(json["date"]),
-    time: json["time"],
-    branch: json["branch"],
-    status: json["status"],
+    name: json['name'],
+    customerName: json['customer_name'],
+    phone: json['phone'],
+    regNumber: json['reg_number'],
+    date: DateTime.parse(json['date']),
+    time: json['time'],
+    branch: json['branch'],
+    status: json['status'],
     services: List<Service>.from(
-      json["services"].map((x) => Service.fromJson(x)),
+      json['services'].map((x) => Service.fromJson(x)),
     ),
   );
 
   Map<String, dynamic> toJson() => {
-    "name": name,
-    "customer_name": customerName,
-    "phone": phone,
-    "reg_number": regNumber,
-    "date": date.toIso8601String().split("T").first,
-    "time": time,
-    "branch": branch,
-    "status": status,
-    "services": List<dynamic>.from(services.map((x) => x.toJson())),
+    'name': name,
+    'customer_name': customerName,
+    'phone': phone,
+    'reg_number': regNumber,
+    'date': date.toIso8601String().split('T').first,
+    'time': time,
+    'branch': branch,
+    'status': status,
+    'services': List<dynamic>.from(services.map((x) => x.toJson())),
   };
 }
 
@@ -97,7 +97,7 @@ class Service {
   Service({required this.serviceName});
 
   factory Service.fromJson(Map<String, dynamic> json) =>
-      Service(serviceName: json["service_name"]);
+      Service(serviceName: json['service_name']);
 
-  Map<String, dynamic> toJson() => {"service_name": serviceName};
+  Map<String, dynamic> toJson() => {'service_name': serviceName};
 }

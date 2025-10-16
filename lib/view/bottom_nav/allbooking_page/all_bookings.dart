@@ -97,7 +97,7 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
           Expanded(
             child: Text(
               value,
-              style: TextStyle(fontSize: 14, color: Colors.black87),
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
             ),
           ),
         ],
@@ -126,11 +126,8 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
+            colorScheme: const ColorScheme.light(
               primary: Colors.red,
-              onPrimary: Colors.white,
-              surface: Colors.white,
-              onSurface: Colors.black,
             ),
           ),
           child: child!,
@@ -292,7 +289,7 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
                         boxShadow: _selectedDate != null
                             ? [
                                 BoxShadow(
-                                  color: Colors.blue.withOpacity(0.2),
+                                  color: Colors.blue.withAlpha(51),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -334,7 +331,7 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
                               child: Container(
                                 padding: const EdgeInsets.all(4),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.2),
+                                  color: Colors.white.withAlpha(51),
                                   shape: BoxShape.circle,
                                 ),
                                 child: const Icon(
@@ -478,7 +475,7 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
                         borderRadius: BorderRadius.circular(12),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withAlpha(13),
                             blurRadius: 10,
                             offset: const Offset(0, 2),
                           ),

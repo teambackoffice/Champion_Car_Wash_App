@@ -14,7 +14,7 @@ class CarWashTechnicianHomePage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text(
-            "Car Wash Technician",
+            'Car Wash Technician',
             style: TextStyle(color: Colors.white),
           ),
           centerTitle: true,
@@ -23,7 +23,7 @@ class CarWashTechnicianHomePage extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.logout, color: Colors.white),
               onPressed: () => _showLogoutDialog(context),
-              tooltip: "Logout",
+              tooltip: 'Logout',
             ),
           ],
           bottom: const TabBar(
@@ -31,13 +31,13 @@ class CarWashTechnicianHomePage extends StatelessWidget {
             unselectedLabelColor: Colors.white70,
             indicatorColor: Colors.white,
             tabs: [
-              Tab(text: "New"),
-              Tab(text: "Under Process"),
-              Tab(text: "Completed"),
+              Tab(text: 'New'),
+              Tab(text: 'Under Process'),
+              Tab(text: 'Completed'),
             ],
           ),
         ),
-        body: TabBarView(
+        body: const TabBarView(
           children: [
             CarWashNewBookings(),
             CarWashUnderProcessing(),
@@ -52,12 +52,12 @@ class CarWashTechnicianHomePage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text("Confirm Logout"),
-        content: const Text("Are you sure you want to log out?"),
+        title: const Text('Confirm Logout'),
+        content: const Text('Are you sure you want to log out?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text("Cancel"),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -73,7 +73,7 @@ class CarWashTechnicianHomePage extends StatelessWidget {
               Navigator.of(ctx).pop();
               _logout(context);
             },
-            child: const Text("Logout"),
+            child: const Text('Logout'),
           ),
         ],
       ),

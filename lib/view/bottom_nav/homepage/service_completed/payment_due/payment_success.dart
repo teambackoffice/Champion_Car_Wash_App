@@ -2,7 +2,7 @@ import 'package:champion_car_wash_app/view/bottom_nav/bottom_nav.dart';
 import 'package:flutter/material.dart';
 
 class PaymentSuccessScreen extends StatefulWidget {
-  const PaymentSuccessScreen({Key? key}) : super(key: key);
+  const PaymentSuccessScreen({super.key});
 
   @override
   State<PaymentSuccessScreen> createState() => _PaymentSuccessScreenState();
@@ -43,14 +43,14 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
               Container(
                 width: 100,
                 height: 100,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE8F5E8),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFE8F5E8),
                   shape: BoxShape.circle,
                 ),
                 child: Container(
                   margin: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF4CAF50),
+                  decoration: const BoxDecoration(
+                    color: Color(0xFF4CAF50),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(

@@ -6,7 +6,7 @@ import 'package:champion_car_wash_app/config/api_constants.dart';
 class CarWashInprogressToCompleteService {
   final _storage = const FlutterSecureStorage();
   final String _baseUrl =
-      "${ApiConstants.baseUrl}/api/method/carwash.Api.auth.submit_carwash_details";
+      '${ApiConstants.baseUrl}/api/method/carwash.Api.auth.submit_carwash_details';
 
   /// Submit Carwash details
   Future<Map<String, dynamic>?> submitCarwashDetails({
@@ -18,50 +18,50 @@ class CarWashInprogressToCompleteService {
   }) async {
     try {
       // Get stored sid
-      String? sid = await _storage.read(key: "sid");
-      print("Stored SID: $sid");
+      String? sid = await _storage.read(key: 'sid');
+      print('Stored SID: $sid');
 
       if (sid == null) {
-        throw Exception("Session ID (sid) not found in storage");
+        throw Exception('Session ID (sid) not found in storage');
       }
 
       var headers = {
         'Content-Type': 'application/json',
         'Cookie': 'sid=$sid',
       };
-      print("Request headers: $headers");
+      print('Request headers: $headers');
 
       var body = json.encode({
-        "service_id": serviceId,
-        "price": price,
-        "carwash_total": carwashTotal,
-        "inspection_type": inspectionType,
-        "answers": answers,
+        'service_id': serviceId,
+        'price': price,
+        'carwash_total': carwashTotal,
+        'inspection_type': inspectionType,
+        'answers': answers,
       });
-      print("Request body: $body");
+      print('Request body: $body');
 
-      var request = http.Request("POST", Uri.parse(_baseUrl));
+      var request = http.Request('POST', Uri.parse(_baseUrl));
       request.body = body;
       request.headers.addAll(headers);
 
-      print("Sending request to $_baseUrl ...");
+      print('Sending request to $_baseUrl ...');
 
       http.StreamedResponse response = await request.send();
-      print("Response status: ${response.statusCode}");
-      print("Response headers: ${response.headers}");
-      print("Request info: ${response.request}");
+      print('Response status: ${response.statusCode}');
+      print('Response headers: ${response.headers}');
+      print('Request info: ${response.request}');
 
       final respStr = await response.stream.bytesToString();
-      print("Response body: $respStr");
+      print('Response body: $respStr');
 
       if (response.statusCode == 200) {
         return json.decode(respStr);
       } else {
-        throw Exception("Failed: ${response.reasonPhrase}");
+        throw Exception('Failed: ${response.reasonPhrase}');
       }
     } catch (e) {
-      print("Error submitting carwash details: $e");
-      throw Exception("Error submitting carwash details: $e");
+      print('Error submitting carwash details: $e');
+      throw Exception('Error submitting carwash details: $e');
     }
   }
 }

@@ -130,7 +130,7 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
             'Service Complete',
             style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
           ),
-          content: Text('Do you want to proceed to create invoice?'),
+          content: const Text('Do you want to proceed to create invoice?'),
           actions: [
             TextButton(
               onPressed: () {
@@ -250,7 +250,7 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                         ),
                         suffixIcon: _searchController.text.isNotEmpty
                             ? IconButton(
-                                icon: Icon(Icons.clear),
+                                icon: const Icon(Icons.clear),
                                 onPressed: () {
                                   _searchController.clear();
                                   _filterBookings('');
@@ -483,7 +483,7 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                                   }),
                                   const SizedBox(height: 20),
                                   if (booking.extraWorkItems.isNotEmpty) ...[
-                                    Text(
+                                    const Text(
                                       'Extra Work Items',
                                       style: TextStyle(
                                         fontSize: 16,

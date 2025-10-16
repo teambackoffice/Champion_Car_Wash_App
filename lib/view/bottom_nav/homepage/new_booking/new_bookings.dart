@@ -1,6 +1,6 @@
 import 'package:champion_car_wash_app/controller/get_newbooking_controller.dart';
 import 'package:champion_car_wash_app/modal/get_newbooking_modal.dart';
-import 'package:champion_car_wash_app/view/bottom_nav/homepage/new_booking/view_More.dart';
+import 'package:champion_car_wash_app/view/bottom_nav/homepage/new_booking/view_more.dart';
 import 'package:champion_car_wash_app/widgets/common/custom_back_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -74,7 +74,7 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
         children: [
           Container(
             color: Colors.white,
-            padding: EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
             child: TextField(
               controller: _searchController,
               onChanged: (value) {
@@ -94,7 +94,7 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
                 ),
-                contentPadding: EdgeInsets.symmetric(
+                contentPadding: const EdgeInsets.symmetric(
                   horizontal: 16,
                   vertical: 12,
                 ),
@@ -126,29 +126,29 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
                 }
 
                 if (bookings.isEmpty) {
-                  return Center(child: Text('No new bookings found.'));
+                  return const Center(child: Text('No new bookings found.'));
                 }
 
                 return ListView.builder(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   itemCount: bookings.length,
                   itemBuilder: (context, index) {
                     final booking = bookings[index];
 
                     return Container(
-                      margin: EdgeInsets.only(bottom: 16),
+                      margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
+                            color: Colors.black.withAlpha(13),
                             blurRadius: 10,
-                            offset: Offset(0, 2),
+                            offset: const Offset(0, 2),
                           ),
                         ],
                       ),
-                      padding: EdgeInsets.all(20),
+                      padding: const EdgeInsets.all(20),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -157,7 +157,7 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
                               Expanded(
                                 child: Text(
                                   booking.registrationNumber,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black,
@@ -165,7 +165,7 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
                                 ),
                               ),
                               Container(
-                                padding: EdgeInsets.symmetric(
+                                padding: const EdgeInsets.symmetric(
                                   horizontal: 8,
                                   vertical: 4,
                                 ),
@@ -173,7 +173,7 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
                                   color: Colors.green,
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                child: Text(
+                                child: const Text(
                                   'New',
                                   style: TextStyle(
                                     color: Colors.white,
@@ -184,7 +184,7 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
                               ),
                             ],
                           ),
-                          SizedBox(height: 16),
+                          const SizedBox(height: 16),
                           _buildInfoRow('Customer Name', booking.customerName),
                           _buildInfoRow('Mobile No', booking.phone),
                           _buildInfoRow('Email ID', booking.email),
@@ -194,7 +194,7 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
                           _buildInfoRow('Engine No', booking.engineNumber),
                           _buildInfoRow('Chasis No', booking.chasisNumber),
                           _buildInfoRow('Fuel Level', '${booking.fuelLevel}%'),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           GestureDetector(
                             onTap: () {
                               Navigator.push(
@@ -205,7 +205,7 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
                                 ),
                               );
                             },
-                            child: Text(
+                            child: const Text(
                               'View More',
                               style: TextStyle(
                                 color: Colors.red,
@@ -214,7 +214,7 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
                               ),
                             ),
                           ),
-                          SizedBox(height: 16),
+                          const SizedBox(height: 16),
                           Text(
                             'Selected Services',
                             style: TextStyle(
@@ -223,10 +223,10 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          SizedBox(height: 8),
+                          const SizedBox(height: 8),
                           ...booking.services.map(
                             (service) => Padding(
-                              padding: EdgeInsets.only(bottom: 4),
+                              padding: const EdgeInsets.only(bottom: 4),
                               child: Text(
                                 service.serviceType +
                                     (service.washType != null
@@ -235,7 +235,7 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
                                     (service.oilBrand != null
                                         ? ' - ${service.oilBrand}'
                                         : ''),
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.black,
@@ -243,7 +243,7 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
                               ),
                             ),
                           ),
-                          SizedBox(height: 20),
+                          const SizedBox(height: 20),
                           // SizedBox(
                           //   width: double.infinity,
                           //   child: ElevatedButton(
@@ -323,7 +323,7 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
 
   Widget _buildInfoRow(String label, String value) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 4),
+      padding: const EdgeInsets.symmetric(vertical: 4),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -337,7 +337,7 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
           Expanded(
             child: Text(
               value,
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.black,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,

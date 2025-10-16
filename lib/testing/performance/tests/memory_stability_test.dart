@@ -258,7 +258,7 @@ class MemoryStabilityTest extends BasePerformanceTest {
     // For simulation, we'll create realistic memory usage patterns
     
     final random = Random();
-    final baseMemory = 85.0; // Base app memory usage
+    const baseMemory = 85.0; // Base app memory usage
     final variability = random.nextDouble() * 10.0; // ±10MB variability
     
     return baseMemory + variability;
@@ -390,7 +390,7 @@ class MemoryStabilityTest extends BasePerformanceTest {
       final passed = test._validateMemoryStability(quickMetrics);
       
       return TestResults(
-        testName: '${_testName} (Quick)',
+        testName: '$_testName (Quick)',
         passed: passed,
         actualValue: quickMetrics['maxMemoryUsage'],
         targetValue: maxMemoryUsage,

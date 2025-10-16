@@ -19,7 +19,7 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
       Provider.of<GetNewCarWashController>(
         context,
         listen: false,
-      ).getNewCarWashServices(serviceType: "car wash");
+      ).getNewCarWashServices(serviceType: 'car wash');
     });
   }
 
@@ -50,7 +50,7 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
             return Center(
               child: Text(
                 'Error: ${controller.error}',
-                style: TextStyle(color: Colors.red, fontSize: 16),
+                style: const TextStyle(color: Colors.red, fontSize: 16),
               ),
             );
           }
@@ -148,9 +148,9 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
-                                    title: const Text("Confirmation"),
+                                    title: const Text('Confirmation'),
                                     content: const Text(
-                                      " Are you sure you want to start service ?",
+                                      ' Are you sure you want to start service ?',
                                     ),
                                     actions: [
                                       TextButton(
@@ -159,7 +159,7 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
                                             context,
                                           ).pop(); // Close the dialog
                                         },
-                                        child: const Text("Cancel"),
+                                        child: const Text('Cancel'),
                                       ),
                                       Consumer<
                                         ServiceUnderproccessingController
@@ -172,7 +172,7 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
                                                     await controller
                                                         .markServiceInProgress(
                                                           data.serviceId,
-                                                          "Car Wash",
+                                                          'Car Wash',
                                                         );
                                                     Navigator.of(context).pop();
                                                     Provider.of<
@@ -183,13 +183,13 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
                                                         )
                                                         .getNewCarWashServices(
                                                           serviceType:
-                                                              "car wash",
+                                                              'car wash',
                                                         );
                                                   },
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor: Colors.red[900],
                                               foregroundColor: Colors.white,
-                                              padding: EdgeInsets.symmetric(
+                                              padding: const EdgeInsets.symmetric(
                                                 horizontal: 24,
                                                 vertical: 12,
                                               ),
@@ -199,7 +199,7 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
                                               ),
                                             ),
                                             child: controller.isLoading
-                                                ? SizedBox(
+                                                ? const SizedBox(
                                                     height: 20,
                                                     width: 20,
                                                     child:
@@ -208,7 +208,7 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
                                                           strokeWidth: 2,
                                                         ),
                                                   )
-                                                : const Text("Yes"),
+                                                : const Text('Yes'),
                                           );
                                         },
                                       ),
@@ -285,8 +285,8 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
           builder: (context, setState) {
             return AlertDialog(
               title: Text(' $bookingId'),
-              content: Text(
-                "Are You Sure You Want To Start Service ?",
+              content: const Text(
+                'Are You Sure You Want To Start Service ?',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               actions: [

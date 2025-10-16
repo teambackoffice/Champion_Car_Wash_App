@@ -403,7 +403,6 @@ void main() {
         );
         
         final lowEndSpecs2 = PerformanceTestHelpers.createMockDeviceSpecs(
-          processor: 'MediaTek Helio G85',
           ramGB: 3,
         );
         

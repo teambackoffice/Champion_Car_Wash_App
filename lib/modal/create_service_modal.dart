@@ -97,7 +97,7 @@ class CreateServiceModal {
       'current_odometer_reading': currentOdometerReading,
       'next_service_odometer': nextServiceOdometer,
       'services': jsonEncode(services.map((s) => s.toJson()).toList()),
-      "service_total": serviceTotal,
+      'service_total': serviceTotal,
     };
   }
 }

@@ -78,8 +78,8 @@ class _PreBookingsScreenContainerState
             children: [
               // Search Bar
               Container(
-                margin: EdgeInsets.all(16),
-                padding: EdgeInsets.symmetric(horizontal: 16),
+                margin: const EdgeInsets.all(16),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(25),
@@ -88,7 +88,7 @@ class _PreBookingsScreenContainerState
                       color: Colors.grey.withOpacity(0.1),
                       spreadRadius: 1,
                       blurRadius: 3,
-                      offset: Offset(0, 1),
+                      offset: const Offset(0, 1),
                     ),
                   ],
                 ),
@@ -101,7 +101,7 @@ class _PreBookingsScreenContainerState
                     hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
                     border: InputBorder.none,
                     suffixIcon: Icon(Icons.search, color: Colors.grey[500]),
-                    contentPadding: EdgeInsets.symmetric(vertical: 16),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                 ),
               ),
@@ -143,7 +143,7 @@ class _PreBookingsScreenContainerState
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
+          const SnackBar(
             content: Text('Failed to refresh booking list'),
             backgroundColor: Colors.red,
           ),
@@ -154,7 +154,7 @@ class _PreBookingsScreenContainerState
 
   Widget _buildContent(GetPrebookingListController controller) {
     if (controller.isLoading) {
-      return Center(
+      return const Center(
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
         ),
@@ -167,7 +167,7 @@ class _PreBookingsScreenContainerState
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.error_outline, size: 64, color: Colors.grey[400]),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
               'Failed to load bookings',
               style: TextStyle(
@@ -176,7 +176,7 @@ class _PreBookingsScreenContainerState
                 fontWeight: FontWeight.w500,
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => controller.fetchPreBookingList(),
               style: ElevatedButton.styleFrom(
@@ -185,7 +185,7 @@ class _PreBookingsScreenContainerState
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: Text('Retry', style: TextStyle(color: Colors.white)),
+              child: const Text('Retry', style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
@@ -202,7 +202,7 @@ class _PreBookingsScreenContainerState
               size: 64,
               color: Colors.grey[400],
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
               controller.bookingData.isEmpty
                   ? 'No bookings found'
@@ -222,14 +222,14 @@ class _PreBookingsScreenContainerState
       onRefresh: _refreshBookingList,
       color: Colors.red,
       child: ListView.builder(
-        padding: EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: _filteredBookings.length,
         itemBuilder: (context, index) {
           final booking = _filteredBookings[index];
           return Column(
             children: [
               _buildBookingCard(booking: booking),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
             ],
           );
         },
@@ -243,7 +243,7 @@ class _PreBookingsScreenContainerState
     Color statusBgColor = _getStatusBgColor(booking.status);
 
     return Container(
-      padding: EdgeInsets.all(20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -252,7 +252,7 @@ class _PreBookingsScreenContainerState
             color: Colors.grey.withOpacity(0.1),
             spreadRadius: 1,
             blurRadius: 5,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
@@ -264,14 +264,14 @@ class _PreBookingsScreenContainerState
             children: [
               Text(
                 booking.regNumber,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
                   color: Colors.black,
                 ),
               ),
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
                   color: statusBgColor,
                   borderRadius: BorderRadius.circular(12),
@@ -287,7 +287,7 @@ class _PreBookingsScreenContainerState
               ),
             ],
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           _buildDetailRow('Booking Date', formattedDate),
           _buildDetailRow('Booking Time', booking.time),
           _buildDetailRow('User Name', booking.customerName),
@@ -297,14 +297,14 @@ class _PreBookingsScreenContainerState
 
           // Updated Services Section
           Text(
-            "Selected Services",
+            'Selected Services',
             style: TextStyle(
               fontSize: 12,
               color: Colors.grey[600],
               fontWeight: FontWeight.w500,
             ),
           ),
-          SizedBox(height: 5),
+          const SizedBox(height: 5),
 
           // Dynamic Services List
           if (booking.services != null && booking.services.isNotEmpty)
@@ -312,7 +312,7 @@ class _PreBookingsScreenContainerState
               crossAxisAlignment: CrossAxisAlignment.start,
               children: booking.services.map<Widget>((service) {
                 return Padding(
-                  padding: EdgeInsets.only(bottom: 2),
+                  padding: const EdgeInsets.only(bottom: 2),
                   child: Row(
                     children: [
                       Icon(
@@ -320,10 +320,10 @@ class _PreBookingsScreenContainerState
                         size: 16,
                         color: Colors.green[600],
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Text(
                         service.serviceName,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 14,
                           color: Colors.black,
                           fontWeight: FontWeight.w500,
@@ -336,7 +336,7 @@ class _PreBookingsScreenContainerState
             )
           else
             Text(
-              "No services selected",
+              'No services selected',
               style: TextStyle(
                 fontSize: 14,
                 color: Colors.grey[500],
@@ -344,11 +344,11 @@ class _PreBookingsScreenContainerState
               ),
             ),
 
-          SizedBox(height: 20),
+          const SizedBox(height: 20),
           Row(
             children: [
               booking.status == 'Confirmed'
-                  ? SizedBox()
+                  ? const SizedBox()
                   : Expanded(
                       child: OutlinedButton(
                         onPressed: () => _showCancelDialog(booking),
@@ -357,7 +357,7 @@ class _PreBookingsScreenContainerState
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          padding: EdgeInsets.symmetric(vertical: 12),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
                         child: Text(
                           'Cancel Booking',
@@ -369,9 +369,9 @@ class _PreBookingsScreenContainerState
                         ),
                       ),
                     ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               booking.status == 'Confirmed'
-                  ? SizedBox()
+                  ? const SizedBox()
                   : Expanded(
                       child: ElevatedButton(
                         onPressed: () => _showConfirmDialog(booking),
@@ -380,10 +380,10 @@ class _PreBookingsScreenContainerState
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          padding: EdgeInsets.symmetric(vertical: 12),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
                           elevation: 0,
                         ),
-                        child: Text(
+                        child: const Text(
                           'Confirm Booking',
                           style: TextStyle(
                             color: Colors.white,
@@ -403,7 +403,7 @@ class _PreBookingsScreenContainerState
   Widget _buildServicesCompact(List<Service> services) {
     if (services.isEmpty) {
       return Text(
-        "No services selected",
+        'No services selected',
         style: TextStyle(
           fontSize: 14,
           color: Colors.grey[500],
@@ -418,7 +418,7 @@ class _PreBookingsScreenContainerState
 
     return Text(
       serviceNames,
-      style: TextStyle(
+      style: const TextStyle(
         fontSize: 14,
         color: Colors.black,
         fontWeight: FontWeight.w500,
@@ -430,7 +430,7 @@ class _PreBookingsScreenContainerState
   Widget _buildServicesChips(List<Service> services) {
     if (services.isEmpty) {
       return Text(
-        "No services selected",
+        'No services selected',
         style: TextStyle(
           fontSize: 14,
           color: Colors.grey[500],
@@ -444,7 +444,7 @@ class _PreBookingsScreenContainerState
       runSpacing: 4,
       children: services.map((service) {
         return Container(
-          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           decoration: BoxDecoration(
             color: Colors.blue[50],
             borderRadius: BorderRadius.circular(20),
@@ -465,7 +465,7 @@ class _PreBookingsScreenContainerState
 
   Widget _buildDetailRow(String label, String value) {
     return Padding(
-      padding: EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -483,7 +483,7 @@ class _PreBookingsScreenContainerState
           Expanded(
             child: Text(
               value,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
                 color: Colors.black,
@@ -555,9 +555,9 @@ class _PreBookingsScreenContainerState
             return Consumer<CancelPrebookController>(
               builder: (context, controller, child) {
                 return AlertDialog(
-                  title: Text('Cancel Booking'),
+                  title: const Text('Cancel Booking'),
                   content: controller.isLoading
-                      ? Column(
+                      ? const Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             CircularProgressIndicator(
@@ -577,7 +577,7 @@ class _PreBookingsScreenContainerState
                       : [
                           TextButton(
                             onPressed: () => Navigator.of(dialogContext).pop(),
-                            child: Text('No'),
+                            child: const Text('No'),
                           ),
                           TextButton(
                             onPressed: () async {
@@ -594,11 +594,11 @@ class _PreBookingsScreenContainerState
                                 final message =
                                     controller.responseMessage ?? 'No response';
                                 final isSuccess =
-                                    !message.toLowerCase().contains("error") &&
+                                    !message.toLowerCase().contains('error') &&
                                     !message.toLowerCase().contains(
-                                      "exception",
+                                      'exception',
                                     ) &&
-                                    !message.toLowerCase().contains("failed");
+                                    !message.toLowerCase().contains('failed');
 
                                 // Use the original context (this.context) for SnackBar
 
@@ -619,12 +619,12 @@ class _PreBookingsScreenContainerState
                                       'Failed to cancel booking: $e',
                                     ),
                                     backgroundColor: Colors.red,
-                                    duration: Duration(seconds: 3),
+                                    duration: const Duration(seconds: 3),
                                   ),
                                 );
                               }
                             },
-                            child: Text(
+                            child: const Text(
                               'Yes',
                               style: TextStyle(color: Colors.red),
                             ),
@@ -651,9 +651,9 @@ class _PreBookingsScreenContainerState
             return Consumer<ConfirmPrebookController>(
               builder: (context, controller, child) {
                 return AlertDialog(
-                  title: Text('Confirm Booking'),
+                  title: const Text('Confirm Booking'),
                   content: controller.isLoading
-                      ? Column(
+                      ? const Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             CircularProgressIndicator(
@@ -673,7 +673,7 @@ class _PreBookingsScreenContainerState
                       : [
                           TextButton(
                             onPressed: () => Navigator.of(dialogContext).pop(),
-                            child: Text('No'),
+                            child: const Text('No'),
                           ),
                           TextButton(
                             onPressed: () async {
@@ -689,11 +689,11 @@ class _PreBookingsScreenContainerState
                               final message =
                                   controller.responseMessage ?? 'No response';
                               final isSuccess =
-                                  !message.toLowerCase().contains("error") &&
+                                  !message.toLowerCase().contains('error') &&
                                   !message.toLowerCase().contains(
-                                    "exception",
+                                    'exception',
                                   ) &&
-                                  !message.toLowerCase().contains("failed");
+                                  !message.toLowerCase().contains('failed');
 
                               // Use the original context (this.context) for SnackBar
                               ScaffoldMessenger.of(this.context).showSnackBar(
@@ -702,7 +702,7 @@ class _PreBookingsScreenContainerState
                                   backgroundColor: isSuccess
                                       ? Colors.green
                                       : Colors.red,
-                                  duration: Duration(seconds: 3),
+                                  duration: const Duration(seconds: 3),
                                 ),
                               );
                               Navigator.push(
@@ -723,7 +723,7 @@ class _PreBookingsScreenContainerState
                               //   ).fetchPreBookingList();
                               // }
                             },
-                            child: Text(
+                            child: const Text(
                               'Yes',
                               style: TextStyle(color: Colors.green),
                             ),

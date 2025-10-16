@@ -14,7 +14,7 @@ class OilTechnicianHomePage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text(
-            "Oil Technician",
+            'Oil Technician',
             style: TextStyle(color: Colors.white),
           ),
           centerTitle: true,
@@ -22,7 +22,7 @@ class OilTechnicianHomePage extends StatelessWidget {
             IconButton(
               icon: const Icon(Icons.logout, color: Colors.white),
               onPressed: () => _showLogoutDialog(context),
-              tooltip: "Logout",
+              tooltip: 'Logout',
             ),
           ],
           bottom: const TabBar(
@@ -30,14 +30,14 @@ class OilTechnicianHomePage extends StatelessWidget {
             unselectedLabelColor: Colors.white70,
             indicatorColor: Colors.white,
             tabs: [
-              Tab(text: "New"),
-              Tab(text: "Under Process"),
-              Tab(text: "Completed"),
+              Tab(text: 'New'),
+              Tab(text: 'Under Process'),
+              Tab(text: 'Completed'),
             ],
           ),
           backgroundColor: Colors.red[900],
         ),
-        body: TabBarView(
+        body: const TabBarView(
           children: [
             NewBookingsTab(),
             UnderProcessingTab(),
@@ -52,12 +52,12 @@ class OilTechnicianHomePage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text("Confirm Logout"),
-        content: const Text("Are you sure you want to log out?"),
+        title: const Text('Confirm Logout'),
+        content: const Text('Are you sure you want to log out?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text("Cancel"),
+            child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
@@ -75,7 +75,7 @@ class OilTechnicianHomePage extends StatelessWidget {
                 vertical: 8.0,
               ),
             ),
-            child: const Text("Logout"),
+            child: const Text('Logout'),
           ),
         ],
       ),

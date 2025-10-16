@@ -89,7 +89,7 @@ class _ServiceSuccessScreenState extends State<ServiceSuccessScreen> {
                 pw.SizedBox(height: 12),
                 pw.Text('Location: $serviceName', style: const pw.TextStyle(fontSize: 14)),
                 pw.Text('Service: $serviceType', style: const pw.TextStyle(fontSize: 14)),
-                pw.Text('Date: ' + DateTime.now().toLocal().toString(), style: const pw.TextStyle(fontSize: 12)),
+                pw.Text('Date: ${DateTime.now().toLocal()}', style: const pw.TextStyle(fontSize: 12)),
                 pw.SizedBox(height: 16),
                 pw.Table(
                   border: pw.TableBorder.all(color: PdfColors.grey300),
@@ -175,7 +175,7 @@ class _ServiceSuccessScreenState extends State<ServiceSuccessScreen> {
                   ),
                   const SizedBox(height: 16),
                   const Text(
-                    "Service Created Successfully",
+                    'Service Created Successfully',
                     style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 24),
@@ -190,7 +190,6 @@ class _ServiceSuccessScreenState extends State<ServiceSuccessScreen> {
                       'wash_type': widget.washType,
                       'price': widget.price,
                     }),
-                    version: QrVersions.auto,
                     size: 180.0,
                   ),
                   const SizedBox(height: 16),
@@ -212,7 +211,7 @@ class _ServiceSuccessScreenState extends State<ServiceSuccessScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       child: const Text(
-                        "Print",
+                        'Print',
                         style: TextStyle(fontSize: 16, color: Colors.white),
                       ),
                     ),
@@ -225,7 +224,7 @@ class _ServiceSuccessScreenState extends State<ServiceSuccessScreen> {
                         // Navigate back to HomePageContent and clear the navigation stack
                         Navigator.of(context).pushAndRemoveUntil(
                           MaterialPageRoute(
-                            builder: (context) => BottomNavigation(),
+                            builder: (context) => const BottomNavigation(),
                           ),
                           (route) => false,
                         );
@@ -238,7 +237,7 @@ class _ServiceSuccessScreenState extends State<ServiceSuccessScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 14),
                       ),
                       child: const Text(
-                        "Back to Home",
+                        'Back to Home',
                         style: TextStyle(color: Colors.red, fontSize: 16),
                       ),
                     ),

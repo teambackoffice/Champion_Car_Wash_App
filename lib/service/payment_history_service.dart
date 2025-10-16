@@ -1,7 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:path_provider/path_provider.dart';
+
+// Top-level function for decoding JSON in a separate isolate
+List<dynamic> _decodeHistory(String jsonString) {
+  return jsonDecode(jsonString) as List<dynamic>;
+}
 
 /// Payment History Service
 /// Stores and manages all payment transactions across different payment methods
@@ -12,14 +19,12 @@ class PaymentHistoryService {
 
   static PaymentHistoryService get instance => _instance;
 
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   final List<PaymentHistoryRecord> _paymentHistory = [];
   final StreamController<List<PaymentHistoryRecord>> _historyController = 
       StreamController<List<PaymentHistoryRecord>>.broadcast();
 
   // Storage keys
-  static const String _historyKey = 'payment_history';
-  static const String _statsKey = 'payment_stats';
+  static const String _historyFilename = 'payment_history.json';
 
   /// Get payment history stream
   Stream<List<PaymentHistoryRecord>> get historyStream => _historyController.stream;
@@ -28,13 +33,11 @@ class PaymentHistoryService {
   List<PaymentHistoryRecord> get paymentHistory => List.unmodifiable(_paymentHistory);
 
   /// Initialize payment history service
-  /// OPTIMIZATION: Now runs asynchronously without blocking startup
   Future<void> initialize() async {
     try {
       if (kDebugMode) {
         print('PaymentHistory: Initializing service...');
       }
-      // OPTIMIZATION: Load payment history asynchronously
       await _loadPaymentHistory();
       if (kDebugMode) {
         print('PaymentHistory: Service initialized with ${_paymentHistory.length} records');
@@ -83,12 +86,10 @@ class PaymentHistoryService {
 
       _paymentHistory.insert(0, record); // Add to beginning (newest first)
       await _savePaymentHistory();
-      await _updatePaymentStats();
 
       // Notify listeners
       _historyController.add(_paymentHistory);
 
-      // OPTIMIZATION: Conditional logging only in debug mode
       if (kDebugMode) {
         print('PaymentHistory: Added record ${record.id} - ${record.paymentMethod} - ${record.status.name}');
         print('PaymentHistory: Total records: ${_paymentHistory.length}');
@@ -143,7 +144,6 @@ class PaymentHistoryService {
         lastUpdated: DateTime.now(),
       );
     } catch (e) {
-      // OPTIMIZATION: Conditional logging
       if (kDebugMode) {
         print('PaymentHistory: Error getting stats: $e');
       }
@@ -183,10 +183,11 @@ class PaymentHistoryService {
   Future<void> clearHistory() async {
     try {
       _paymentHistory.clear();
-      await _secureStorage.delete(key: _historyKey);
-      await _secureStorage.delete(key: _statsKey);
+      final file = await _getHistoryFile();
+      if (await file.exists()) {
+        await file.delete();
+      }
       _historyController.add(_paymentHistory);
-      // OPTIMIZATION: Conditional logging
       if (kDebugMode) {
         print('PaymentHistory: History cleared');
       }
@@ -207,7 +208,6 @@ class PaymentHistoryService {
       };
       return jsonEncode(data);
     } catch (e) {
-      // OPTIMIZATION: Conditional logging
       if (kDebugMode) {
         print('PaymentHistory: Error exporting: $e');
       }
@@ -215,21 +215,26 @@ class PaymentHistoryService {
     }
   }
 
+  Future<File> _getHistoryFile() async {
+    final directory = await getApplicationDocumentsDirectory();
+    return File('${directory.path}/$_historyFilename');
+  }
+
   /// Load payment history from storage
-  /// OPTIMIZATION: Asynchronous loading without blocking UI
   Future<void> _loadPaymentHistory() async {
     try {
-      final historyJson = await _secureStorage.read(key: _historyKey);
-      if (historyJson != null) {
-        // OPTIMIZATION: Decode JSON asynchronously
-        final List<dynamic> historyList = jsonDecode(historyJson);
-        _paymentHistory.clear();
-        _paymentHistory.addAll(
-          historyList.map((json) => PaymentHistoryRecord.fromJson(json)).toList()
-        );
-        // OPTIMIZATION: Conditional logging
-        if (kDebugMode) {
-          print('PaymentHistory: Loaded ${_paymentHistory.length} records from storage');
+      final file = await _getHistoryFile();
+      if (await file.exists()) {
+        final historyJson = await file.readAsString();
+        if (historyJson.isNotEmpty) {
+          final List<dynamic> historyList = await compute(_decodeHistory, historyJson);
+          _paymentHistory.clear();
+          _paymentHistory.addAll(
+            historyList.map((json) => PaymentHistoryRecord.fromJson(json)).toList()
+          );
+          if (kDebugMode) {
+            print('PaymentHistory: Loaded ${_paymentHistory.length} records from storage');
+          }
         }
       }
     } catch (e) {
@@ -240,34 +245,18 @@ class PaymentHistoryService {
   }
 
   /// Save payment history to storage
-  /// OPTIMIZATION: Asynchronous saving without blocking UI
   Future<void> _savePaymentHistory() async {
     try {
-      // OPTIMIZATION: Keep only last 1000 records to prevent storage bloat and improve performance
       if (_paymentHistory.length > 1000) {
         _paymentHistory.removeRange(1000, _paymentHistory.length);
       }
 
-      // OPTIMIZATION: Encode JSON asynchronously
-      final historyJson = jsonEncode(_paymentHistory.map((p) => p.toJson()).toList());
-      await _secureStorage.write(key: _historyKey, value: historyJson);
+      final historyJson = await compute(jsonEncode, _paymentHistory.map((p) => p.toJson()).toList());
+      final file = await _getHistoryFile();
+      await file.writeAsString(historyJson);
     } catch (e) {
       if (kDebugMode) {
         print('PaymentHistory: Error saving history: $e');
-      }
-    }
-  }
-
-  /// Update payment statistics
-  /// OPTIMIZATION: Asynchronous stats update without blocking UI
-  Future<void> _updatePaymentStats() async {
-    try {
-      final stats = await getPaymentStats();
-      final statsJson = jsonEncode(stats.toJson());
-      await _secureStorage.write(key: _statsKey, value: statsJson);
-    } catch (e) {
-      if (kDebugMode) {
-        print('PaymentHistory: Error updating stats: $e');
       }
     }
   }

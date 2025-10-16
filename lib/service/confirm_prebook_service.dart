@@ -16,7 +16,7 @@ class ConfirmPrebookService {
     );
     print(request);
 
-    request.body = json.encode({"pre_book_id": regNumber});
+    request.body = json.encode({'pre_book_id': regNumber});
 
     try {
       http.StreamedResponse response = await request.send();

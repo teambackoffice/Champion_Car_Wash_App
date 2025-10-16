@@ -15,7 +15,7 @@ class InvoiceSuccessPage extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.check_circle, color: Colors.green, size: 100),
+                const Icon(Icons.check_circle, color: Colors.green, size: 100),
                 const SizedBox(height: 24),
                 const Text(
                   'Invoice Created Successfully!',
@@ -39,12 +39,12 @@ class InvoiceSuccessPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => BottomNavigation(),
+                        builder: (context) => const BottomNavigation(),
                       ),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFB53E3E),
+                    backgroundColor: const Color(0xFFB53E3E),
                     padding: const EdgeInsets.symmetric(
                       vertical: 14,
                       horizontal: 32,

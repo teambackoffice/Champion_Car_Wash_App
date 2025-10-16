@@ -15,9 +15,9 @@ class ExtraWorkModal {
   ExtraWorkModal({required this.message});
 
   factory ExtraWorkModal.fromJson(Map<String, dynamic> json) =>
-      ExtraWorkModal(message: Message.fromJson(json["message"]));
+      ExtraWorkModal(message: Message.fromJson(json['message']));
 
-  Map<String, dynamic> toJson() => {"message": message.toJson()};
+  Map<String, dynamic> toJson() => {'message': message.toJson()};
 }
 
 class Message {
@@ -32,17 +32,17 @@ class Message {
   });
 
   factory Message.fromJson(Map<String, dynamic> json) => Message(
-    status: json["status"],
+    status: json['status'],
     extraDetails: List<ExtraDetail>.from(
-      json["extra details"].map((x) => ExtraDetail.fromJson(x)),
+      json['extra details'].map((x) => ExtraDetail.fromJson(x)),
     ),
-    code: json["code"],
+    code: json['code'],
   );
 
   Map<String, dynamic> toJson() => {
-    "status": status,
-    "extra details": List<dynamic>.from(extraDetails.map((x) => x.toJson())),
-    "code": code,
+    'status': status,
+    'extra details': List<dynamic>.from(extraDetails.map((x) => x.toJson())),
+    'code': code,
   };
 }
 
@@ -53,7 +53,7 @@ class ExtraDetail {
   ExtraDetail({required this.name, required this.price});
 
   factory ExtraDetail.fromJson(Map<String, dynamic> json) =>
-      ExtraDetail(name: json["name"], price: json["price"]);
+      ExtraDetail(name: json['name'], price: json['price']);
 
-  Map<String, dynamic> toJson() => {"name": name, "price": price};
+  Map<String, dynamic> toJson() => {'name': name, 'price': price};
 }

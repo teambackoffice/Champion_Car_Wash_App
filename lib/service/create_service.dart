@@ -10,7 +10,7 @@ class CreateService {
   static const String baseUrl =
       '${ApiConstants.baseUrl}api/method/carwash.Api.auth.create_service_by_supervisor';
 
-  final _storage = FlutterSecureStorage();
+  static const _storage = FlutterSecureStorage();
 
   Future<Map<String, dynamic>> createServiceWithCustomerVehicle(
     CreateServiceModal serviceModel,

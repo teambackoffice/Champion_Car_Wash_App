@@ -111,7 +111,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -126,9 +126,8 @@ class _CreateServicePageState extends State<CreateServicePage> {
                       isRequired: false,
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
-                    flex: 1,
                     child: ElevatedButton(
                       onPressed: () {
                         // Implement search functionality
@@ -136,37 +135,37 @@ class _CreateServicePageState extends State<CreateServicePage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey[300],
                         foregroundColor: Colors.black,
-                        padding: EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                         ),
                       ),
-                      child: Text('Search'),
+                      child: const Text('Search'),
                     ),
                   ),
                 ],
               ),
 
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               // Vehicle Details Section
               _buildSectionTitle('Vehicle Details'),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               // Make Dropdown
               _buildMakeDropdown(),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               // Model Dropdown
               _buildModelDropdown(),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               _buildTypeDropdown(),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               _buildTextField(
                 controller: _addressController,
                 hintText: 'Modal Of Year',
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               _buildTextField(
                 controller: _purchaseDateController,
@@ -175,68 +174,68 @@ class _CreateServicePageState extends State<CreateServicePage> {
                 readOnly: true,
                 onTap: () => _selectDate(context),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               _buildTextField(
                 controller: _engineNumberController,
                 hintText: 'Engine Number',
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               _buildTextField(
                 controller: _chassisNumberController,
                 hintText: 'Chassis Number',
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               _buildTextField(
                 controller: regNumberController,
                 hintText: 'Registration Number',
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               // Customer Details Section
               _buildSectionTitle('Customer Details'),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               _buildTextField(
                 controller: nameController,
                 hintText: 'Customer Name',
                 readOnly: widget.isPrebook,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               _buildTextField(
                 controller: mobileController,
                 hintText: '+971 Phone Number here',
                 keyboardType: TextInputType.phone,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               _buildTextField(
                 controller: _emailController,
                 hintText: 'email id',
                 keyboardType: TextInputType.emailAddress,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               _buildTextField(
                 controller: _addressController,
                 hintText: 'Address',
                 suffixIcon: Icons.location_on_outlined,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
 
               _buildTextField(controller: _cityController, hintText: 'City'),
 
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
 
               // Inspection Needed Checkbox with Video Status
               _buildInspectionSection(),
 
-              SizedBox(height: 32),
+              const SizedBox(height: 32),
 
               // Continue Button
               SizedBox(
@@ -248,7 +247,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
                       // Additional validation for dropdowns
                       if (_selectedMake == null || _selectedMake!.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
+                          const SnackBar(
                             content: Text('Please select a car make'),
                             backgroundColor: Colors.red,
                           ),
@@ -258,7 +257,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
 
                       if (_selectedModel == null || _selectedModel!.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
+                          const SnackBar(
                             content: Text('Please select a car model'),
                             backgroundColor: Colors.red,
                           ),
@@ -310,7 +309,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
                       );
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
+                        const SnackBar(
                           content: Text('Please fill in all required fields'),
                           backgroundColor: Colors.red,
                         ),
@@ -319,12 +318,12 @@ class _CreateServicePageState extends State<CreateServicePage> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
-                    padding: EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Continue',
                     style: TextStyle(
                       color: Colors.white,
@@ -344,7 +343,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
   // Updated inspection section with video status display
   Widget _buildInspectionSection() {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.grey[50],
         borderRadius: BorderRadius.circular(8),
@@ -370,7 +369,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
                 },
                 activeColor: Colors.blue,
               ),
-              Expanded(
+              const Expanded(
                 child: Text(
                   'Inspection Needed',
                   style: TextStyle(fontSize: 16),
@@ -381,9 +380,9 @@ class _CreateServicePageState extends State<CreateServicePage> {
 
           // Show video status if inspection is needed
           if (_inspectionNeeded) ...[
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Container(
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: _videoPath != null
                     ? Colors.green[50]
@@ -402,7 +401,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
                     color: _videoPath != null ? Colors.green : Colors.orange,
                     size: 20,
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       _videoPath != null
@@ -419,12 +418,12 @@ class _CreateServicePageState extends State<CreateServicePage> {
                   if (_videoPath == null)
                     TextButton(
                       onPressed: _openVideoCapture,
-                      child: Text('Record'),
+                      child: const Text('Record'),
                     ),
                   if (_videoPath != null)
                     TextButton(
                       onPressed: _openVideoCapture,
-                      child: Text('Re-record'),
+                      child: const Text('Re-record'),
                     ),
                 ],
               ),
@@ -454,7 +453,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
     }
 
     return DropdownButtonFormField<String>(
-      initialValue: _selectedMake,
+      value: _selectedMake,
       hint: Text('Select Make', style: TextStyle(color: Colors.grey[400])),
       items: _makesController.makes.map((CarMake make) {
         return DropdownMenuItem<String>(
@@ -493,7 +492,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
         }
 
         return DropdownButtonFormField<String>(
-          initialValue: _selectedModel,
+          value: _selectedModel,
           hint: Text('Select Model', style: TextStyle(color: Colors.grey[400])),
           items: _modelsController.models.map((CarModel model) {
             return DropdownMenuItem<String>(
@@ -534,7 +533,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
     }
 
     return DropdownButtonFormField<String>(
-      initialValue: _selectedType,
+      value: _selectedType,
       hint: Text('Select Car Type', style: TextStyle(color: Colors.grey[400])),
       items: [selectedCarModel.carType].map((type) {
         return DropdownMenuItem<String>(value: type, child: Text(type));
@@ -548,7 +547,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
 
   Widget _buildLoadingDropdown(String text) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.grey[50],
         border: Border.all(color: Colors.grey[300]!),
@@ -556,12 +555,12 @@ class _CreateServicePageState extends State<CreateServicePage> {
       ),
       child: Row(
         children: [
-          SizedBox(
+          const SizedBox(
             width: 20,
             height: 20,
             child: CircularProgressIndicator(strokeWidth: 2),
           ),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Text(text, style: TextStyle(color: Colors.grey[600])),
         ],
       ),
@@ -570,7 +569,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
 
   Widget _buildErrorDropdown(String text, VoidCallback onRetry) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.grey[50],
         border: Border.all(color: Colors.grey[300]!),
@@ -578,12 +577,12 @@ class _CreateServicePageState extends State<CreateServicePage> {
       ),
       child: Row(
         children: [
-          Icon(Icons.error_outline, color: Colors.red, size: 20),
-          SizedBox(width: 12),
+          const Icon(Icons.error_outline, color: Colors.red, size: 20),
+          const SizedBox(width: 12),
           Expanded(
-            child: Text(text, style: TextStyle(color: Colors.red)),
+            child: Text(text, style: const TextStyle(color: Colors.red)),
           ),
-          TextButton(onPressed: onRetry, child: Text('Retry')),
+          TextButton(onPressed: onRetry, child: const Text('Retry')),
         ],
       ),
     );
@@ -591,7 +590,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
 
   Widget _buildDisabledDropdown(String text) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.grey[100],
         border: Border.all(color: Colors.grey[300]!),
@@ -600,7 +599,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
       child: Row(
         children: [
           Icon(Icons.info_outline, color: Colors.grey[400], size: 20),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Text(text, style: TextStyle(color: Colors.grey[400])),
         ],
       ),
@@ -609,7 +608,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
 
   Widget _buildInfoDropdown(String text) {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.blue[50],
         border: Border.all(color: Colors.blue[200]!),
@@ -618,7 +617,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
       child: Row(
         children: [
           Icon(Icons.info_outline, color: Colors.blue[700], size: 20),
-          SizedBox(width: 12),
+          const SizedBox(width: 12),
           Text(text, style: TextStyle(color: Colors.blue[700])),
         ],
       ),
@@ -639,9 +638,9 @@ class _CreateServicePageState extends State<CreateServicePage> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: Colors.blue),
+        borderSide: const BorderSide(color: Colors.blue),
       ),
-      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     );
   }
 
@@ -677,9 +676,9 @@ class _CreateServicePageState extends State<CreateServicePage> {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.blue),
+          borderSide: const BorderSide(color: Colors.blue),
         ),
-        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
       // validator: isRequired
       //     ? (value) {
@@ -695,7 +694,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: TextStyle(
+      style: const TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w600,
         color: Colors.black87,
@@ -704,6 +703,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    if (!mounted) return;
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -713,7 +713,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
     if (picked != null) {
       setState(() {
         _purchaseDateController.text =
-            "${picked.day}/${picked.month}/${picked.year}";
+            '${picked.day}/${picked.month}/${picked.year}';
       });
     }
   }
@@ -769,21 +769,21 @@ class _CreateServicePageState extends State<CreateServicePage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Camera Permission Required'),
-          content: Text(
+          title: const Text('Camera Permission Required'),
+          content: const Text(
             'Camera access is permanently denied. Please enable camera permission in your device settings to record inspection videos.',
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
                 openAppSettings(); // This opens the app settings
               },
-              child: Text('Open Settings'),
+              child: const Text('Open Settings'),
             ),
           ],
         );
@@ -796,7 +796,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
       SnackBar(
         content: Text(message),
         backgroundColor: Colors.red,
-        duration: Duration(seconds: 3),
+        duration: const Duration(seconds: 3),
       ),
     );
   }
@@ -853,12 +853,12 @@ class _VideoCaptureScreenState extends State<VideoCaptureScreen> {
   @override
   Widget build(BuildContext context) {
     if (!_controller.value.isInitialized) {
-      return Scaffold(body: Center(child: CircularProgressIndicator()));
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Record Inspection Video'),
+        title: const Text('Record Inspection Video'),
         backgroundColor: Colors.black,
         foregroundColor: Colors.white,
       ),
@@ -866,7 +866,7 @@ class _VideoCaptureScreenState extends State<VideoCaptureScreen> {
         children: [
           Expanded(child: CameraPreview(_controller)),
           Container(
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             color: Colors.black,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -876,10 +876,10 @@ class _VideoCaptureScreenState extends State<VideoCaptureScreen> {
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.grey,
-                    shape: CircleBorder(),
-                    padding: EdgeInsets.all(20),
+                    shape: const CircleBorder(),
+                    padding: const EdgeInsets.all(20),
                   ),
-                  child: Icon(Icons.close, color: Colors.white),
+                  child: const Icon(Icons.close, color: Colors.white),
                 ),
 
                 // Record/Stop button
@@ -887,8 +887,8 @@ class _VideoCaptureScreenState extends State<VideoCaptureScreen> {
                   onPressed: _isRecording ? _stopRecording : _startRecording,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _isRecording ? Colors.red : Colors.white,
-                    shape: CircleBorder(),
-                    padding: EdgeInsets.all(30),
+                    shape: const CircleBorder(),
+                    padding: const EdgeInsets.all(30),
                   ),
                   child: Icon(
                     _isRecording ? Icons.stop : Icons.videocam,
@@ -903,12 +903,12 @@ class _VideoCaptureScreenState extends State<VideoCaptureScreen> {
                         onPressed: () => Navigator.pop(context, _videoPath),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
-                          shape: CircleBorder(),
-                          padding: EdgeInsets.all(20),
+                          shape: const CircleBorder(),
+                          padding: const EdgeInsets.all(20),
                         ),
-                        child: Icon(Icons.check, color: Colors.white),
+                        child: const Icon(Icons.check, color: Colors.white),
                       )
-                    : SizedBox(width: 60),
+                    : const SizedBox(width: 60),
               ],
             ),
           ),

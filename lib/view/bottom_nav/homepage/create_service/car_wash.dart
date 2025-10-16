@@ -35,7 +35,7 @@ class _CarWashScreenState extends State<CarWashScreen> {
 
             if (controller.carwashList == null ||
                 controller.carwashList!.message.washType.isEmpty) {
-              return const Center(child: Text("No wash types available"));
+              return const Center(child: Text('No wash types available'));
             }
 
             final washList = controller.carwashList!.message.washType;
@@ -73,7 +73,7 @@ class _CarWashScreenState extends State<CarWashScreen> {
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.grey.withOpacity(0.07),
+                                color: Colors.grey.withAlpha(18),
                                 spreadRadius: 1,
                                 blurRadius: 6,
                                 offset: const Offset(0, 3),
@@ -85,7 +85,7 @@ class _CarWashScreenState extends State<CarWashScreen> {
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(8),
                                 child: Image.asset(
-                                  "assets/bodyWash1.jpg",
+                                  'assets/bodyWash1.jpg',
                                   width: 70,
                                   height: 70,
                                   fit: BoxFit.cover,
@@ -104,7 +104,7 @@ class _CarWashScreenState extends State<CarWashScreen> {
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
-                                    "₹${wash.price.toStringAsFixed(2)}",
+                                    '₹${wash.price.toStringAsFixed(2)}',
                                     style: const TextStyle(
                                       fontSize: 16,
                                       color: Color(0xFFD82332),

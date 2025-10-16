@@ -139,10 +139,8 @@ void main() {
         final baselineMetrics = _createTestMetrics(
           startupTime: 2000,
           frameRate: 50.0,
-          memoryUsage: 100.0,
         );
         final currentMetrics = _createTestMetrics(
-          startupTime: 1500,
           frameRate: 55.0,
           memoryUsage: 90.0,
         );
@@ -176,7 +174,7 @@ void main() {
           _createTestMetrics(startupTime: 3000, frameRate: 45.0),
           _createTestMetrics(startupTime: 2500, frameRate: 50.0),
           _createTestMetrics(startupTime: 2000, frameRate: 55.0),
-          _createTestMetrics(startupTime: 1500, frameRate: 60.0),
+          _createTestMetrics(),
         ];
         
         for (final metrics in entries) {
@@ -245,7 +243,7 @@ void main() {
   group('MetricsComparison Tests', () {
     test('should calculate startup time improvement correctly', () {
       final baseline = _createTestMetrics(startupTime: 2000);
-      final current = _createTestMetrics(startupTime: 1500);
+      final current = _createTestMetrics();
       
       final comparison = MetricsComparison.fromMetrics(
         current: current,
@@ -258,7 +256,7 @@ void main() {
     
     test('should calculate frame rate improvement correctly', () {
       final baseline = _createTestMetrics(frameRate: 50.0);
-      final current = _createTestMetrics(frameRate: 60.0);
+      final current = _createTestMetrics();
       
       final comparison = MetricsComparison.fromMetrics(
         current: current,
@@ -271,7 +269,7 @@ void main() {
     
     test('should calculate memory usage improvement correctly', () {
       final baseline = _createTestMetrics(memoryUsage: 120.0);
-      final current = _createTestMetrics(memoryUsage: 100.0);
+      final current = _createTestMetrics();
       
       final comparison = MetricsComparison.fromMetrics(
         current: current,
@@ -299,9 +297,7 @@ void main() {
         memoryUsage: 120.0,
       );
       final current = _createTestMetrics(
-        startupTime: 1500,
-        frameRate: 60.0,
-        memoryUsage: 100.0,
+        
       );
       
       final comparison = MetricsComparison.fromMetrics(

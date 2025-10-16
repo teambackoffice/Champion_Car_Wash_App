@@ -161,9 +161,9 @@ class PerformanceScorer {
     // - Smooth scrolling (booking lists)
     // - Quick API responses (status updates)
     
-    final startupWeight = 0.4;
-    final frameRateWeight = 0.3;
-    final apiWeight = 0.3;
+    const startupWeight = 0.4;
+    const frameRateWeight = 0.3;
+    const apiWeight = 0.3;
     
     final startupScore = _calculateStartupScore(metrics.startupTimeMs, 
         ScoringThresholds.championCarWash());
@@ -183,9 +183,9 @@ class PerformanceScorer {
     // - API performance (reports and analytics)
     // - Overall stability
     
-    final memoryWeight = 0.4;
-    final apiWeight = 0.35;
-    final stabilityWeight = 0.25;
+    const memoryWeight = 0.4;
+    const apiWeight = 0.35;
+    const stabilityWeight = 0.25;
     
     final memoryScore = _calculateMemoryScore(metrics.memoryUsageMB, 
         ScoringThresholds.championCarWash());
@@ -205,9 +205,9 @@ class PerformanceScorer {
     // - UI stability (NFC interactions)
     // - Memory efficiency (payment processing)
     
-    final apiWeight = 0.5;
-    final stabilityWeight = 0.3;
-    final memoryWeight = 0.2;
+    const apiWeight = 0.5;
+    const stabilityWeight = 0.3;
+    const memoryWeight = 0.2;
     
     final apiScore = _calculateApiScore(metrics.apiResponseTimeMs, 
         ScoringThresholds.championCarWash());
@@ -227,9 +227,9 @@ class PerformanceScorer {
     // - Smooth UI (booking creation)
     // - Battery efficiency (mobile usage)
     
-    final startupWeight = 0.4;
-    final frameRateWeight = 0.35;
-    final batteryWeight = 0.25;
+    const startupWeight = 0.4;
+    const frameRateWeight = 0.35;
+    const batteryWeight = 0.25;
     
     final startupScore = _calculateStartupScore(metrics.startupTimeMs, 
         ScoringThresholds.championCarWash());

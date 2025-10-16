@@ -6,13 +6,13 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
 class GetCompletedServices {
-  final String Url =
+  final String url =
       '${ApiConstants.baseUrl}api/method/carwash.Api.auth.get_completed_service_details';
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
   Future<GetCompletedModal> getcompleted() async {
     try {
-      final request = http.Request('GET', Uri.parse(Url));
+      final request = http.Request('GET', Uri.parse(url));
       final String? sid = await _secureStorage.read(key: 'sid');
 
       if (sid == null) {

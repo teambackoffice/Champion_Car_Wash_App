@@ -1,7 +1,6 @@
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/booking_status.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/create_service.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/pre_booking_now/pre_book.dart';
-import 'package:champion_car_wash_app/view/test/payment_history_viewer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -35,14 +34,14 @@ class _HomePageContentState extends State<HomePageContent> {
 
   // OPTIMIZATION: Precache images to prevent UI jank
   void _precacheImages() {
-    precacheImage(const AssetImage("assets/person.jpeg"), context);
+    precacheImage(const AssetImage('assets/person.jpeg'), context);
   }
 
   // OPTIMIZATION: Load both storage values in parallel instead of sequentially
   Future<void> _loadUserData() async {
     final results = await Future.wait([
-      storage.read(key: "full_name"),
-      storage.read(key: "branch"),
+      storage.read(key: 'full_name'),
+      storage.read(key: 'branch'),
     ]);
     
     setState(() {
@@ -53,14 +52,14 @@ class _HomePageContentState extends State<HomePageContent> {
 
   // Keep individual methods for backward compatibility
   Future<void> _loadFullname() async {
-    final storedName = await storage.read(key: "full_name");
+    final storedName = await storage.read(key: 'full_name');
     setState(() {
       fullname = storedName ?? '';
     });
   }
 
   Future<void> loadbranch() async {
-    final storedBranch = await storage.read(key: "branch");
+    final storedBranch = await storage.read(key: 'branch');
     setState(() {
       branch = storedBranch ?? '';
     });
@@ -103,62 +102,55 @@ class _HomePageContentState extends State<HomePageContent> {
                     ),
                   ],
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Container(
-                      width: 70,
-                      height: 70,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF7DB3A8),
-                        borderRadius: BorderRadius.circular(35),
+                    const CircleAvatar(
+                      radius: 40,
+                      backgroundColor: Color(0xFF7DB3A8),
+                      child: Icon(
+                        Icons.person,
+                        size: 50,
+                        color: Colors.white,
                       ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(35),
-                        child: Image.asset(
-                          "assets/person.jpeg",
-                          fit: BoxFit.cover,
+                    ),
+                    const SizedBox(height: 15),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          fullname.isNotEmpty
+                              ? fullname[0].toUpperCase() +
+                                    fullname.substring(1)
+                              : '',
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
                         ),
+                        const SizedBox(width: 5),
+                    Text(
+                      branch.isNotEmpty
+                          ? '(${branch[0].toUpperCase()}${branch.substring(1)})'
+                          : '',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black54,
                       ),
                     ),
-                    const SizedBox(width: 15),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            fullname.isNotEmpty
-                                ? fullname[0].toUpperCase() +
-                                      fullname.substring(1)
-                                : '',
-                            style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
-                          ),
-
-                          const SizedBox(height: 5),
-                          // const Text(
-                          //   "+966 87523 7236",
-                          //   style: TextStyle(
-                          //     fontSize: 14,
-                          //     color: Colors.black54,
-                          //   ),
-                          // ),
-                          const SizedBox(height: 3),
-                          Text(
-                            branch.isNotEmpty
-                                ? branch[0].toUpperCase() + branch.substring(1)
-                                : '',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.black54,
-                            ),
-                          ),
-                        ],
-                      ),
+                      ],
                     ),
+                    const SizedBox(height: 5),
+                    // Text(
+                    //   branch.isNotEmpty
+                    //       ? branch[0].toUpperCase() + branch.substring(1)
+                    //       : '',
+                    //   style: const TextStyle(
+                    //     fontSize: 16,
+                    //     color: Colors.black54,
+                    //   ),
+                    // ),
                   ],
                 ),
                 ),
@@ -169,7 +161,7 @@ class _HomePageContentState extends State<HomePageContent> {
               // Booking Statistics
               // OPTIMIZATION: RepaintBoundary prevents this complex widget from
               // causing repaints in parent/sibling widgets
-              RepaintBoundary(
+              const RepaintBoundary(
                 child: BookingStatus(),
               ),
 
@@ -185,7 +177,7 @@ class _HomePageContentState extends State<HomePageContent> {
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
-                            CreateServicePage(isPrebook: false),
+                            const CreateServicePage(isPrebook: false),
                       ),
                     );
                   },
@@ -214,7 +206,7 @@ class _HomePageContentState extends State<HomePageContent> {
                       ),
                       const SizedBox(width: 10),
                       const Text(
-                        "Create Service",
+                        'Create Service',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -236,10 +228,10 @@ class _HomePageContentState extends State<HomePageContent> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => PreBookingButton(),
+                        builder: (context) => const PreBookingButton(),
                       ),
                     );
-                    print("Pre Book Now tapped");
+                    print('Pre Book Now tapped');
                   },
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFFD32F2F),
@@ -265,7 +257,7 @@ class _HomePageContentState extends State<HomePageContent> {
                       ),
                       const SizedBox(width: 10),
                       const Text(
-                        "Pre Book Now",
+                        'Pre Book Now',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,

@@ -36,7 +36,7 @@ class _OilChangeScreenState extends State<OilChangeScreen> {
 
             if (controller.oilBrand == null ||
                 controller.oilBrand!.message.oilBrands.isEmpty) {
-              return const Center(child: Text("No oil brands available"));
+              return const Center(child: Text('No oil brands available'));
             }
 
             final oillist = controller.oilBrand!.message.oilBrands;
@@ -153,7 +153,7 @@ class _OilChangeScreenState extends State<OilChangeScreen> {
                             borderRadius: BorderRadius.circular(12),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.grey.withOpacity(0.08),
+                                color: Colors.grey.withAlpha(20),
                                 spreadRadius: 1,
                                 blurRadius: 8,
                                 offset: const Offset(0, 2),
@@ -173,7 +173,7 @@ class _OilChangeScreenState extends State<OilChangeScreen> {
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
                                   child: Image.asset(
-                                    "assets/oil_change.png",
+                                    'assets/oil_change.png',
                                     fit: BoxFit.cover,
                                     errorBuilder: (context, error, stackTrace) {
                                       return Container(
@@ -210,9 +210,7 @@ class _OilChangeScreenState extends State<OilChangeScreen> {
                                           horizontal: 6,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: const Color(
-                                            0xFFD82332,
-                                          ).withOpacity(0.1),
+                                          color: const Color(0xFFD82332).withAlpha(26),
                                           borderRadius: BorderRadius.circular(
                                             4,
                                           ),
@@ -231,7 +229,7 @@ class _OilChangeScreenState extends State<OilChangeScreen> {
                               ),
 
                               // Price
-                              Column(
+                              const Column(
                                 crossAxisAlignment: CrossAxisAlignment.end,
                                 children: [
                                   // Text(
@@ -242,7 +240,7 @@ class _OilChangeScreenState extends State<OilChangeScreen> {
                                   //     fontWeight: FontWeight.bold,
                                   //   ),
                                   // ),
-                                  const SizedBox(height: 4),
+                                  SizedBox(height: 4),
                                 ],
                               ),
                             ],
@@ -313,7 +311,7 @@ class _OilChangeScreenState extends State<OilChangeScreen> {
             ),
           ),
           const Spacer(),
-          Text(
+          const Text(
             'Oil Change Service',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
           ),

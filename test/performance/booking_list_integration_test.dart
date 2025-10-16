@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/allbooking_page/all_bookings.dart';
 import 'package:champion_car_wash_app/controller/get_allbooking_controller.dart';
 import 'package:champion_car_wash_app/modal/get_allbooking_modal.dart';
-import '../../lib/testing/performance/tests/booking_list_performance_test.dart';
+import 'package:champion_car_wash_app/testing/performance/tests/booking_list_performance_test.dart';
 
 /// Integration test for booking list performance with real UI components
 /// Validates 60fps scrolling with 100+ booking items and search functionality
@@ -236,7 +236,7 @@ List<ServiceData> _generateTestBookingData(int count) {
       lastServiceOdometer: 10000.0 + random.nextDouble() * 50000.0,
       currentOdometerReading: 60000.0 + random.nextDouble() * 40000.0,
       nextServiceOdometer: 110000.0 + random.nextDouble() * 20000.0,
-      video: random.nextBool() ? 'https://example.com/video${i}.mp4' : null,
+      video: random.nextBool() ? 'https://example.com/video$i.mp4' : null,
       services: [
         GetAllServiceItem(
           serviceType: _getRandomServiceType(random),
@@ -362,7 +362,7 @@ Future<void> _performExtendedUsage(WidgetTester tester) async {
     if (cycleCount % 5 == 0) {
       await tester.tap(searchFieldFinder);
       await tester.pump();
-      await tester.enterText(searchFieldFinder, 'Customer ${cycleCount}');
+      await tester.enterText(searchFieldFinder, 'Customer $cycleCount');
       await tester.pump(const Duration(milliseconds: 300));
       
       // Clear search

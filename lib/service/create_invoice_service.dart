@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 class CreateInvoiceService {
   static const String _url =
       '${ApiConstants.baseUrl}api/method/carwash.Api.auth.create_sales_invoice';
-  static final FlutterSecureStorage _storage = const FlutterSecureStorage();
+  static const FlutterSecureStorage _storage = FlutterSecureStorage();
 
   /// Create Sales Invoice API
   static Future<http.Response?> createSalesInvoice({
@@ -21,7 +21,7 @@ class CreateInvoiceService {
       final sid = await _storage.read(key: 'sid');
 
       if (sid == null) {
-        throw Exception("User session ID (sid) not found in secure storage.");
+        throw Exception('User session ID (sid) not found in secure storage.');
       }
 
       // Print all items before sending
@@ -37,9 +37,9 @@ class CreateInvoiceService {
       };
 
       final body = json.encode({
-        "customer": customer,
-        "service_id": serviceId,
-        "items": items,
+        'customer': customer,
+        'service_id': serviceId,
+        'items': items,
       });
 
       print('Sending Invoice Request Body: $body');

@@ -50,22 +50,22 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
       }
 
       items.add({
-        "item_code": service.serviceType, // Backend should map this to actual item
-        "item_name": itemDescription,
-        "qty": service.qty > 0 ? service.qty : 1,
-        "rate": service.price ?? 0,
-        "price": service.price ?? 0,
+        'item_code': service.serviceType, // Backend should map this to actual item
+        'item_name': itemDescription,
+        'qty': service.qty > 0 ? service.qty : 1,
+        'rate': service.price ?? 0,
+        'price': service.price ?? 0,
       });
     }
 
     // Add extra work items
     for (var extraWork in widget.booking!.extraWorkItems) {
       items.add({
-        "item_code": extraWork.workItem,
-        "item_name": extraWork.workItem,
-        "qty": extraWork.qty > 0 ? extraWork.qty : 1,
-        "rate": extraWork.rate,
-        "price": extraWork.rate,
+        'item_code': extraWork.workItem,
+        'item_name': extraWork.workItem,
+        'qty': extraWork.qty > 0 ? extraWork.qty : 1,
+        'rate': extraWork.rate,
+        'price': extraWork.rate,
       });
     }
 
@@ -81,7 +81,7 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
       items: items,
     );
 
-    if (controller.responseMessage?.contains("successfully") ?? false) {
+    if (controller.responseMessage?.contains('successfully') ?? false) {
       if (mounted) {
         Navigator.pushReplacement(
           context,
@@ -94,7 +94,7 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(controller.responseMessage ?? "Unknown error"),
+            content: Text(controller.responseMessage ?? 'Unknown error'),
           ),
         );
       }

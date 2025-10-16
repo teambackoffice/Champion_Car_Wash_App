@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 class GetOilbrandService {
   static Future<GetOilBrandList?> getOilBrandList() async {
     final uri = Uri.parse(
-      "${ApiConstants.baseUrl}api/method/carwash.Api.auth.get_all_oil_brand",
+      '${ApiConstants.baseUrl}api/method/carwash.Api.auth.get_all_oil_brand',
     );
     print(uri);
 

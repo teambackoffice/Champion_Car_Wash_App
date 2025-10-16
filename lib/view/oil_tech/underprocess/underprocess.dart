@@ -5,7 +5,7 @@ import 'package:champion_car_wash_app/controller/oil_tech/extra_work_controller.
 import 'package:champion_car_wash_app/controller/oil_tech/inprogress_oil_controller.dart';
 import 'package:champion_car_wash_app/controller/oil_tech/inprogress_status_chnager_controller.dart';
 import 'package:champion_car_wash_app/controller/oil_tech/inspection_list_controller.dart';
-import 'package:champion_car_wash_app/controller/oilsubtype_byBrand_controller.dart';
+import 'package:champion_car_wash_app/controller/oil_subtype_by_brand_controller.dart';
 import 'package:champion_car_wash_app/modal/oil_tech/inprogress_oil_modal.dart';
 import 'package:champion_car_wash_app/modal/oil_tech/inspection_list_modal.dart';
 import 'package:flutter/material.dart';
@@ -111,8 +111,6 @@ class UnderProcessingTab extends StatefulWidget {
 }
 
 class _UnderProcessingTabState extends State<UnderProcessingTab> {
-  OilSelection? get selectedOil => selectedOil;
-  List<ExtraWorkItem> get extraWorkItems => extraWorkItems;
   @override
   void initState() {
     super.initState();
@@ -127,43 +125,43 @@ class _UnderProcessingTabState extends State<UnderProcessingTab> {
   // Sample data - replace with your actual data source
   final List<ProcessingBookingData> processingBookings = [
     ProcessingBookingData(
-      bookingId: "RO-2025-06-0035",
-      bookingDate: "Jun 25 2025",
-      bookingTime: "9:00am",
-      userName: "John Doe",
-      mobileNo: "+971 99865 25140",
-      email: "john@gmail.com",
-      vehicleType: "SUV",
+      bookingId: 'RO-2025-06-0035',
+      bookingDate: 'Jun 25 2025',
+      bookingTime: '9:00am',
+      userName: 'John Doe',
+      mobileNo: '+971 99865 25140',
+      email: 'john@gmail.com',
+      vehicleType: 'SUV',
       oilbrand: 'Mobil',
       vehicleNo: 'KL55AB8899',
-      engineModel: "Fortuner",
-      selectedServices: ["Super Car Wash", "Oil Change"],
+      engineModel: 'Fortuner',
+      selectedServices: ['Super Car Wash', 'Oil Change'],
     ),
     ProcessingBookingData(
-      bookingId: "RO-2025-06-0036",
-      bookingDate: "Jun 25 2025",
-      bookingTime: "10:30am",
-      userName: "Sarah Wilson",
-      mobileNo: "+971 99865 25141",
-      email: "sarah@gmail.com",
-      vehicleType: "Sedan",
+      bookingId: 'RO-2025-06-0036',
+      bookingDate: 'Jun 25 2025',
+      bookingTime: '10:30am',
+      userName: 'Sarah Wilson',
+      mobileNo: '+971 99865 25141',
+      email: 'sarah@gmail.com',
+      vehicleType: 'Sedan',
       oilbrand: 'Shell',
       vehicleNo: 'KL55AB8899',
-      engineModel: "Camry",
-      selectedServices: ["Full Service", "Tire Rotation"],
+      engineModel: 'Camry',
+      selectedServices: ['Full Service', 'Tire Rotation'],
     ),
     ProcessingBookingData(
-      bookingId: "RO-2025-06-0037",
-      bookingDate: "Jun 25 2025",
-      bookingTime: "11:00am",
-      userName: "Mike Johnson",
-      mobileNo: "+971 99865 25142",
-      email: "mike@gmail.com",
+      bookingId: 'RO-2025-06-0037',
+      bookingDate: 'Jun 25 2025',
+      bookingTime: '11:00am',
+      userName: 'Mike Johnson',
+      mobileNo: '+971 99865 25142',
+      email: 'mike@gmail.com',
       oilbrand: 'Mobil',
-      vehicleType: "Hatchback",
+      vehicleType: 'Hatchback',
       vehicleNo: 'KL55AB8899',
-      engineModel: "Civic",
-      selectedServices: ["Basic Wash", "Interior Cleaning"],
+      engineModel: 'Civic',
+      selectedServices: ['Basic Wash', 'Interior Cleaning'],
     ),
   ];
 
@@ -185,10 +183,10 @@ class _UnderProcessingTabState extends State<UnderProcessingTab> {
             );
           }
           if (inProgressOilController.error != null) {
-            return Center(
+            return const Center(
               child: Text(
                 'No data available',
-                style: const TextStyle(color: Colors.red, fontSize: 16),
+                style: TextStyle(color: Colors.red, fontSize: 16),
               ),
             );
           }
@@ -880,7 +878,7 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
                   }
 
                   return DropdownButtonFormField<String>(
-                    initialValue: selectedOilBrand,
+                    value: selectedOilBrand,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -905,7 +903,7 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
                       Provider.of<OilsubtypeBybrandController>(
                         context,
                         listen: false,
-                      ).fetchOilSubtypesByBrand(newValue ?? "");
+                      ).fetchOilSubtypesByBrand(newValue ?? '');
                     },
                   );
                 },
@@ -934,7 +932,7 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
                   }
                   final subtypes = controller.oilSubtypes;
                   return DropdownButtonFormField<String>(
-                    initialValue: selectedLitres,
+                    value: selectedLitres,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -1146,7 +1144,7 @@ class _InspectionDialogState extends State<InspectionDialog> {
                         activeColor: Colors.red[800],
                         controlAffinity: ListTileControlAffinity.leading,
                         contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 0,
+                          
                         ),
                       );
                     },
@@ -1348,7 +1346,6 @@ class _AddExtraWorkDialogState extends State<AddExtraWorkDialog> {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 contentPadding: const EdgeInsets.symmetric(
-                  vertical: 0,
                   horizontal: 16,
                 ),
               ),

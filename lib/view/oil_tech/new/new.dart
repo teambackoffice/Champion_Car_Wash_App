@@ -19,7 +19,7 @@ class _NewBookingsTabState extends State<NewBookingsTab> {
       Provider.of<NewOilTechController>(
         context,
         listen: false,
-      ).getNewOilTechServices(serviceType: "Oil Change");
+      ).getNewOilTechServices(serviceType: 'Oil Change');
     });
   }
   // Sample data - replace with your actual data source
@@ -39,14 +39,14 @@ class _NewBookingsTabState extends State<NewBookingsTab> {
             return Center(
               child: Text(
                 'Error: ${controller.error}',
-                style: TextStyle(color: Colors.red, fontSize: 16),
+                style: const TextStyle(color: Colors.red, fontSize: 16),
               ),
             );
           }
           final bookings = controller.innerMessage?.data ?? [];
 
           if (bookings.isEmpty) {
-            return Center(
+            return const Center(
               child: Text(
                 'No new bookings available',
                 style: TextStyle(color: Colors.grey, fontSize: 16),
@@ -154,9 +154,9 @@ class _NewBookingsTabState extends State<NewBookingsTab> {
                                 context: context,
                                 builder: (BuildContext context) {
                                   return AlertDialog(
-                                    title: const Text("Confirmation"),
+                                    title: const Text('Confirmation'),
                                     content: const Text(
-                                      " Are you sure you want to start service ?",
+                                      ' Are you sure you want to start service ?',
                                     ),
                                     actions: [
                                       TextButton(
@@ -165,7 +165,7 @@ class _NewBookingsTabState extends State<NewBookingsTab> {
                                             context,
                                           ).pop(); // Close the dialog
                                         },
-                                        child: const Text("Cancel"),
+                                        child: const Text('Cancel'),
                                       ),
                                       Consumer<
                                         ServiceUnderproccessingController
@@ -178,7 +178,7 @@ class _NewBookingsTabState extends State<NewBookingsTab> {
                                                     await controller
                                                         .markServiceInProgress(
                                                           data.serviceId,
-                                                          "Oil Change",
+                                                          'Oil Change',
                                                         );
                                                     Navigator.of(context).pop();
                                                     Provider.of<
@@ -189,13 +189,13 @@ class _NewBookingsTabState extends State<NewBookingsTab> {
                                                         )
                                                         .getNewOilTechServices(
                                                           serviceType:
-                                                              "Oil Change",
+                                                              'Oil Change',
                                                         );
                                                   },
                                             style: ElevatedButton.styleFrom(
                                               backgroundColor: Colors.red[900],
                                               foregroundColor: Colors.white,
-                                              padding: EdgeInsets.symmetric(
+                                              padding: const EdgeInsets.symmetric(
                                                 horizontal: 24,
                                                 vertical: 12,
                                               ),
@@ -205,7 +205,7 @@ class _NewBookingsTabState extends State<NewBookingsTab> {
                                               ),
                                             ),
                                             child: controller.isLoading
-                                                ? SizedBox(
+                                                ? const SizedBox(
                                                     height: 20,
                                                     width: 20,
                                                     child:
@@ -214,7 +214,7 @@ class _NewBookingsTabState extends State<NewBookingsTab> {
                                                           strokeWidth: 2,
                                                         ),
                                                   )
-                                                : const Text("Yes"),
+                                                : const Text('Yes'),
                                           );
                                         },
                                       ),

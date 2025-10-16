@@ -183,7 +183,7 @@ class _SelectServiceState extends State<SelectService> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withAlpha(13),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -257,13 +257,13 @@ class _SelectServiceState extends State<SelectService> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.green.withOpacity(0.1),
+        color: Colors.green.withAlpha(26),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.green.withOpacity(0.3)),
+        border: Border.all(color: Colors.green.withAlpha(77)),
       ),
       child: Row(
         children: [
-          Icon(Icons.check_circle, color: Colors.green, size: 20),
+          const Icon(Icons.check_circle, color: Colors.green, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -351,7 +351,7 @@ class _SelectServiceState extends State<SelectService> {
   }) {
     return Card(
       elevation: 2,
-      shadowColor: Colors.black.withOpacity(0.1),
+      shadowColor: Colors.black.withAlpha(26),
       color: Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
@@ -805,11 +805,11 @@ class _SelectServiceState extends State<SelectService> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.0),
           ),
-          title: Row(
+          title: const Row(
             children: [
               Icon(Icons.check_circle, color: Colors.green, size: 28),
-              const SizedBox(width: 12),
-              const Text(
+              SizedBox(width: 12),
+              Text(
                 'Success',
                 style: TextStyle(
                   fontSize: 22,
@@ -819,9 +819,9 @@ class _SelectServiceState extends State<SelectService> {
               ),
             ],
           ),
-          content: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: const Text(
+          content: const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0),
+            child: Text(
               'Service created successfully !',
               style: TextStyle(fontSize: 16, color: Colors.black87),
             ),

@@ -22,12 +22,11 @@ class InspectionListController extends ChangeNotifier {
             (q) => Question(
               questions: q.questions,
               isMandatory: q.isMandatory,
-              isChecked: false, // add local state for checkbox
             ),
           )
           .toList();
     } catch (e) {
-      error = "Failed to load inspection list";
+      error = 'Failed to load inspection list';
     } finally {
       isLoading = false;
       notifyListeners();

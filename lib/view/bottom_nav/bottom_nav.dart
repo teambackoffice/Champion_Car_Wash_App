@@ -29,9 +29,9 @@ class _BottomNavigationState extends State<BottomNavigation> {
   Future<void> _precacheNavigationImages() async {
     try {
       await Future.wait([
-        precacheImage(const AssetImage("assets/home icon.png"), context),
-        precacheImage(const AssetImage("assets/booking.png"), context),
-        precacheImage(const AssetImage("assets/profile.png"), context),
+        precacheImage(const AssetImage('assets/home icon.png'), context),
+        precacheImage(const AssetImage('assets/booking.png'), context),
+        precacheImage(const AssetImage('assets/profile.png'), context),
       ]);
     } catch (e) {
       // Graceful fallback if image precaching fails
@@ -102,7 +102,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Image.asset("assets/home icon.png", color: Colors.red),
+                    Image.asset('assets/home icon.png', color: Colors.red),
                     const SizedBox(height: 2),
                     Text(
                       'Home',
@@ -136,7 +136,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Image.asset("assets/booking.png", color: Colors.red),
+                    Image.asset('assets/booking.png', color: Colors.red),
                     const SizedBox(height: 2),
                     Text(
                       'All Bookings',
@@ -170,7 +170,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Image.asset("assets/profile.png", color: Colors.red),
+                    Image.asset('assets/profile.png', color: Colors.red),
                     const SizedBox(height: 2),
                     Text(
                       'Profile',

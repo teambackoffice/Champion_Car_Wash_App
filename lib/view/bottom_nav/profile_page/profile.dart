@@ -25,14 +25,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _loadFullname() async {
-    final storedName = await storage.read(key: "full_name");
+    final storedName = await storage.read(key: 'full_name');
     setState(() {
       fullname = storedName ?? '';
     });
   }
 
   Future<void> loadbranch() async {
-    final storedBranch = await storage.read(key: "branch");
+    final storedBranch = await storage.read(key: 'branch');
     setState(() {
       branch = storedBranch ?? '';
     });

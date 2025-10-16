@@ -16,9 +16,9 @@ class InspectionListModal {
   InspectionListModal({required this.message});
 
   factory InspectionListModal.fromJson(Map<String, dynamic> json) =>
-      InspectionListModal(message: Message.fromJson(json["message"]));
+      InspectionListModal(message: Message.fromJson(json['message']));
 
-  Map<String, dynamic> toJson() => {"message": message.toJson()};
+  Map<String, dynamic> toJson() => {'message': message.toJson()};
 }
 
 class Message {
@@ -35,19 +35,19 @@ class Message {
   });
 
   factory Message.fromJson(Map<String, dynamic> json) => Message(
-    success: json["success"],
-    inspectionType: json["inspection_type"],
-    template: json["template"],
+    success: json['success'],
+    inspectionType: json['inspection_type'],
+    template: json['template'],
     questions: List<Question>.from(
-      json["questions"].map((x) => Question.fromJson(x)),
+      json['questions'].map((x) => Question.fromJson(x)),
     ),
   );
 
   Map<String, dynamic> toJson() => {
-    "success": success,
-    "inspection_type": inspectionType,
-    "template": template,
-    "questions": List<dynamic>.from(questions.map((x) => x.toJson())),
+    'success': success,
+    'inspection_type': inspectionType,
+    'template': template,
+    'questions': List<dynamic>.from(questions.map((x) => x.toJson())),
   };
 }
 
@@ -63,13 +63,12 @@ class Question {
   });
 
   factory Question.fromJson(Map<String, dynamic> json) => Question(
-    questions: json["questions"],
-    isMandatory: json["is_mandatory"],
-    isChecked: false, // Always start unchecked when loading
+    questions: json['questions'],
+    isMandatory: json['is_mandatory'],
   );
 
   Map<String, dynamic> toJson() => {
-    "questions": questions,
-    "is_mandatory": isMandatory,
+    'questions': questions,
+    'is_mandatory': isMandatory,
   };
 }

@@ -12,7 +12,7 @@ class CancelPrebookService {
   Future<String?> cancelPreBooking(String regNumber) async {
     var request = http.Request('POST', Uri.parse(_url));
 
-    request.body = json.encode({"pre_book_id": regNumber});
+    request.body = json.encode({'pre_book_id': regNumber});
 
     try {
       http.StreamedResponse response = await request.send();

@@ -7,7 +7,7 @@ import 'package:http/http.dart' as http;
 class GetCarwashService {
   static Future<GetCarwashList?> getCarwashList() async {
     final uri = Uri.parse(
-      "${ApiConstants.baseUrl}api/method/carwash.Api.auth.get_wash_type",
+      '${ApiConstants.baseUrl}api/method/carwash.Api.auth.get_wash_type',
     );
 
     try {

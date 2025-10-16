@@ -6,7 +6,6 @@ import 'package:champion_car_wash_app/view/carwash_tech/carwas_homepage.dart';
 import 'package:champion_car_wash_app/view/oil_tech/oil_homepage.dart';
 
 // ACTIVE STRIPE PAYMENT TEST
-import 'package:champion_car_wash_app/view/test/stripe_payment_test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
@@ -48,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (isLoggedIn) {
         // Get roles from secure storage
-        final secureStorage = FlutterSecureStorage();
+        const secureStorage = FlutterSecureStorage();
         final rolesString = await secureStorage.read(key: 'roles');
         List<String> roles = [];
 
@@ -68,20 +67,20 @@ class _LoginScreenState extends State<LoginScreen> {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (_) => CarWashTechnicianHomePage(),
+              builder: (_) => const CarWashTechnicianHomePage(),
             ), // replace with your Carwash page
           );
         } else if (roles.contains('Oil Technician')) {
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(
-              builder: (_) => OilTechnicianHomePage(),
+              builder: (_) => const OilTechnicianHomePage(),
             ), // replace with your Oil Tech page
           );
         } else if (roles.contains('supervisors')) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => BottomNavigation()),
+            MaterialPageRoute(builder: (_) => const BottomNavigation()),
           );
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -128,7 +127,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     // Flexible spacing that collapses when keyboard appears
                     if (!isKeyboardVisible) ...[

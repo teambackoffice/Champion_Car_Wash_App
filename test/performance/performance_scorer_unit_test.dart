@@ -88,8 +88,7 @@ void main() {
         final metrics = _createTestMetrics();
         
         final championScore = scorer.calculateScore(
-          metrics, 
-          profile: ScoringProfile.championCarWash,
+          metrics,
         );
         final balancedScore = scorer.calculateScore(
           metrics, 
@@ -109,7 +108,7 @@ void main() {
     group('Component Scoring', () {
       test('should score startup time correctly', () {
         final excellentStartup = _createTestMetrics(startupTime: 800); // < 1000ms
-        final goodStartup = _createTestMetrics(startupTime: 1500); // < 2000ms
+        final goodStartup = _createTestMetrics(); // < 2000ms
         final poorStartup = _createTestMetrics(startupTime: 6000); // > 5000ms
         
         final excellentScore = scorer.calculateScore(excellentStartup);
@@ -122,7 +121,7 @@ void main() {
       });
       
       test('should score frame rate correctly', () {
-        final excellentFps = _createTestMetrics(frameRate: 60.0);
+        final excellentFps = _createTestMetrics();
         final goodFps = _createTestMetrics(frameRate: 56.0);
         final poorFps = _createTestMetrics(frameRate: 30.0);
         
@@ -151,7 +150,7 @@ void main() {
       
       test('should score API response time correctly', () {
         final excellentApi = _createTestMetrics(apiResponseTime: 400.0);
-        final goodApi = _createTestMetrics(apiResponseTime: 800.0);
+        final goodApi = _createTestMetrics();
         final poorApi = _createTestMetrics(apiResponseTime: 4000.0);
         
         final excellentScore = scorer.calculateScore(excellentApi);
@@ -168,7 +167,6 @@ void main() {
       test('should calculate technician workflow score', () {
         final metrics = _createTestMetrics(
           startupTime: 1000, // Good for frequent app switching
-          frameRate: 60.0,   // Smooth scrolling
           apiResponseTime: 500, // Quick status updates
         );
         

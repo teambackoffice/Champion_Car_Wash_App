@@ -10,11 +10,11 @@ class AddPrebookingService {
     required AddPreBookingList preBooking,
   }) async {
     final uri = Uri.parse(
-      "${ApiConstants.baseUrl}api/method/carwash.Api.auth.create_pre_booking",
+      '${ApiConstants.baseUrl}api/method/carwash.Api.auth.create_pre_booking',
     );
 
-    final branch = await FlutterSecureStorage().read(key: "branch");
-    final sid = await FlutterSecureStorage().read(key: 'sid');
+    final branch = await const FlutterSecureStorage().read(key: 'branch');
+    final sid = await const FlutterSecureStorage().read(key: 'sid');
 
     // ✅ Fixed Cookie header syntax
     var headers = {

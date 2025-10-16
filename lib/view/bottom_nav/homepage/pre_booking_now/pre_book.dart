@@ -83,7 +83,7 @@ class _PreBookingButtonState extends State<PreBookingButton> {
       // Format time as 24-hour string (HH:MM) for API
       String formattedTime =
           '${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}';
-      final branch = await FlutterSecureStorage().read(key: "branch");
+      final branch = await const FlutterSecureStorage().read(key: 'branch');
       try {
         // Print data before sending to API
         final prebookingData = AddPreBookingList(
@@ -165,7 +165,7 @@ class _PreBookingButtonState extends State<PreBookingButton> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
-                          "Customer Details",
+                          'Customer Details',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
@@ -174,7 +174,7 @@ class _PreBookingButtonState extends State<PreBookingButton> {
                         const SizedBox(height: 16),
                         _buildTextField(
                           _nameController,
-                          "Customer Name",
+                          'Customer Name',
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
                               return 'Please enter customer name';
@@ -185,7 +185,7 @@ class _PreBookingButtonState extends State<PreBookingButton> {
                         const SizedBox(height: 12),
                         _buildTextField(
                           _phoneController,
-                          "+971 Phone Number here",
+                          '+971 Phone Number here',
                           keyboardType: TextInputType.phone,
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
@@ -200,7 +200,7 @@ class _PreBookingButtonState extends State<PreBookingButton> {
                         const SizedBox(height: 12),
                         _buildTextField(
                           _regNumberController,
-                          "Registration Number",
+                          'Registration Number',
                           validator: (value) {
                             if (value == null || value.trim().isEmpty) {
                               return 'Please enter registration number';
@@ -210,7 +210,7 @@ class _PreBookingButtonState extends State<PreBookingButton> {
                         ),
                         const SizedBox(height: 16),
                         const Text(
-                          "Service Selection",
+                          'Service Selection',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
@@ -220,7 +220,7 @@ class _PreBookingButtonState extends State<PreBookingButton> {
                         _buildMultiServiceSelection(),
                         const SizedBox(height: 16),
                         const Text(
-                          "Schedule Details",
+                          'Schedule Details',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
@@ -231,7 +231,7 @@ class _PreBookingButtonState extends State<PreBookingButton> {
                           onTap: _pickDate,
                           child: AbsorbPointer(
                             child: TextFormField(
-                              decoration: _inputDecoration("Select Date")
+                              decoration: _inputDecoration('Select Date')
                                   .copyWith(
                                     suffixIcon: const Icon(
                                       Icons.calendar_today,
@@ -240,7 +240,7 @@ class _PreBookingButtonState extends State<PreBookingButton> {
                               controller: TextEditingController(
                                 text: _selectedDate == null
                                     ? ''
-                                    : "${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}",
+                                    : '${_selectedDate!.day}/${_selectedDate!.month}/${_selectedDate!.year}',
                               ),
                             ),
                           ),
@@ -250,7 +250,7 @@ class _PreBookingButtonState extends State<PreBookingButton> {
                           onTap: _pickTime,
                           child: AbsorbPointer(
                             child: TextFormField(
-                              decoration: _inputDecoration("Select Time")
+                              decoration: _inputDecoration('Select Time')
                                   .copyWith(
                                     suffixIcon: const Icon(Icons.access_time),
                                   ),
@@ -291,7 +291,7 @@ class _PreBookingButtonState extends State<PreBookingButton> {
                               ),
                             )
                           : const Text(
-                              "Book Now",
+                              'Book Now',
                               style: TextStyle(
                                 color: Colors.white,
                                 fontSize: 16,

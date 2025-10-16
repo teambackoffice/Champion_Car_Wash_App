@@ -66,7 +66,7 @@ class _BookingStatusState extends State<BookingStatus> with AutomaticKeepAliveCl
                     },
                   ),
                 ),
-                const SizedBox(width: 15),
+                const SizedBox(width: 10),
                 // Pre Booking Card
                 Expanded(
                   child: _buildStatusCard(
@@ -88,7 +88,7 @@ class _BookingStatusState extends State<BookingStatus> with AutomaticKeepAliveCl
                 ),
           ],
         ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 10),
             Row(
               children: [
                 // Under Processing Card
@@ -110,7 +110,7 @@ class _BookingStatusState extends State<BookingStatus> with AutomaticKeepAliveCl
                     },
                   ),
                 ),
-                const SizedBox(width: 15),
+                const SizedBox(width: 10),
                 // Service Completed Card
                 Expanded(
                   child: _buildStatusCard(
@@ -153,13 +153,13 @@ class _BookingStatusState extends State<BookingStatus> with AutomaticKeepAliveCl
       onTap: onTap,
       borderRadius: BorderRadius.circular(15),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.08),
+              color: Colors.black.withAlpha(20),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -169,7 +169,7 @@ class _BookingStatusState extends State<BookingStatus> with AutomaticKeepAliveCl
           children: [
             RepaintBoundary(
               child: Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   color: color,
                   borderRadius: BorderRadius.circular(10),
@@ -177,21 +177,21 @@ class _BookingStatusState extends State<BookingStatus> with AutomaticKeepAliveCl
                 child: Icon(
                   icon,
                   color: Colors.white,
-                  size: 24,
+                  size: 20,
                 ),
               ),
             ),
-            const SizedBox(height: 15),
+            const SizedBox(height: 10),
             Text(
               title,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                fontSize: 12,
+                fontSize: 11,
                 color: Colors.black,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 5),
             isLoading
                 ? Column(
                     children: [
@@ -199,14 +199,14 @@ class _BookingStatusState extends State<BookingStatus> with AutomaticKeepAliveCl
                         height: 32,
                         width: 60,
                         decoration: BoxDecoration(
-                          color: color.withOpacity(0.1),
+                          color: color.withAlpha(26),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(6),
                           child: LinearProgressIndicator(
                             backgroundColor: Colors.transparent,
-                            valueColor: AlwaysStoppedAnimation<Color>(color.withOpacity(0.3)),
+                            valueColor: AlwaysStoppedAnimation<Color>(color.withAlpha(77)),
                             minHeight: 32,
                           ),
                         ),
@@ -216,7 +216,7 @@ class _BookingStatusState extends State<BookingStatus> with AutomaticKeepAliveCl
                 : Text(
                     count.toString(),
                     style: TextStyle(
-                      fontSize: 32,
+                      fontSize: 28,
                       fontWeight: FontWeight.bold,
                       color: color,
                     ),

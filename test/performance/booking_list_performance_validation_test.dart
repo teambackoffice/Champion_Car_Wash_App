@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import '../../lib/testing/performance/tests/booking_list_performance_test.dart';
-import '../../lib/testing/performance/core/performance_test_suite.dart';
+import 'package:champion_car_wash_app/testing/performance/tests/booking_list_performance_test.dart';
+import 'package:champion_car_wash_app/testing/performance/core/performance_test_suite.dart';
 
 /// Validation test for booking list performance implementation
 /// Tests the booking list performance test implementation for task 2.2

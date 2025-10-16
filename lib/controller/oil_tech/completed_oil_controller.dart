@@ -25,12 +25,12 @@ class CompletedOilController extends ChangeNotifier {
     }
   }
 
-  setIsLoading(bool value) {
+  void setIsLoading(bool value) {
     _isLoading = value;
     notifyListeners();
   }
 
-  setError(String? value) {
+  void setError(String? value) {
     _error = value;
     notifyListeners();
   }

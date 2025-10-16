@@ -33,6 +33,7 @@ class UnderProcessingController extends ChangeNotifier {
       if (timeSinceLastFetch < _cacheValidDuration) {
         // If approaching expiry, trigger background refresh
         if (timeSinceLastFetch > _backgroundRefreshThreshold) {
+          // ignore: unawaited_futures
           _backgroundRefresh();
         }
         return; // Use cached data

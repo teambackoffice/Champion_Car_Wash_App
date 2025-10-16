@@ -1,6 +1,5 @@
 import 'package:champion_car_wash_app/modal/underprocess_modal.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/payment_success.dart';
-import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/stripe_payment_page.dart';
 import 'package:champion_car_wash_app/widgets/common/custom_back_button.dart';
 import 'package:flutter/material.dart';
 
@@ -61,7 +60,7 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Service Details',
             style: TextStyle(
               fontSize: 16,
@@ -84,10 +83,10 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
                       widget.booking!.serviceId,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.black87,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -108,10 +107,10 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
                       widget.booking!.customerName,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Colors.black87,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -131,10 +130,10 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
               fontWeight: FontWeight.w500,
             ),
           ),
-          SizedBox(height: 4),
+          const SizedBox(height: 4),
           Text(
             widget.booking!.registrationNumber,
-            style: TextStyle(
+            style: const TextStyle(
               color: Colors.black87,
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -155,7 +154,7 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Services',
             style: TextStyle(
               fontSize: 16,
@@ -189,7 +188,7 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             'Extra Works',
             style: TextStyle(
               fontSize: 16,
@@ -254,7 +253,7 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
             ),
             const SizedBox(height: 8),
           ],
-          Divider(height: 24, thickness: 1),
+          const Divider(height: 24, thickness: 1),
           _ServiceItem(
             title: 'Grand Total',
             amount: '${widget.booking!.grandTotal.toStringAsFixed(2)} AED',
@@ -270,7 +269,7 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
+        const Text(
           'Payment Method',
           style: TextStyle(
             fontSize: 16,
@@ -288,14 +287,14 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(
                     color: selectedPaymentMethod == 'Cash'
-                        ? Color(0xFFD32F2F)
+                        ? const Color(0xFFD32F2F)
                         : Colors.grey.shade300,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                   backgroundColor: selectedPaymentMethod == 'Cash'
-                      ? Color(0xFFD32F2F)
+                      ? const Color(0xFFD32F2F)
                       : Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
@@ -317,14 +316,14 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(
                     color: selectedPaymentMethod == 'Tap'
-                        ? Color(0xFFD32F2F)
+                        ? const Color(0xFFD32F2F)
                         : Colors.grey.shade300,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                   backgroundColor: selectedPaymentMethod == 'Tap'
-                      ? Color(0xFFD32F2F)
+                      ? const Color(0xFFD32F2F)
                       : Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
@@ -353,14 +352,14 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
                   size: 20,
                   color: selectedPaymentMethod == 'Stripe Card'
                       ? Colors.white
-                      : Color(0xFF635BFF),
+                      : const Color(0xFF635BFF),
                 ),
                 label: Text(
                   'Stripe Card',
                   style: TextStyle(
                     color: selectedPaymentMethod == 'Stripe Card'
                         ? Colors.white
-                        : Color(0xFF635BFF),
+                        : const Color(0xFF635BFF),
                     fontWeight: FontWeight.w500,
                     fontSize: 13,
                   ),
@@ -368,14 +367,14 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(
                     color: selectedPaymentMethod == 'Stripe Card'
-                        ? Color(0xFF635BFF)
+                        ? const Color(0xFF635BFF)
                         : Colors.grey.shade300,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                   backgroundColor: selectedPaymentMethod == 'Stripe Card'
-                      ? Color(0xFF635BFF)
+                      ? const Color(0xFF635BFF)
                       : Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
@@ -390,14 +389,14 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
                   size: 20,
                   color: selectedPaymentMethod == 'Stripe NFC'
                       ? Colors.white
-                      : Color(0xFF635BFF),
+                      : const Color(0xFF635BFF),
                 ),
                 label: Text(
                   'Stripe NFC',
                   style: TextStyle(
                     color: selectedPaymentMethod == 'Stripe NFC'
                         ? Colors.white
-                        : Color(0xFF635BFF),
+                        : const Color(0xFF635BFF),
                     fontWeight: FontWeight.w500,
                     fontSize: 13,
                   ),
@@ -405,14 +404,14 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(
                     color: selectedPaymentMethod == 'Stripe NFC'
-                        ? Color(0xFF635BFF)
+                        ? const Color(0xFF635BFF)
                         : Colors.grey.shade300,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
                   backgroundColor: selectedPaymentMethod == 'Stripe NFC'
-                      ? Color(0xFF635BFF)
+                      ? const Color(0xFF635BFF)
                       : Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
@@ -433,7 +432,7 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
       SnackBar(
         content: Text('Payment method selected: $method'),
         duration: const Duration(seconds: 1),
-        backgroundColor: Color(0xFFD32F2F),
+        backgroundColor: const Color(0xFFD32F2F),
       ),
     );
   }
@@ -444,7 +443,7 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
       child: ElevatedButton(
         onPressed: _handleSubmit,
         style: ElevatedButton.styleFrom(
-          backgroundColor: Color(0xFFD32F2F),
+          backgroundColor: const Color(0xFFD32F2F),
           foregroundColor: Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 16),
           shape: RoundedRectangleBorder(
@@ -454,7 +453,7 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
         ),
         child: Text(
           'Confirm Payment - ${widget.booking!.grandTotal.toStringAsFixed(2)} AED',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -466,14 +465,14 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Confirm Payment'),
+          title: const Text('Confirm Payment'),
           content: Text(
             'Are you sure you want to process payment of ${widget.booking!.grandTotal.toStringAsFixed(2)} AED via $selectedPaymentMethod?',
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
             ),
             ElevatedButton(
               onPressed: () {
@@ -515,17 +514,17 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
                   Navigator.pushReplacement(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => PaymentSuccessScreen(),
+                      builder: (context) => const PaymentSuccessScreen(),
                     ),
                   );
                 }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: selectedPaymentMethod.contains('Stripe')
-                    ? Color(0xFF635BFF)
-                    : Color(0xFFD32F2F),
+                    ? const Color(0xFF635BFF)
+                    : const Color(0xFFD32F2F),
               ),
-              child: Text('Confirm', style: TextStyle(color: Colors.white)),
+              child: const Text('Confirm', style: TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -579,7 +578,7 @@ class _ServiceItem extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
                   fontSize: isTotal ? 18 : 16,
-                  color: isTotal ? Color(0xFFD32F2F) : Colors.black87,
+                  color: isTotal ? const Color(0xFFD32F2F) : Colors.black87,
                 ),
               ),
             ),
@@ -588,7 +587,7 @@ class _ServiceItem extends StatelessWidget {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: isTotal ? 18 : 16,
-                color: isTotal ? Color(0xFFD32F2F) : Colors.black87,
+                color: isTotal ? const Color(0xFFD32F2F) : Colors.black87,
               ),
             ),
           ],

@@ -31,10 +31,10 @@ class CarwashServiceController extends ChangeNotifier {
       if (result != null) {
         _carwashList = result;
       } else {
-        _errorMessage = "Failed to fetch wash types.";
+        _errorMessage = 'Failed to fetch wash types.';
       }
     } catch (e) {
-      _errorMessage = "An error occurred: $e";
+      _errorMessage = 'An error occurred: $e';
     } finally {
       _isLoading = false;
       notifyListeners();

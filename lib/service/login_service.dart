@@ -32,7 +32,7 @@ class LoginService {
         await _secureStorage.write(key: 'full_name', value: fullName);
         await _secureStorage.write(key: 'api_key', value: apiKey);
         await _secureStorage.write(key: 'sid', value: sid);
-        await _secureStorage.write(key: "branch", value: branch);
+        await _secureStorage.write(key: 'branch', value: branch);
 
         // Convert roles to JSON string and store
         await _secureStorage.write(key: 'roles', value: jsonEncode(roles));

@@ -47,7 +47,7 @@ abstract class BasePerformanceTest implements PerformanceTestInterface {
       
       // Log error for debugging
       if (kDebugMode) {
-        print('Performance test error in ${testName}: $e');
+        print('Performance test error in $testName: $e');
         print('Stack trace: $stackTrace');
       }
       

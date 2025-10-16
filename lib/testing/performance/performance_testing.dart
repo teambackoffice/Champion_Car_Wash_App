@@ -26,7 +26,7 @@
 /// final metrics = await PerformanceMonitor.getCurrentMetrics();
 /// ```
 
-library performance_testing;
+library;
 
 // Core framework exports
 export 'core/performance_test_suite.dart';
