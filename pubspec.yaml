@@ -108,6 +108,8 @@ flutter:
           - asset: assets/fonts/Sarabun-Light.ttf
             weight: 300
 
+
+
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package

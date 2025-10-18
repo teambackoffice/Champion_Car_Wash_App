@@ -9,7 +9,7 @@
     <key>NSMicrophoneUsageDescription</key>
     <string>This app needs microphone access to record inspection videos with audio</string>
 	<key>CFBundleDisplayName</key>
-	<string>Champion Car Wash App</string>
+	<string>Champion Car Wash</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -17,7 +17,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>champion_car_wash_app</string>
+	<string>Champion Car Wash</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
