@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:champion_car_wash_app/controller/get_completed_controller.dart';
 import 'package:champion_car_wash_app/modal/get_completed_modal.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/payment_due.dart';
@@ -14,6 +16,7 @@ class ServiceCompletedScreen extends StatefulWidget {
 
 class _ServiceCompletedScreenState extends State<ServiceCompletedScreen> {
   String _searchQuery = '';
+  Timer? _debounceTimer;
 
   @override
   void initState() {
@@ -24,6 +27,13 @@ class _ServiceCompletedScreenState extends State<ServiceCompletedScreen> {
         listen: false,
       ).fetchcompletedlist();
     });
+  }
+
+  @override
+  void dispose() {
+    // MEMORY LEAK FIX: Cancel debounce timer
+    _debounceTimer?.cancel();
+    super.dispose();
   }
 
   // Helper method to format services list
@@ -73,45 +83,56 @@ class _ServiceCompletedScreenState extends State<ServiceCompletedScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: const AppBarBackButton(),
-        title: const Text(
-          'Service Completed',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
+      backgroundColor: const Color(0xFF1A1A1A), // Pure black-grey background
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(128.0),
+        child: AppBar(
+          backgroundColor: const Color(0xFF2A2A2A), // Dark grey-black
+          elevation: 0,
+          leading: const AppBarBackButton(),
+          title: const Text(
+            'Service Completed',
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
           ),
-        ),
-        centerTitle: false,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(80),
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            color: Colors.white,
+          centerTitle: false,
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(72.0),
             child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey[100],
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.grey[300]!),
-              ),
-              child: TextField(
-                onChanged: (value) {
-                  setState(() {
-                    _searchQuery = value.toLowerCase().trim();
-                  });
-                },
-                decoration: InputDecoration(
-                  hintText: 'Search Customer by Vehicle Number',
-                  hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
-                  prefixIcon: Icon(Icons.search, color: Colors.grey[500]),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              color: const Color(0xFF2A2A2A), // Dark grey-black
+              child: Container(
+                height: 48,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF3D3D3D), // Lighter grey-black
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: const Color(0xFF555555)),
+                ),
+                child: TextField(
+                  style: const TextStyle(color: Colors.white),
+                  onChanged: (value) {
+                    // PERFORMANCE FIX: Debounce search to avoid filtering on every keystroke
+                    _debounceTimer?.cancel();
+                    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+                      if (mounted) {
+                        setState(() {
+                          _searchQuery = value.toLowerCase().trim();
+                        });
+                      }
+                    });
+                  },
+                  decoration: InputDecoration(
+                    hintText: 'Search Customer by Vehicle Number',
+                    hintStyle: TextStyle(color: Colors.grey[400], fontSize: 14),
+                    prefixIcon: Icon(Icons.search, color: Colors.grey[300]),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                   ),
                 ),
               ),

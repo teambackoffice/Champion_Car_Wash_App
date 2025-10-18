@@ -32,6 +32,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
   // final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _modalOfYearController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _purchaseDateController = TextEditingController();
   final TextEditingController _engineNumberController = TextEditingController();
@@ -93,20 +94,23 @@ class _CreateServicePageState extends State<CreateServicePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: const AppBarBackButton(),
-        title: const Text(
-          'Create Service',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
+      backgroundColor: const Color(0xFF1A1A1A), // Pure black-grey background
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80.0),
+        child: AppBar(
+          backgroundColor: const Color(0xFF2A2A2A), // Dark grey-black
+          elevation: 0,
+          leading: const AppBarBackButton(),
+          title: const Text(
+            'Create Service',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
           ),
+          centerTitle: true,
         ),
-        centerTitle: true,
       ),
       body: Form(
         key: _formKey,
@@ -162,7 +166,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
               _buildTypeDropdown(),
               const SizedBox(height: 16),
               _buildTextField(
-                controller: _addressController,
+                controller: _modalOfYearController,
                 hintText: 'Modal Of Year',
               ),
               const SizedBox(height: 16),
@@ -287,7 +291,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => SelectService(
-                            customerName: mobileController,
+                            customerName: nameController,
                             phoneNumber: mobileController,
                             email: _emailController,
                             address: _addressController,
@@ -345,9 +349,9 @@ class _CreateServicePageState extends State<CreateServicePage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
+        color: const Color(0xFF2A2A2A),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[300]!),
+        border: Border.all(color: const Color(0xFF555555)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -367,12 +371,14 @@ class _CreateServicePageState extends State<CreateServicePage> {
                     _openVideoCapture();
                   }
                 },
-                activeColor: Colors.blue,
+                activeColor: Colors.red,
+                checkColor: Colors.white,
+                side: const BorderSide(color: Colors.grey),
               ),
               const Expanded(
                 child: Text(
                   'Inspection Needed',
-                  style: TextStyle(fontSize: 16),
+                  style: TextStyle(fontSize: 16, color: Colors.white),
                 ),
               ),
             ],
@@ -385,13 +391,11 @@ class _CreateServicePageState extends State<CreateServicePage> {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: _videoPath != null
-                    ? Colors.green[50]
-                    : Colors.orange[50],
+                    ? Colors.green.withOpacity(0.2)
+                    : Colors.orange.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(6),
                 border: Border.all(
-                  color: _videoPath != null
-                      ? Colors.green[300]!
-                      : Colors.orange[300]!,
+                  color: _videoPath != null ? Colors.green : Colors.orange,
                 ),
               ),
               child: Row(
@@ -408,9 +412,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
                           ? 'Video recorded successfully'
                           : 'Tap to record inspection video',
                       style: TextStyle(
-                        color: _videoPath != null
-                            ? Colors.green[700]
-                            : Colors.orange[700],
+                        color: _videoPath != null ? Colors.green : Colors.orange,
                         fontSize: 14,
                       ),
                     ),
@@ -418,7 +420,10 @@ class _CreateServicePageState extends State<CreateServicePage> {
                   if (_videoPath == null)
                     TextButton(
                       onPressed: _openVideoCapture,
-                      child: const Text('Record'),
+                      child: const Text(
+                        'Record',
+                        style: TextStyle(color: Colors.orange),
+                      ),
                     ),
                   if (_videoPath != null)
                     TextButton(
@@ -454,11 +459,13 @@ class _CreateServicePageState extends State<CreateServicePage> {
 
     return DropdownButtonFormField<String>(
       value: _selectedMake,
-      hint: Text('Select Make', style: TextStyle(color: Colors.grey[400])),
+      hint: Text('Select Make', style: TextStyle(color: Colors.grey[500])),
+      style: const TextStyle(color: Colors.white),
+      dropdownColor: const Color(0xFF2A2A2A),
       items: _makesController.makes.map((CarMake make) {
         return DropdownMenuItem<String>(
           value: make.name,
-          child: Text(make.name),
+          child: Text(make.name, style: const TextStyle(color: Colors.white)),
         );
       }).toList(),
       onChanged: _onMakeChanged,
@@ -493,11 +500,13 @@ class _CreateServicePageState extends State<CreateServicePage> {
 
         return DropdownButtonFormField<String>(
           value: _selectedModel,
-          hint: Text('Select Model', style: TextStyle(color: Colors.grey[400])),
+          hint: Text('Select Model', style: TextStyle(color: Colors.grey[500])),
+          style: const TextStyle(color: Colors.white),
+          dropdownColor: const Color(0xFF2A2A2A),
           items: _modelsController.models.map((CarModel model) {
             return DropdownMenuItem<String>(
               value: model.model,
-              child: Text(model.model),
+              child: Text(model.model, style: const TextStyle(color: Colors.white)),
             );
           }).toList(),
           onChanged: (value) => setState(() => _selectedModel = value),
@@ -534,9 +543,14 @@ class _CreateServicePageState extends State<CreateServicePage> {
 
     return DropdownButtonFormField<String>(
       value: _selectedType,
-      hint: Text('Select Car Type', style: TextStyle(color: Colors.grey[400])),
+      hint: Text('Select Car Type', style: TextStyle(color: Colors.grey[500])),
+      style: const TextStyle(color: Colors.white),
+      dropdownColor: const Color(0xFF2A2A2A),
       items: [selectedCarModel.carType].map((type) {
-        return DropdownMenuItem<String>(value: type, child: Text(type));
+        return DropdownMenuItem<String>(
+          value: type,
+          child: Text(type, style: const TextStyle(color: Colors.white)),
+        );
       }).toList(),
       onChanged: (value) => setState(() => _selectedType = value),
       decoration: _dropdownDecoration(),
@@ -549,8 +563,8 @@ class _CreateServicePageState extends State<CreateServicePage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
-        border: Border.all(color: Colors.grey[300]!),
+        color: const Color(0xFF2A2A2A),
+        border: Border.all(color: const Color(0xFF555555)),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -558,10 +572,13 @@ class _CreateServicePageState extends State<CreateServicePage> {
           const SizedBox(
             width: 20,
             height: 20,
-            child: CircularProgressIndicator(strokeWidth: 2),
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+            ),
           ),
           const SizedBox(width: 12),
-          Text(text, style: TextStyle(color: Colors.grey[600])),
+          Text(text, style: const TextStyle(color: Colors.white70)),
         ],
       ),
     );
@@ -571,8 +588,8 @@ class _CreateServicePageState extends State<CreateServicePage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[50],
-        border: Border.all(color: Colors.grey[300]!),
+        color: const Color(0xFF2A2A2A),
+        border: Border.all(color: const Color(0xFF555555)),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -582,7 +599,10 @@ class _CreateServicePageState extends State<CreateServicePage> {
           Expanded(
             child: Text(text, style: const TextStyle(color: Colors.red)),
           ),
-          TextButton(onPressed: onRetry, child: const Text('Retry')),
+          TextButton(
+            onPressed: onRetry,
+            child: const Text('Retry', style: TextStyle(color: Colors.red)),
+          ),
         ],
       ),
     );
@@ -592,15 +612,15 @@ class _CreateServicePageState extends State<CreateServicePage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[100],
-        border: Border.all(color: Colors.grey[300]!),
+        color: const Color(0xFF2A2A2A),
+        border: Border.all(color: const Color(0xFF555555)),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline, color: Colors.grey[400], size: 20),
+          Icon(Icons.info_outline, color: Colors.grey[500], size: 20),
           const SizedBox(width: 12),
-          Text(text, style: TextStyle(color: Colors.grey[400])),
+          Text(text, style: TextStyle(color: Colors.grey[500])),
         ],
       ),
     );
@@ -610,15 +630,15 @@ class _CreateServicePageState extends State<CreateServicePage> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.blue[50],
-        border: Border.all(color: Colors.blue[200]!),
+        color: const Color(0xFF2A2A2A),
+        border: Border.all(color: const Color(0xFF555555)),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline, color: Colors.blue[700], size: 20),
+          const Icon(Icons.info_outline, color: Colors.blue, size: 20),
           const SizedBox(width: 12),
-          Text(text, style: TextStyle(color: Colors.blue[700])),
+          Text(text, style: const TextStyle(color: Colors.blue)),
         ],
       ),
     );
@@ -627,18 +647,18 @@ class _CreateServicePageState extends State<CreateServicePage> {
   InputDecoration _dropdownDecoration() {
     return InputDecoration(
       filled: true,
-      fillColor: Colors.grey[50],
+      fillColor: const Color(0xFF2A2A2A),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: Colors.grey[300]!),
+        borderSide: const BorderSide(color: Color(0xFF555555)),
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: BorderSide(color: Colors.grey[300]!),
+        borderSide: const BorderSide(color: Color(0xFF555555)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
-        borderSide: const BorderSide(color: Colors.blue),
+        borderSide: const BorderSide(color: Colors.red, width: 2),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
     );
@@ -658,25 +678,26 @@ class _CreateServicePageState extends State<CreateServicePage> {
       keyboardType: keyboardType,
       readOnly: readOnly,
       onTap: onTap,
+      style: const TextStyle(color: Colors.white),
       decoration: InputDecoration(
         hintText: hintText,
-        hintStyle: TextStyle(color: Colors.grey[400]),
+        hintStyle: TextStyle(color: Colors.grey[500]),
         suffixIcon: suffixIcon != null
             ? Icon(suffixIcon, color: Colors.grey[400])
             : null,
         filled: true,
-        fillColor: Colors.grey[50],
+        fillColor: const Color(0xFF2A2A2A),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey[300]!),
+          borderSide: const BorderSide(color: Color(0xFF555555)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: BorderSide(color: Colors.grey[300]!),
+          borderSide: const BorderSide(color: Color(0xFF555555)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Colors.blue),
+          borderSide: const BorderSide(color: Colors.red, width: 2),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       ),
@@ -697,7 +718,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
       style: const TextStyle(
         fontSize: 18,
         fontWeight: FontWeight.w600,
-        color: Colors.black87,
+        color: Colors.white,
       ),
     );
   }
@@ -809,6 +830,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
     mobileController.dispose();
     _emailController.dispose();
     _addressController.dispose();
+    _modalOfYearController.dispose();
     _cityController.dispose();
     _purchaseDateController.dispose();
     _engineNumberController.dispose();
@@ -857,10 +879,13 @@ class _VideoCaptureScreenState extends State<VideoCaptureScreen> {
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Record Inspection Video'),
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80.0),
+        child: AppBar(
+          title: const Text('Record Inspection Video'),
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+        ),
       ),
       body: Column(
         children: [

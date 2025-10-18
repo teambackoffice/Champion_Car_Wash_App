@@ -8,12 +8,15 @@ class AddPrebookingController extends ChangeNotifier {
   Future<bool> addPrebook({required AddPreBookingList prebook}) async {
     setIsLoading(true);
     notifyListeners();
-    final result = await AddPrebookingService.addPreBooking(
-      preBooking: prebook,
-    );
-    setIsLoading(true);
-    notifyListeners();
-    return true;
+    try {
+      await AddPrebookingService.addPreBooking(
+        preBooking: prebook,
+      );
+      return true;
+    } finally {
+      setIsLoading(false);
+      notifyListeners();
+    }
   }
 
   void setIsLoading(bool value) {

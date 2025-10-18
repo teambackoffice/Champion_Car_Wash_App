@@ -8,13 +8,22 @@ import 'package:flutter/material.dart';
 /// - Customizable colors and behavior
 /// - Better navigation handling
 class CustomBackButton extends StatelessWidget {
+  const CustomBackButton({
+    this.backgroundColor = Colors.red,
+    this.iconColor = Colors.white,
+    this.size = 48, // Adjusted size for a sleeker look
+    this.onPressed,
+    this.isCircular = true,
+    super.key,
+  });
+
   /// The color of the button background (default: red)
   final Color backgroundColor;
 
   /// The color of the icon (default: white)
   final Color iconColor;
 
-  /// The size of the button (default: 40)
+  /// The size of the button (default: 48)
   final double size;
 
   /// Custom callback when button is pressed. If null, uses Navigator.pop
@@ -23,15 +32,6 @@ class CustomBackButton extends StatelessWidget {
   /// Whether to show the button as a circle (default: true)
   final bool isCircular;
 
-  const CustomBackButton({
-    super.key,
-    this.backgroundColor = Colors.red,
-    this.iconColor = Colors.white,
-    this.size = 40,
-    this.onPressed,
-    this.isCircular = true,
-  });
-
   @override
   Widget build(BuildContext context) {
     return Material(
@@ -39,27 +39,33 @@ class CustomBackButton extends StatelessWidget {
       child: InkWell(
         onTap: onPressed ?? () => Navigator.pop(context),
         borderRadius: BorderRadius.circular(isCircular ? size / 2 : 8),
-        // Larger tap target for better accessibility
-        customBorder: const CircleBorder(),
         child: Container(
           width: size,
           height: size,
           decoration: BoxDecoration(
-            color: backgroundColor,
+            gradient: LinearGradient(
+              colors: [backgroundColor, backgroundColor.withOpacity(0.8)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
             shape: isCircular ? BoxShape.circle : BoxShape.rectangle,
             borderRadius: isCircular ? null : BorderRadius.circular(8),
+            border: Border.all(
+              color: Colors.white.withOpacity(0.2),
+              width: 1,
+            ),
             boxShadow: [
               BoxShadow(
-                color: backgroundColor.withValues(alpha: 0.3),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
+                color: backgroundColor.withOpacity(0.4),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
           child: Icon(
-            Icons.arrow_back_ios_new_outlined,
+            Icons.arrow_back,
             color: iconColor,
-            size: size * 0.45, // Icon size proportional to button size
+            size: size * 0.5,
           ),
         ),
       ),
@@ -70,6 +76,13 @@ class CustomBackButton extends StatelessWidget {
 /// AppBar leading widget wrapper for CustomBackButton
 /// This ensures proper centering and spacing in AppBar
 class AppBarBackButton extends StatelessWidget {
+  const AppBarBackButton({
+    this.backgroundColor = Colors.red,
+    this.iconColor = Colors.white,
+    this.onPressed,
+    super.key,
+  });
+
   /// The color of the button background (default: red)
   final Color backgroundColor;
 
@@ -79,21 +92,15 @@ class AppBarBackButton extends StatelessWidget {
   /// Custom callback when button is pressed. If null, uses Navigator.pop
   final VoidCallback? onPressed;
 
-  const AppBarBackButton({
-    super.key,
-    this.backgroundColor = Colors.red,
-    this.iconColor = Colors.white,
-    this.onPressed,
-  });
-
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
+    return Container(
+      margin: const EdgeInsets.all(8.0),
       child: CustomBackButton(
         backgroundColor: backgroundColor,
         iconColor: iconColor,
         onPressed: onPressed,
+        size: 40, // Smaller size for AppBar
       ),
     );
   }

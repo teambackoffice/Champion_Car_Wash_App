@@ -108,7 +108,7 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
       child: Consumer<SalesInvoiceController>(
         builder: (context, controller, _) {
           return Scaffold(
-            backgroundColor: Colors.grey[100],
+            backgroundColor: const Color(0xFF1A1A1A), // Pure black-grey background
             body: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -133,7 +133,7 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
                         Text(
                           'Customer: ${widget.booking!.customerName}',
                           style: const TextStyle(
-                            fontSize: 16,
+                            fontSize: 18,
                             fontWeight: FontWeight.w600,
                             color: Colors.black87,
                           ),
@@ -141,14 +141,14 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
                         Text(
                           'Registration No : ${widget.booking!.registrationNumber}',
                           style: const TextStyle(
-                            fontSize: 14,
+                            fontSize: 16,
                             color: Colors.black54,
                           ),
                         ),
                       ],
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
                     // Services and Extra Work Items List
                     Container(
@@ -159,11 +159,11 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: ListView(
-                        padding: const EdgeInsets.all(24.0),
+                        padding: const EdgeInsets.all(16.0),
                         children: [
                           // Services
                           ...services.map((service) => Padding(
-                            padding: const EdgeInsets.only(bottom: 16),
+                            padding: const EdgeInsets.only(bottom: 12),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
@@ -175,7 +175,7 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
                                       Text(
                                         service.serviceType,
                                         style: const TextStyle(
-                                          fontSize: 16,
+                                          fontSize: 18,
                                           fontWeight: FontWeight.w500,
                                           color: Colors.black,
                                         ),
@@ -184,7 +184,7 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
                                         Text(
                                           'Wash Type: ${service.washType}',
                                           style: const TextStyle(
-                                            fontSize: 12,
+                                            fontSize: 14,
                                             color: Colors.grey,
                                           ),
                                         ),
@@ -192,7 +192,7 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
                                         Text(
                                           'Oil Brand: ${service.oilBrand}',
                                           style: const TextStyle(
-                                            fontSize: 12,
+                                            fontSize: 14,
                                             color: Colors.grey,
                                           ),
                                         ),
@@ -206,14 +206,14 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
                                       Text(
                                         '${service.qty} × ₹${(service.price ?? 0).toInt()}',
                                         style: const TextStyle(
-                                          fontSize: 12,
+                                          fontSize: 14,
                                           color: Colors.grey,
                                         ),
                                       ),
                                     Text(
                                       '₹${(service.price ?? 0).toInt()}',
                                       style: const TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 18,
                                         fontWeight: FontWeight.w600,
                                         color: Colors.black,
                                       ),
@@ -232,7 +232,7 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
                               child: Text(
                                 'Extra Work Items',
                                 style: TextStyle(
-                                  fontSize: 14,
+                                  fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.black87,
                                 ),
@@ -247,7 +247,7 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
                                     child: Text(
                                       item.workItem,
                                       style: const TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 18,
                                         fontWeight: FontWeight.w500,
                                         color: Colors.black,
                                       ),
@@ -260,14 +260,14 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
                                         Text(
                                           '${item.qty} × ₹${item.rate.toInt()}',
                                           style: const TextStyle(
-                                            fontSize: 12,
+                                            fontSize: 14,
                                             color: Colors.grey,
                                           ),
                                         ),
                                       Text(
                                         '₹${(item.qty * item.rate).toInt()}',
                                         style: const TextStyle(
-                                          fontSize: 16,
+                                          fontSize: 18,
                                           fontWeight: FontWeight.w600,
                                           color: Colors.black,
                                         ),
@@ -282,12 +282,12 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
                       ),
                     ),
 
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
 
                     // Summary
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(24.0),
+                      padding: const EdgeInsets.all(16.0),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16),
@@ -312,7 +312,7 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(
                         horizontal: 16,
-                        vertical: 12,
+                        vertical: 8,
                       ),
                       child: ElevatedButton(
                         onPressed: controller.isLoading
@@ -336,7 +336,7 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
                             : const Text(
                                 'Create Invoice',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 18,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -359,7 +359,7 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
         Text(
           label,
           style: TextStyle(
-            fontSize: isTotal ? 18 : 16,
+            fontSize: isTotal ? 20 : 18,
             fontWeight: isTotal ? FontWeight.bold : FontWeight.w500,
             color: Colors.black,
           ),
@@ -367,7 +367,7 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
         Text(
           amount,
           style: TextStyle(
-            fontSize: isTotal ? 18 : 16,
+            fontSize: isTotal ? 20 : 18,
             fontWeight: FontWeight.w600,
             color: Colors.black,
           ),

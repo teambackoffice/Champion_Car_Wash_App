@@ -23,6 +23,17 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
   bool _isPasswordVisible = false;
   bool _isLoading = false;
+  bool _imagesPrecached = false;
+
+  // PERFORMANCE FIX: Precache login logo for smoother initial render
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_imagesPrecached) {
+      precacheImage(const AssetImage('assets/login_logo.png'), context);
+      _imagesPrecached = true;
+    }
+  }
 
   // Update your _handleLogin method in the LoginScreen
   void _handleLogin() async {
@@ -41,6 +52,9 @@ class _LoginScreenState extends State<LoginScreen> {
         _passwordController.text.trim(),
       );
 
+      // PERFORMANCE FIX: Check if widget is still mounted before setState
+      if (!mounted) return;
+
       setState(() {
         _isLoading = false;
       });
@@ -55,6 +69,7 @@ class _LoginScreenState extends State<LoginScreen> {
           roles = List<String>.from(jsonDecode(rolesString));
         }
 
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Login successful!'),
@@ -63,6 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
         );
 
         // Navigate based on role
+        if (!mounted) return;
         if (roles.contains('Carwash Technician')) {
           Navigator.pushReplacement(
             context,
@@ -83,6 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
             MaterialPageRoute(builder: (_) => const BottomNavigation()),
           );
         } else {
+          if (!mounted) return;
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('No valid role assigned to user.'),
@@ -91,6 +108,7 @@ class _LoginScreenState extends State<LoginScreen> {
           );
         }
       } else {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(loginController.errorMessage ?? 'Login failed!'),
@@ -108,7 +126,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final isKeyboardVisible = keyboardHeight > 0;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFF1A1A1A),
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -149,6 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w300,
+                        color: Colors.white,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -160,19 +179,24 @@ class _LoginScreenState extends State<LoginScreen> {
                       controller: _usernameController,
                       textInputAction: TextInputAction.next,
                       keyboardType: TextInputType.text,
+                      style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         hintText: 'Login Id',
-                        prefixIcon: const Icon(Icons.person_outline),
+                        hintStyle: TextStyle(color: Colors.grey.shade500),
+                        prefixIcon: Icon(Icons.person_outline, color: Colors.grey.shade400),
+                        filled: true,
+                        fillColor: const Color(0xFF2A2A2A),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 14,
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
+                          borderSide: BorderSide(color: Colors.grey.shade700),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -198,19 +222,24 @@ class _LoginScreenState extends State<LoginScreen> {
                       obscureText: !_isPasswordVisible,
                       textInputAction: TextInputAction.done,
                       onFieldSubmitted: (_) => _handleLogin(),
+                      style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
                         hintText: 'Password',
-                        prefixIcon: const Icon(Icons.lock_outline),
+                        hintStyle: TextStyle(color: Colors.grey.shade500),
+                        prefixIcon: Icon(Icons.lock_outline, color: Colors.grey.shade400),
+                        filled: true,
+                        fillColor: const Color(0xFF2A2A2A),
                         contentPadding: const EdgeInsets.symmetric(
                           horizontal: 16,
                           vertical: 14,
                         ),
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
+                          borderSide: BorderSide.none,
                         ),
                         enabledBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
+                          borderSide: BorderSide(color: Colors.grey.shade700),
                         ),
                         focusedBorder: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(10),
@@ -224,7 +253,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             _isPasswordVisible
                                 ? Icons.visibility
                                 : Icons.visibility_off,
-                            color: Colors.grey,
+                            color: Colors.grey.shade400,
                           ),
                           onPressed: () {
                             setState(() {

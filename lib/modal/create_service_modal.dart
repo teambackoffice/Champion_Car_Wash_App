@@ -80,7 +80,7 @@ class CreateServiceModal {
   Map<String, String> toFormData() {
     return {
       'customer_name': customerName,
-      'phone': phone,
+      'customer_phone': phone,
       'email': email,
       'address': address,
       'city': city,

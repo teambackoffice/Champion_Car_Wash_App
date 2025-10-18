@@ -21,8 +21,17 @@ class ViewMorePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('View More')),
-      backgroundColor: Colors.grey[100],
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80.0),
+        child: AppBar(
+          backgroundColor: const Color(0xFF2A2A2A), // Dark grey-black
+          title: const Text(
+            'View More',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+      ),
+      backgroundColor: const Color(0xFF1A1A1A), // Pure black-grey background
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: _buildBookingCard(),

@@ -17,29 +17,32 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Payment Details'),
-        backgroundColor: const Color(0xFFF9FAF9),
-        elevation: 0,
-        leading: const AppBarBackButton(),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80.0),
+        child: AppBar(
+          title: const Text('Payment Details'),
+          backgroundColor: const Color(0xFFF9FAF9),
+          elevation: 0,
+          leading: const AppBarBackButton(),
+        ),
       ),
       backgroundColor: const Color(0xFFF9FAF9),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildCustomerInfo(),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               _buildServicesCard(),
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
               if (widget.booking!.extraWorkItems.isNotEmpty) ...[
                 _buildExtraWorksCard(),
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
               ],
               _buildTotalCard(),
-              const SizedBox(height: 32),
+              const SizedBox(height: 20),
               _buildPaymentOptions(),
               const Spacer(),
               _buildSubmitButton(),
@@ -63,12 +66,12 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
           const Text(
             'Service Details',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.w600,
               color: Colors.black87,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           Row(
             children: [
               Expanded(
@@ -79,7 +82,7 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
                       'Service ID',
                       style: TextStyle(
                         color: Colors.grey[600],
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -88,7 +91,7 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
                       widget.booking!.serviceId,
                       style: const TextStyle(
                         color: Colors.black87,
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -103,7 +106,7 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
                       'Customer',
                       style: TextStyle(
                         color: Colors.grey[600],
-                        fontSize: 12,
+                        fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -112,7 +115,7 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
                       widget.booking!.customerName,
                       style: const TextStyle(
                         color: Colors.black87,
-                        fontSize: 14,
+                        fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -121,12 +124,12 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           Text(
             'Registration Number',
             style: TextStyle(
               color: Colors.grey[600],
-              fontSize: 12,
+              fontSize: 14,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -135,7 +138,7 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
             widget.booking!.registrationNumber,
             style: const TextStyle(
               color: Colors.black87,
-              fontSize: 14,
+              fontSize: 16,
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -157,12 +160,12 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
           const Text(
             'Services',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.w600,
               color: Colors.black87,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           ...widget.booking!.services.map(
             (service) => Padding(
               padding: const EdgeInsets.only(bottom: 8),
@@ -191,12 +194,12 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
           const Text(
             'Extra Works',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.w600,
               color: Colors.black87,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           ...widget.booking!.extraWorkItems.map(
             (extraWork) => Padding(
               padding: const EdgeInsets.only(bottom: 8),
@@ -272,7 +275,7 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
         const Text(
           'Payment Method',
           style: TextStyle(
-            fontSize: 16,
+            fontSize: 18,
             fontWeight: FontWeight.w600,
             color: Colors.black87,
           ),
@@ -453,7 +456,7 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
         ),
         child: Text(
           'Confirm Payment - ${widget.booking!.grandTotal.toStringAsFixed(2)} AED',
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
         ),
       ),
     );
@@ -577,7 +580,7 @@ class _ServiceItem extends StatelessWidget {
                 title,
                 style: TextStyle(
                   fontWeight: isBold ? FontWeight.bold : FontWeight.w500,
-                  fontSize: isTotal ? 18 : 16,
+                  fontSize: isTotal ? 20 : 18,
                   color: isTotal ? const Color(0xFFD32F2F) : Colors.black87,
                 ),
               ),
@@ -586,7 +589,7 @@ class _ServiceItem extends StatelessWidget {
               amount,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: isTotal ? 18 : 16,
+                fontSize: isTotal ? 20 : 18,
                 color: isTotal ? const Color(0xFFD32F2F) : Colors.black87,
               ),
             ),
@@ -597,7 +600,7 @@ class _ServiceItem extends StatelessWidget {
           Text(
             subtitle!,
             style: TextStyle(
-              fontSize: 12,
+              fontSize: 14,
               color: Colors.grey[600],
               fontStyle: FontStyle.italic,
             ),

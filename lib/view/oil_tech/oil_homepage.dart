@@ -12,30 +12,33 @@ class OilTechnicianHomePage extends StatelessWidget {
     return DefaultTabController(
       length: 3, // Number of tabs
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Oil Technician',
-            style: TextStyle(color: Colors.white),
-          ),
-          centerTitle: true,
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.logout, color: Colors.white),
-              onPressed: () => _showLogoutDialog(context),
-              tooltip: 'Logout',
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(80.0),
+          child: AppBar(
+            title: const Text(
+              'Oil Technician',
+              style: TextStyle(color: Colors.white),
             ),
-          ],
-          bottom: const TabBar(
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
-            indicatorColor: Colors.white,
-            tabs: [
-              Tab(text: 'New'),
-              Tab(text: 'Under Process'),
-              Tab(text: 'Completed'),
+            centerTitle: true,
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.logout, color: Colors.white),
+                onPressed: () => _showLogoutDialog(context),
+                tooltip: 'Logout',
+              ),
             ],
+            bottom: const TabBar(
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.white70,
+              indicatorColor: Colors.white,
+              tabs: [
+                Tab(text: 'New'),
+                Tab(text: 'Under Process'),
+                Tab(text: 'Completed'),
+              ],
+            ),
+            backgroundColor: Colors.red[900],
           ),
-          backgroundColor: Colors.red[900],
         ),
         body: const TabBarView(
           children: [

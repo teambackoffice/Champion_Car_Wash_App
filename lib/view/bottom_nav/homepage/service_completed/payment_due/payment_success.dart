@@ -30,7 +30,12 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
         return false;
       },
       child: Scaffold(
-      backgroundColor: const Color(0xFFF8F8F8),
+      backgroundColor: const Color(0xFF1A1A1A),
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF2A2A2A),
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(24.0),
@@ -38,13 +43,13 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Spacer(),
-              
+
               // Success Icon
               Container(
                 width: 100,
                 height: 100,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFE8F5E8),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Container(
@@ -60,16 +65,16 @@ class _PaymentSuccessScreenState extends State<PaymentSuccessScreen> {
                   ),
                 ),
               ),
-              
+
               const SizedBox(height: 32),
-              
+
               // Success Text
               const Text(
                 'Payment Successfully',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w600,
-                  color: Color(0xFF2D2D2D),
+                  color: Colors.white,
                 ),
                 textAlign: TextAlign.center,
               ),

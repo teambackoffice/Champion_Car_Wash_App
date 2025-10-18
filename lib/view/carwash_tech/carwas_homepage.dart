@@ -9,32 +9,38 @@ class CarWashTechnicianHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return DefaultTabController(
       length: 3, // Number of tabs
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text(
-            'Car Wash Technician',
-            style: TextStyle(color: Colors.white),
-          ),
-          centerTitle: true,
-          backgroundColor: Colors.red[800],
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.logout, color: Colors.white),
-              onPressed: () => _showLogoutDialog(context),
-              tooltip: 'Logout',
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(80.0),
+          child: AppBar(
+            title: Text(
+              'Car Wash Technician',
+              style: TextStyle(color: isDarkMode ? Colors.white : Colors.white),
             ),
-          ],
-          bottom: const TabBar(
-            labelColor: Colors.white,
-            unselectedLabelColor: Colors.white70,
-            indicatorColor: Colors.white,
-            tabs: [
-              Tab(text: 'New'),
-              Tab(text: 'Under Process'),
-              Tab(text: 'Completed'),
+            centerTitle: true,
+            backgroundColor: isDarkMode ? theme.primaryColor : Colors.red[800],
+            actions: [
+              IconButton(
+                icon: Icon(Icons.logout, color: isDarkMode ? Colors.white : Colors.white),
+                onPressed: () => _showLogoutDialog(context),
+                tooltip: 'Logout',
+              ),
             ],
+            bottom: TabBar(
+              labelColor: isDarkMode ? Colors.white : Colors.white,
+              unselectedLabelColor: isDarkMode ? Colors.white70 : Colors.white70,
+              indicatorColor: isDarkMode ? Colors.white : Colors.white,
+              tabs: const [
+                Tab(text: 'New'),
+                Tab(text: 'Under Process'),
+                Tab(text: 'Completed'),
+              ],
+            ),
           ),
         ),
         body: const TabBarView(
@@ -49,6 +55,9 @@ class CarWashTechnicianHomePage extends StatelessWidget {
   }
 
   void _showLogoutDialog(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -61,8 +70,8 @@ class CarWashTechnicianHomePage extends StatelessWidget {
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red[800], // Background color
-              foregroundColor: Colors.white, // Text color
+              backgroundColor: isDarkMode ? theme.primaryColor : Colors.red[800], // Background color
+              foregroundColor: isDarkMode ? Colors.white : Colors.white, // Text color
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),

@@ -35,28 +35,31 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: isDarkMode ? theme.scaffoldBackgroundColor : Colors.grey[100],
       body: Consumer<InprogressCarWashController>(
         builder: (context, controller, child) {
           final processingBookings =
               controller.carWashInProgressModal?.message.data ?? [];
           if (controller.isLoading) {
             return Center(
-              child: CircularProgressIndicator(color: Colors.red[800]),
+              child: CircularProgressIndicator(color: theme.primaryColor),
             );
           }
           if (processingBookings.isEmpty) {
             return Center(
               child: Text(
                 'No processing bookings found',
-                style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 18, color: theme.textTheme.bodySmall?.color),
               ),
             );
           }
 
           if (controller.error != null) {
-            return Center(child: Text('Error: ${controller.error}'));
+            return Center(child: Text('Error: ${controller.error}', style: TextStyle(color: theme.colorScheme.error)));
           }
 
           return ListView.builder(
@@ -67,10 +70,11 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
               return Container(
                 margin: const EdgeInsets.only(bottom: 16.0),
                 child: Card(
-                  elevation: 2,
+                  elevation: isDarkMode ? 4 : 2,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
+                  color: theme.cardColor,
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Column(
@@ -82,10 +86,10 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                           children: [
                             Text(
                               booking.serviceId,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black87,
+                                color: theme.textTheme.titleLarge?.color,
                               ),
                             ),
                             Container(
@@ -121,12 +125,12 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                         ),
                         _buildDetailRow('User Name', booking.customerName),
                         const SizedBox(height: 8),
-                        const Text(
+                        Text(
                           'Selected Services',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: Colors.grey,
+                            color: theme.textTheme.bodyMedium?.color,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -135,9 +139,10 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                             padding: const EdgeInsets.only(bottom: 4),
                             child: Text(
                               service.washType,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
+                                color: theme.textTheme.bodyLarge?.color,
                               ),
                             ),
                           ),
@@ -149,7 +154,7 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                             onPressed: () =>
                                 _showInspectionDialog(context, booking),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.red[700],
+                              backgroundColor: isDarkMode ? theme.primaryColor : Colors.red[700],
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
@@ -175,6 +180,7 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
   }
 
   Widget _buildDetailRow(String label, String value) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Row(
@@ -184,14 +190,14 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
             width: 100,
             child: Text(
               label,
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
+              style: TextStyle(fontSize: 14, color: theme.textTheme.bodySmall?.color),
             ),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: theme.textTheme.bodyMedium?.color),
             ),
           ),
         ],
@@ -232,6 +238,9 @@ class _InspectionDialogState extends State<InspectionDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Consumer<InspectionListController>(
       builder: (context, controller, _) {
         if (controller.isLoading) {
@@ -260,7 +269,7 @@ class _InspectionDialogState extends State<InspectionDialog> {
               children: [
                 Text(
                   'Vehicle: ${widget.booking.make} - ${widget.booking.model}',
-                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  style: TextStyle(fontSize: 14, color: theme.textTheme.bodySmall?.color),
                 ),
                 const SizedBox(height: 16),
                 Flexible(
@@ -279,14 +288,14 @@ class _InspectionDialogState extends State<InspectionDialog> {
                                 : null,
                             color: item.isChecked
                                 ? Colors.grey
-                                : Colors.black87,
+                                : theme.textTheme.bodyLarge?.color,
                           ),
                         ),
                         value: item.isChecked,
                         onChanged: (bool? value) {
                           controller.toggleCheck(index, value ?? false);
                         },
-                        activeColor: Colors.red[800],
+                        activeColor: theme.primaryColor,
                         controlAffinity: ListTileControlAffinity.leading,
                         contentPadding: const EdgeInsets.symmetric(
                           
@@ -308,7 +317,7 @@ class _InspectionDialogState extends State<InspectionDialog> {
                   ? () => _completeInspection(context)
                   : null,
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red[800],
+                backgroundColor: theme.primaryColor,
                 foregroundColor: Colors.white,
               ),
               child: const Text('Complete Service'),

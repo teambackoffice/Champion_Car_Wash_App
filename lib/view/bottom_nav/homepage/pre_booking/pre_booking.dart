@@ -5,6 +5,7 @@ import 'package:champion_car_wash_app/modal/get_prebooking_list.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/create_service.dart';
 import 'package:champion_car_wash_app/widgets/common/custom_back_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class PreBookingsScreenContainer extends StatefulWidget {
@@ -53,20 +54,23 @@ class _PreBookingsScreenContainerState
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: const AppBarBackButton(),
-        title: const Text(
-          'xPre Bookings',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.w500,
+      backgroundColor: const Color(0xFF1A1A1A), // Pure black-grey background
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80.0),
+        child: AppBar(
+          backgroundColor: const Color(0xFF2A2A2A), // Dark grey-black
+          elevation: 0,
+          leading: const AppBarBackButton(),
+          title: const Text(
+            'Pre Bookings',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w500,
+            ),
           ),
+          centerTitle: true,
         ),
-        centerTitle: true,
       ),
       body: Consumer<GetPrebookingListController>(
         builder: (context, controller, child) {
@@ -118,6 +122,9 @@ class _PreBookingsScreenContainerState
 
   Future<void> _refreshBookingList() async {
     try {
+      // Add haptic feedback
+      HapticFeedback.mediumImpact();
+
       // Clear current data
       setState(() {
         _filteredBookings.clear();
@@ -220,8 +227,10 @@ class _PreBookingsScreenContainerState
 
     return RefreshIndicator(
       onRefresh: _refreshBookingList,
-      color: Colors.red,
+      color: const Color(0xFFD32F2F),
+      backgroundColor: Colors.white,
       child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: _filteredBookings.length,
         itemBuilder: (context, index) {

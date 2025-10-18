@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:champion_car_wash_app/controller/get_newbooking_controller.dart';
 import 'package:champion_car_wash_app/modal/get_newbooking_modal.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/new_booking/view_more.dart';
 import 'package:champion_car_wash_app/widgets/common/custom_back_button.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 class NewBookingsScreen extends StatefulWidget {
@@ -15,22 +18,37 @@ class NewBookingsScreen extends StatefulWidget {
 class _NewBookingsScreenState extends State<NewBookingsScreen> {
   final TextEditingController _searchController = TextEditingController();
   List<ServiceData> _filteredBookings = [];
+  bool _isLoading = true;
+  Timer? _debounceTimer;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // PERFORMANCE FIX: Early exit if widget is already disposed
+      if (!mounted) return;
+
       final controller = Provider.of<GetNewbookingController>(
         context,
         listen: false,
       );
+
       await controller.fetchBookingList();
+
+      // PERFORMANCE FIX: Check mounted again after async operation
+      if (!mounted) return;
+
       setState(() {
         _filteredBookings = controller.bookingData;
+        _isLoading = false;
       });
     });
   }
 
   void _filterBookings(String query, List<ServiceData> allBookings) {
+    // PERFORMANCE FIX: Check mounted before setState to prevent errors
+    if (!mounted) return;
+
     setState(() {
       if (query.isEmpty) {
         _filteredBookings = allBookings;
@@ -46,9 +64,29 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
     });
   }
 
+  // Pull to refresh functionality
+  Future<void> _handleRefresh() async {
+    // Add haptic feedback
+    HapticFeedback.mediumImpact();
+
+    final controller = Provider.of<GetNewbookingController>(
+      context,
+      listen: false,
+    );
+
+    await controller.fetchBookingList();
+
+    if (mounted) {
+      setState(() {
+        _filteredBookings = controller.bookingData;
+      });
+    }
+  }
+
   @override
   void dispose() {
-    // MEMORY LEAK FIX: Dispose TextEditingController
+    // MEMORY LEAK FIX: Dispose TextEditingController and debounce timer
+    _debounceTimer?.cancel();
     _searchController.dispose();
     super.dispose();
   }
@@ -56,40 +94,48 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        leading: const AppBarBackButton(),
-        title: const Text(
-          'New Bookings',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+      backgroundColor: const Color(0xFF1A1A1A), // Pure black-grey background
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80.0),
+        child: AppBar(
+          backgroundColor: const Color(0xFF2A2A2A), // Dark grey-black
+          leading: const AppBarBackButton(),
+          title: const Text(
+            'New Bookings',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
           ),
+          centerTitle: true,
         ),
-        centerTitle: true,
       ),
       body: Column(
         children: [
           Container(
-            color: Colors.white,
+            color: const Color(0xFF2A2A2A), // Dark grey-black
             padding: const EdgeInsets.all(16),
             child: TextField(
               controller: _searchController,
+              style: const TextStyle(color: Colors.white),
               onChanged: (value) {
-                final allBookings = Provider.of<GetNewbookingController>(
-                  context,
-                  listen: false,
-                ).bookingData;
-                _filterBookings(value, allBookings);
+                // PERFORMANCE FIX: Debounce search to avoid filtering on every keystroke
+                _debounceTimer?.cancel();
+                _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+                  final allBookings = Provider.of<GetNewbookingController>(
+                    context,
+                    listen: false,
+                  ).bookingData;
+                  _filterBookings(value, allBookings);
+                });
               },
               decoration: InputDecoration(
                 hintText: 'Search Customer by Vehicle Number',
-                hintStyle: TextStyle(color: Colors.grey[500]),
-                suffixIcon: Icon(Icons.search, color: Colors.grey[400]),
+                hintStyle: TextStyle(color: Colors.grey[400]),
+                suffixIcon: Icon(Icons.search, color: Colors.grey[300]),
                 filled: true,
-                fillColor: Colors.grey[50],
+                fillColor: const Color(0xFF3D3D3D), // Lighter grey-black
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -104,35 +150,44 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
           Expanded(
             child: Consumer<GetNewbookingController>(
               builder: (context, controller, child) {
-                if (controller.isLoading) {
+                // Show loading indicator during initial data fetch
+                if (_isLoading || controller.isLoading) {
                   return const Center(
-                    child: CircularProgressIndicator(color: Colors.red),
+                    child: CircularProgressIndicator(color: Color(0xFFD32F2F)),
                   );
                 }
 
                 if (controller.error != null) {
-                  return Center(child: Text(controller.error!));
+                  return Center(
+                    child: Text(
+                      controller.error!,
+                      style: const TextStyle(color: Colors.white70),
+                    ),
+                  );
                 }
 
                 final bookings = _filteredBookings;
+                // PERFORMANCE FIX: Single empty check with context-aware message
                 if (bookings.isEmpty) {
                   return Center(
                     child: Text(
                       controller.bookingData.isEmpty
                           ? 'No new bookings found.'
                           : 'No matching registration number.',
+                      style: const TextStyle(color: Colors.white70),
                     ),
                   );
                 }
 
-                if (bookings.isEmpty) {
-                  return const Center(child: Text('No new bookings found.'));
-                }
-
-                return ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: bookings.length,
-                  itemBuilder: (context, index) {
+                return RefreshIndicator(
+                  onRefresh: _handleRefresh,
+                  color: const Color(0xFFD32F2F),
+                  backgroundColor: Colors.white,
+                  child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(16),
+                    itemCount: bookings.length,
+                    itemBuilder: (context, index) {
                     final booking = bookings[index];
 
                     return Container(
@@ -311,7 +366,8 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
                         ],
                       ),
                     );
-                  },
+                    },
+                  ),
                 );
               },
             ),

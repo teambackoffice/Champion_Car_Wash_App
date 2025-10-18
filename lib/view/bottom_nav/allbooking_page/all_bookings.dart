@@ -62,60 +62,6 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
     });
   }
 
-  Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'completed':
-        return Colors.green;
-      case 'open':
-        return Colors.blue;
-      case 'in progress':
-        return Colors.orange;
-      case 'cancelled':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 120,
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: const TextStyle(fontSize: 14, color: Colors.black87),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // Format booking date to "2 June 2025" format
-  String _formatBookingDate(String dateString) {
-    try {
-      DateTime date = DateTime.parse(dateString);
-      return DateFormat('d MMMM yyyy').format(date);
-    } catch (e) {
-      // If parsing fails, return the original string
-      return dateString;
-    }
-  }
-
   // Date picker function
   Future<void> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -212,35 +158,39 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text(
-          'All Bookings',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
+      backgroundColor: const Color(0xFF1A1A1A), // Pure black-grey background
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80.0),
+        child: AppBar(
+          backgroundColor: const Color(0xFF2A2A2A), // Dark grey-black
+          elevation: 0,
+          title: const Text(
+            'All Bookings',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
           ),
+          centerTitle: true,
         ),
-        centerTitle: true,
       ),
       body: Column(
         children: [
           // 🔍 Search Bar
           Container(
-            color: Colors.white,
+            color: const Color(0xFF2A2A2A), // Dark grey-black
             padding: const EdgeInsets.all(16),
             child: TextField(
               controller: _searchController,
+              style: const TextStyle(color: Colors.white),
               decoration: InputDecoration(
                 hintText: 'Search by Vehicle Number',
                 hintStyle: TextStyle(color: Colors.grey[400]),
-                prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
+                prefixIcon: Icon(Icons.search, color: Colors.grey[300]),
                 suffixIcon: _searchQuery.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.clear),
+                        icon: Icon(Icons.clear, color: Colors.grey[300]),
                         onPressed: () {
                           _searchController.clear();
                         },
@@ -248,17 +198,17 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
                     : null,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
+                  borderSide: const BorderSide(color: Color(0xFF555555)),
                 ),
                 filled: true,
-                fillColor: Colors.grey[50],
+                fillColor: const Color(0xFF3D3D3D), // Lighter grey-black
               ),
             ),
           ),
 
           // 📅 Filter Row
           Container(
-            color: Colors.white,
+            color: const Color(0xFF2A2A2A), // Dark grey-black
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Row(
               children: [
@@ -278,18 +228,18 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
                                 end: Alignment.bottomRight,
                               )
                             : null,
-                        color: _selectedDate != null ? null : Colors.grey[50],
+                        color: _selectedDate != null ? null : const Color(0xFF3D3D3D),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: _selectedDate != null
                               ? Colors.red[300]!
-                              : Colors.grey[300]!,
+                              : const Color(0xFF555555),
                           width: _selectedDate != null ? 2 : 1,
                         ),
                         boxShadow: _selectedDate != null
                             ? [
                                 BoxShadow(
-                                  color: Colors.blue.withAlpha(51),
+                                  color: Colors.red.withAlpha(51),
                                   blurRadius: 8,
                                   offset: const Offset(0, 2),
                                 ),
@@ -304,7 +254,7 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
                             size: 20,
                             color: _selectedDate != null
                                 ? Colors.white
-                                : Colors.grey[600],
+                                : Colors.grey[300],
                           ),
                           const SizedBox(width: 12),
                           Expanded(
@@ -317,7 +267,7 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
                               style: TextStyle(
                                 color: _selectedDate != null
                                     ? Colors.white
-                                    : Colors.grey[600],
+                                    : Colors.grey[300],
                                 fontWeight: _selectedDate != null
                                     ? FontWeight.w600
                                     : FontWeight.w500,
@@ -347,11 +297,12 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
                   ),
                 ),
                 const SizedBox(width: 16),
-                Consumer<GetAllbookingController>(
-                  builder: (context, controller, _) {
-                    final filteredBookings = _filterBookings(
-                      controller.bookingData,
-                    );
+                // PERFORMANCE FIX: Use Selector instead of Consumer to reduce rebuilds
+                // Only rebuilds when filtered count changes, not on every controller update
+                Selector<GetAllbookingController, int>(
+                  selector: (_, controller) =>
+                      _filterBookings(controller.bookingData).length,
+                  builder: (context, count, _) {
                     return Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 12,
@@ -372,7 +323,7 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            '${filteredBookings.length}',
+                            '$count',
                             style: TextStyle(
                               color: Colors.grey[800],
                               fontSize: 12,
@@ -462,113 +413,173 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
                   );
                 }
 
+                // PERFORMANCE FIX: Use extracted BookingCard widget for better performance
                 return ListView.builder(
                   padding: const EdgeInsets.all(16),
                   itemCount: filteredBookings.length,
                   itemBuilder: (context, index) {
-                    final booking = filteredBookings[index];
-
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withAlpha(13),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // 🚗 Header
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    booking.registrationNumber,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: _getStatusColor(booking.status),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    booking.status,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(height: 12),
-
-                            // 🧾 Booking Details
-                            _buildDetailRow(
-                              'Customer Name',
-                              booking.customerName,
-                            ),
-                            _buildDetailRow('Phone', booking.phone),
-                            _buildDetailRow(
-                              'Booking Date',
-                              _formatBookingDate(booking.purchaseDate),
-                            ),
-                            _buildDetailRow('Address', booking.address),
-
-                            const SizedBox(height: 8),
-
-                            // 🛠️ Services
-                            const Text(
-                              'Selected Services',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: booking.services.map<Widget>((service) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 2),
-                                  child: Text(
-                                    '${service.serviceType}'
-                                    '${service.washType != null ? ' - ${service.washType}' : ''}'
-                                    '${service.oilBrand != null ? ' (${service.oilBrand})' : ''}',
-                                    style: const TextStyle(fontSize: 14),
-                                  ),
-                                );
-                              }).toList(),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
+                    return _BookingCard(booking: filteredBookings[index]);
                   },
                 );
               },
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// PERFORMANCE FIX: Extracted BookingCard to reduce rebuild surface area
+class _BookingCard extends StatelessWidget {
+  final dynamic booking;
+
+  const _BookingCard({required this.booking});
+
+  Color _getStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'completed':
+        return Colors.green;
+      case 'open':
+        return Colors.blue;
+      case 'in progress':
+        return Colors.orange;
+      case 'cancelled':
+        return Colors.red;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(fontSize: 14, color: Colors.black87),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatBookingDate(String dateString) {
+    try {
+      DateTime date = DateTime.parse(dateString);
+      return DateFormat('d MMMM yyyy').format(date);
+    } catch (e) {
+      return dateString;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(13),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 🚗 Header
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Text(
+                    booking.registrationNumber,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: _getStatusColor(booking.status),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    booking.status,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            // 🧾 Booking Details
+            _buildDetailRow('Customer Name', booking.customerName),
+            _buildDetailRow('Phone', booking.phone),
+            _buildDetailRow(
+              'Booking Date',
+              _formatBookingDate(booking.purchaseDate),
+            ),
+            _buildDetailRow('Address', booking.address),
+
+            const SizedBox(height: 8),
+
+            // 🛠️ Services
+            const Text(
+              'Selected Services',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: booking.services.map<Widget>((service) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 2),
+                  child: Text(
+                    '${service.serviceType}'
+                    '${service.washType != null ? ' - ${service.washType}' : ''}'
+                    '${service.oilBrand != null ? ' (${service.oilBrand})' : ''}',
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                );
+              }).toList(),
+            ),
+          ],
+        ),
       ),
     );
   }

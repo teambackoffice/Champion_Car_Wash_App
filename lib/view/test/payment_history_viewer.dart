@@ -173,27 +173,30 @@ class _PaymentHistoryViewerState extends State<PaymentHistoryViewer> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Payment History'),
-        backgroundColor: Colors.green,
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.file_download),
-            onPressed: _exportHistory,
-            tooltip: 'Export History',
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete_sweep),
-            onPressed: _clearHistory,
-            tooltip: 'Clear History',
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadPaymentHistory,
-            tooltip: 'Refresh',
-          ),
-        ],
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80.0),
+        child: AppBar(
+          title: const Text('Payment History'),
+          backgroundColor: Colors.green,
+          foregroundColor: Colors.white,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.file_download),
+              onPressed: _exportHistory,
+              tooltip: 'Export History',
+            ),
+            IconButton(
+              icon: const Icon(Icons.delete_sweep),
+              onPressed: _clearHistory,
+              tooltip: 'Clear History',
+            ),
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: _loadPaymentHistory,
+              tooltip: 'Refresh',
+            ),
+          ],
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

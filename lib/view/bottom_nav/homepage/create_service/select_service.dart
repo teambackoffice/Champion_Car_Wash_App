@@ -124,20 +124,23 @@ class _SelectServiceState extends State<SelectService> {
         ), // Add CarWash provider
       ],
       child: Scaffold(
-        backgroundColor: Colors.grey[50],
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          leading: const AppBarBackButton(),
-          title: const Text(
-            'Services',
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
+        backgroundColor: const Color(0xFF1A1A1A),
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(80.0),
+          child: AppBar(
+            backgroundColor: const Color(0xFF2A2A2A),
+            elevation: 0,
+            leading: const AppBarBackButton(),
+            title: const Text(
+              'Services',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.w600,
+              ),
             ),
+            centerTitle: true,
           ),
-          centerTitle: true,
         ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16),
@@ -179,11 +182,11 @@ class _SelectServiceState extends State<SelectService> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFF2A2A2A),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(13),
+            color: Colors.black.withAlpha(51),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -200,7 +203,7 @@ class _SelectServiceState extends State<SelectService> {
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black87,
+                  color: Colors.white,
                 ),
               ),
               TextButton(
@@ -282,7 +285,7 @@ class _SelectServiceState extends State<SelectService> {
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    color: Colors.white,
                   ),
                 ),
               ],
@@ -326,12 +329,16 @@ class _SelectServiceState extends State<SelectService> {
           itemCount: services.length,
           itemBuilder: (context, index) {
             final service = services[index];
-            final config = serviceConfigMap[service.name];
+            final configKey = serviceConfigMap.keys.firstWhere(
+              (key) => service.name.contains(key),
+              orElse: () => '',
+            );
+            final config = serviceConfigMap[configKey];
 
             return Column(
               children: [
                 _buildServiceItem(
-                  imagePath: config?.imagePath ?? 'assets/icons/default.png',
+                  imagePath: config?.imagePath ?? 'assets/carwash.png',
                   title: service.name,
                   onTap: config?.onTap ?? () {},
                 ),
@@ -351,8 +358,8 @@ class _SelectServiceState extends State<SelectService> {
   }) {
     return Card(
       elevation: 2,
-      shadowColor: Colors.black.withAlpha(26),
-      color: Colors.white,
+      shadowColor: Colors.black.withAlpha(51),
+      color: const Color(0xFF2A2A2A),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         onTap: onTap,
@@ -376,7 +383,7 @@ class _SelectServiceState extends State<SelectService> {
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
-                    color: Colors.black87,
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -391,11 +398,11 @@ class _SelectServiceState extends State<SelectService> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFF2A2A2A),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(0.2),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -427,7 +434,7 @@ class _SelectServiceState extends State<SelectService> {
           style: TextStyle(
             fontSize: isTotal ? 16 : 14,
             fontWeight: isTotal ? FontWeight.w600 : FontWeight.w400,
-            color: Colors.black87,
+            color: Colors.white,
           ),
         ),
         Text(
@@ -435,7 +442,7 @@ class _SelectServiceState extends State<SelectService> {
           style: TextStyle(
             fontSize: isTotal ? 16 : 14,
             fontWeight: isTotal ? FontWeight.w600 : FontWeight.w400,
-            color: Colors.black87,
+            color: Colors.white,
           ),
         ),
       ],
@@ -446,11 +453,11 @@ class _SelectServiceState extends State<SelectService> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFF2A2A2A),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withOpacity(0.2),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -464,7 +471,7 @@ class _SelectServiceState extends State<SelectService> {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
-              color: Colors.black87,
+              color: Colors.white,
             ),
           ),
           const SizedBox(height: 16),
@@ -475,7 +482,7 @@ class _SelectServiceState extends State<SelectService> {
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
-              color: Colors.black87,
+              color: Colors.white,
             ),
           ),
           const SizedBox(height: 8),
@@ -559,28 +566,29 @@ class _SelectServiceState extends State<SelectService> {
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: Colors.grey[700],
+            color: Colors.white70,
           ),
         ),
         const SizedBox(height: 8),
         TextField(
           controller: controller,
           keyboardType: TextInputType.number,
+          style: const TextStyle(color: Colors.white),
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(color: Colors.grey[400]),
             filled: true,
-            fillColor: Colors.grey[50],
+            fillColor: const Color(0xFF3D3D3D),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+              borderSide: const BorderSide(color: Color(0xFF555555)),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: Colors.grey[300]!),
+              borderSide: const BorderSide(color: Color(0xFF555555)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
@@ -694,7 +702,10 @@ class _SelectServiceState extends State<SelectService> {
       // Validate required fields
       if (_validateForm()) {
         // Get branch from secure storage
-        String branch = await _secureStorage.read(key: 'branch') ?? 'Qatar';
+        String? branch = await _secureStorage.read(key: 'branch');
+        if (branch == null || branch == 'Not Assigned') {
+          branch = 'Qatar';
+        }
 
         // Create services list
         List<ServiceItem> services = [];
@@ -702,7 +713,7 @@ class _SelectServiceState extends State<SelectService> {
         if (selectedCarWash != null) {
           services.add(
             ServiceItem(
-              serviceType: 'Car Wash',
+              serviceType: selectedCarWash!.name,
               washType: selectedCarWash!.name,
               price: selectedCarWash!.price,
             ),
@@ -714,7 +725,7 @@ class _SelectServiceState extends State<SelectService> {
             ServiceItem(
               serviceType: 'Oil Change',
               oilBrand: selectedOilChange!.name,
-              // price: selectedOilChange!.price,
+              price: selectedOilChange!.price,
             ),
           );
         }
@@ -802,6 +813,7 @@ class _SelectServiceState extends State<SelectService> {
       barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
+          backgroundColor: const Color(0xFF2A2A2A),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.0),
           ),
@@ -823,7 +835,7 @@ class _SelectServiceState extends State<SelectService> {
             padding: EdgeInsets.symmetric(vertical: 8.0),
             child: Text(
               'Service created successfully !',
-              style: TextStyle(fontSize: 16, color: Colors.black87),
+              style: TextStyle(fontSize: 16, color: Colors.white),
             ),
           ),
           actions: [
@@ -841,9 +853,9 @@ class _SelectServiceState extends State<SelectService> {
                         model: _getSelectedModel(),
                         purchaseDate: widget.purchaseDate.text,
                         engineNumber: widget.engineNumber.text,
-                        serviceType: selectedCarWash!.name,
-                        washType: selectedCarWash!.name,
-                        price: selectedCarWash!.price!,
+                        serviceType: selectedCarWash?.name ?? selectedOilChange?.name ?? '',
+                        washType: selectedCarWash?.name ?? selectedOilChange?.name ?? 'N/A',
+                        price: selectedCarWash?.price ?? selectedOilChange?.price ?? 0.0,
                         locationName: locationName,
                       ),
                     ),
@@ -880,12 +892,13 @@ class _SelectServiceState extends State<SelectService> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Error'),
-          content: Text(message),
+          backgroundColor: const Color(0xFF2A2A2A),
+          title: const Text('Error', style: TextStyle(color: Colors.white)),
+          content: Text(message, style: const TextStyle(color: Colors.white70)),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('OK'),
+              child: const Text('OK', style: TextStyle(color: Colors.red)),
             ),
           ],
         );

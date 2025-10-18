@@ -18,24 +18,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
-    _loadFullname();
-    loadbranch();
+    // PERFORMANCE FIX: Load profile data in parallel instead of sequentially
+    _loadProfileData();
   }
 
-  Future<void> _loadFullname() async {
-    final storedName = await storage.read(key: 'full_name');
-    setState(() {
-      fullname = storedName ?? '';
-    });
-  }
+  Future<void> _loadProfileData() async {
+    // PERFORMANCE FIX: Use Future.wait to load both values in parallel
+    final results = await Future.wait([
+      storage.read(key: 'full_name'),
+      storage.read(key: 'branch'),
+    ]);
 
-  Future<void> loadbranch() async {
-    final storedBranch = await storage.read(key: 'branch');
-    setState(() {
-      branch = storedBranch ?? '';
-    });
+    if (mounted) {
+      setState(() {
+        fullname = results[0] ?? '';
+        branch = results[1] ?? '';
+      });
+    }
   }
 
   @override
@@ -49,7 +49,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFFDFDFD),
+      backgroundColor: const Color(0xFF1A1A1A), // Pure black-grey background
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 32),
@@ -99,18 +99,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             showDialog(
                               context: context,
                               builder: (context) => AlertDialog(
+                                backgroundColor: const Color(0xFF2A2A2A),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(16),
                                 ),
-                                title: const Text('Confirm Logout'),
+                                title: const Text(
+                                  'Confirm Logout',
+                                  style: TextStyle(color: Colors.white),
+                                ),
                                 content: const Text(
                                   'Are you sure you want to log out?',
+                                  style: TextStyle(color: Colors.white70),
                                 ),
                                 actions: [
                                   TextButton(
                                     onPressed: () =>
                                         Navigator.of(context).pop(),
-                                    child: const Text('Cancel'),
+                                    child: const Text(
+                                      'Cancel',
+                                      style: TextStyle(color: Colors.white70),
+                                    ),
                                   ),
                                   ElevatedButton(
                                     style: ElevatedButton.styleFrom(
@@ -211,20 +219,20 @@ class ReadOnlyField extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12),
       height: 50,
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: const Color(0xFF555555)),
         borderRadius: BorderRadius.circular(8),
-        color: isButton ? const Color(0xFFF9F9F9) : Colors.white,
+        color: isButton ? const Color(0xFF2A2A2A) : const Color(0xFF3D3D3D),
       ),
       child: Row(
         children: [
-          Icon(icon, color: Colors.grey.shade600),
+          Icon(icon, color: Colors.grey.shade300),
           const SizedBox(width: 10),
           Expanded(
             child: Text(
               text,
               style: TextStyle(
                 fontSize: 16,
-                color: isButton ? Colors.red : Colors.black,
+                color: isButton ? const Color(0xFFD32F2F) : Colors.white,
               ),
             ),
           ),

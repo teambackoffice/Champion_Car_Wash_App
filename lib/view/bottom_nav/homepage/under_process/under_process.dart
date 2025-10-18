@@ -23,9 +23,8 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
   void initState() {
     super.initState();
 
-    _searchController.addListener(() {
-      _filterBookings(_searchController.text);
-    });
+    // PERFORMANCE FIX: Use named method for listener to properly remove it later
+    _searchController.addListener(_onSearchChanged);
 
     // Fetch data after the first frame is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -43,8 +42,14 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
     });
   }
 
+  void _onSearchChanged() {
+    _filterBookings(_searchController.text);
+  }
+
   @override
   void dispose() {
+    // PERFORMANCE FIX: Remove listener before disposing to prevent memory leak
+    _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     super.dispose();
   }
@@ -166,20 +171,23 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 2,
-        leading: const AppBarBackButton(),
-        title: const Text(
-          'Under Processing',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.black87,
+      backgroundColor: const Color(0xFF1A1A1A), // Pure black-grey background
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(80.0),
+        child: AppBar(
+          backgroundColor: const Color(0xFF2A2A2A), // Dark grey-black
+          elevation: 2,
+          leading: const AppBarBackButton(),
+          title: const Text(
+            'Under Processing',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
           ),
+          centerTitle: true,
         ),
-        centerTitle: true,
       ),
       body: SafeArea(
         child: Consumer<UnderProcessingController>(
@@ -223,11 +231,23 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
               );
             }
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Container(
+            return RefreshIndicator(
+              onRefresh: () async {
+                await controller.fetchUnderProcessingBookings();
+                if (mounted) {
+                  setState(() {
+                    _filteredBookings = controller.serviceCars;
+                  });
+                }
+              },
+              color: const Color(0xFFD32F2F),
+              backgroundColor: Colors.white,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(8),
@@ -624,7 +644,8 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                       ),
                     );
                   }),
-                ],
+                  ],
+                ),
               ),
             );
           },

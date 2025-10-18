@@ -83,7 +83,10 @@ class _PreBookingButtonState extends State<PreBookingButton> {
       // Format time as 24-hour string (HH:MM) for API
       String formattedTime =
           '${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}';
-      final branch = await const FlutterSecureStorage().read(key: 'branch');
+      String? branch = await const FlutterSecureStorage().read(key: 'branch');
+      if (branch == null || branch == 'Not Assigned') {
+        branch = 'Qatar';
+      }
       try {
         // Print data before sending to API
         final prebookingData = AddPreBookingList(
@@ -92,7 +95,7 @@ class _PreBookingButtonState extends State<PreBookingButton> {
           regNumber: _regNumberController.text.trim(),
           date: _selectedDate!,
           time: formattedTime,
-          branch: branch!,
+          branch: branch,
           services: _selectedServices,
         );
 
@@ -113,9 +116,10 @@ class _PreBookingButtonState extends State<PreBookingButton> {
         // Clear form after successful submission
         _clearForm();
 
-        // Optionally navigate back
-        Navigator.pop(context);
+        // Navigate back and pass refresh signal
+        Navigator.pop(context, true);
       } catch (error) {
+        print('Error creating pre-booking: $error'); // Add this log
         // Show error message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -143,14 +147,17 @@ class _PreBookingButtonState extends State<PreBookingButton> {
     return ChangeNotifierProvider<ServiceTypeController>.value(
       value: _controller,
       child: Scaffold(
-        backgroundColor: Colors.white,
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          centerTitle: true,
-          title: const Text(
-            'Pre Booking',
-            style: TextStyle(color: Colors.black),
+        backgroundColor: const Color(0xFF1A1A1A),
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(80.0),
+          child: AppBar(
+            backgroundColor: const Color(0xFF2A2A2A),
+            elevation: 0,
+            centerTitle: true,
+            title: const Text(
+              'Pre Booking',
+              style: TextStyle(color: Colors.white),
+            ),
           ),
         ),
         body: Padding(
@@ -169,6 +176,7 @@ class _PreBookingButtonState extends State<PreBookingButton> {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
+                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 16),
@@ -214,6 +222,7 @@ class _PreBookingButtonState extends State<PreBookingButton> {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
+                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -224,6 +233,7 @@ class _PreBookingButtonState extends State<PreBookingButton> {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,
+                            color: Colors.white,
                           ),
                         ),
                         const SizedBox(height: 12),
@@ -311,8 +321,11 @@ class _PreBookingButtonState extends State<PreBookingButton> {
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
       hintText: hint,
+      hintStyle: TextStyle(color: Colors.grey[400]),
+      filled: true,
+      fillColor: const Color(0xFF3D3D3D),
       border: OutlineInputBorder(
-        borderSide: BorderSide(color: Colors.grey.shade300),
+        borderSide: const BorderSide(color: Color(0xFF555555)),
         borderRadius: BorderRadius.circular(10),
       ),
       focusedBorder: OutlineInputBorder(
@@ -321,7 +334,7 @@ class _PreBookingButtonState extends State<PreBookingButton> {
       ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide(color: Colors.grey.shade300),
+        borderSide: const BorderSide(color: Color(0xFF555555)),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
     );
@@ -336,6 +349,7 @@ class _PreBookingButtonState extends State<PreBookingButton> {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
+      style: const TextStyle(color: Colors.white),
       decoration: _inputDecoration(hint),
       validator: validator,
     );
@@ -357,13 +371,13 @@ class _PreBookingButtonState extends State<PreBookingButton> {
           return Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.red.shade50,
+              color: const Color(0xFF2A2A2A),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.red.shade200),
+              border: Border.all(color: Colors.red),
             ),
             child: Text(
               controller.error ?? 'Error loading services',
-              style: TextStyle(color: Colors.red.shade700),
+              style: const TextStyle(color: Colors.red),
             ),
           );
         }
@@ -374,11 +388,14 @@ class _PreBookingButtonState extends State<PreBookingButton> {
           return Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.grey.shade50,
+              color: const Color(0xFF2A2A2A),
               borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey.shade200),
+              border: Border.all(color: const Color(0xFF555555)),
             ),
-            child: const Text('No services available'),
+            child: const Text(
+              'No services available',
+              style: TextStyle(color: Colors.white70),
+            ),
           );
         }
 
@@ -388,7 +405,8 @@ class _PreBookingButtonState extends State<PreBookingButton> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                border: Border.all(color: Colors.grey.shade300),
+                color: const Color(0xFF2A2A2A),
+                border: Border.all(color: const Color(0xFF555555)),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Column(
@@ -399,7 +417,7 @@ class _PreBookingButtonState extends State<PreBookingButton> {
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: Colors.grey,
+                      color: Colors.white70,
                     ),
                   ),
                   const SizedBox(height: 8),
@@ -408,7 +426,10 @@ class _PreBookingButtonState extends State<PreBookingButton> {
                       (s) => s.service == serviceType.name,
                     );
                     return CheckboxListTile(
-                      title: Text(serviceType.name),
+                      title: Text(
+                        serviceType.name,
+                        style: const TextStyle(color: Colors.white),
+                      ),
                       value: isSelected,
                       onChanged: (bool? value) {
                         setState(() {
@@ -438,7 +459,10 @@ class _PreBookingButtonState extends State<PreBookingButton> {
                 spacing: 8,
                 children: _selectedServices.map((service) {
                   return Chip(
-                    label: Text(service.service),
+                    label: Text(
+                      service.service,
+                      style: const TextStyle(color: Colors.white),
+                    ),
                     onDeleted: () {
                       setState(() {
                         _selectedServices.removeWhere(
@@ -446,7 +470,7 @@ class _PreBookingButtonState extends State<PreBookingButton> {
                         );
                       });
                     },
-                    backgroundColor: Colors.red.shade50,
+                    backgroundColor: const Color(0xFF3D3D3D),
                     deleteIconColor: Colors.red,
                   );
                 }).toList(),

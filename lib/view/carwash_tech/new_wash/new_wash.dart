@@ -25,8 +25,11 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: isDarkMode ? theme.scaffoldBackgroundColor : Colors.grey[100],
       body: Consumer<GetNewCarWashController>(
         builder: (context, controller, child) {
           final booking =
@@ -34,14 +37,14 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
               []; // ✅ Proper initialization
           if (controller.isLoading) {
             return Center(
-              child: CircularProgressIndicator(color: Colors.red[800]),
+              child: CircularProgressIndicator(color: theme.primaryColor),
             );
           }
           if (booking.isEmpty) {
             return Center(
               child: Text(
                 'No new bookings found',
-                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                style: TextStyle(fontSize: 14, color: theme.textTheme.bodySmall?.color),
               ),
             );
           }
@@ -50,7 +53,7 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
             return Center(
               child: Text(
                 'Error: ${controller.error}',
-                style: const TextStyle(color: Colors.red, fontSize: 16),
+                style: TextStyle(color: theme.colorScheme.error, fontSize: 16),
               ),
             );
           }
@@ -63,10 +66,11 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
               return Container(
                 margin: const EdgeInsets.only(bottom: 16.0),
                 child: Card(
-                  elevation: 2,
+                  elevation: isDarkMode ? 4 : 2,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
+                  color: theme.cardColor,
                   child: Padding(
                     padding: const EdgeInsets.all(20.0),
                     child: Column(
@@ -78,10 +82,10 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
                           children: [
                             Text(
                               data.serviceId,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black87,
+                                color: theme.textTheme.titleLarge?.color,
                               ),
                             ),
 
@@ -117,12 +121,12 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
                         const SizedBox(height: 8),
 
                         const SizedBox(height: 8),
-                        const Text(
+                        Text(
                           'Selected Services',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                            color: Colors.grey,
+                            color: theme.textTheme.bodyMedium?.color,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -131,10 +135,10 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
                             padding: const EdgeInsets.only(bottom: 4),
                             child: Text(
                               service.washType!,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w500,
-                                color: Colors.black87,
+                                color: theme.textTheme.bodyLarge?.color,
                               ),
                             ),
                           ),
@@ -187,7 +191,7 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
                                                         );
                                                   },
                                             style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.red[900],
+                                              backgroundColor: isDarkMode ? theme.primaryColor : Colors.red[900],
                                               foregroundColor: Colors.white,
                                               padding: const EdgeInsets.symmetric(
                                                 horizontal: 24,
@@ -219,7 +223,7 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
                             },
                             // _startService(context, booking.bookingId),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFFD32F2F),
+                              backgroundColor: isDarkMode ? theme.primaryColor : const Color(0xFFD32F2F),
                               foregroundColor: Colors.white,
                               padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
@@ -249,6 +253,7 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
   }
 
   Widget _buildDetailRow(String label, String value) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Row(
@@ -258,17 +263,17 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
             width: 100,
             child: Text(
               label,
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
+              style: TextStyle(fontSize: 14, color: theme.textTheme.bodySmall?.color),
             ),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: Colors.black87,
+                color: theme.textTheme.bodyMedium?.color,
               ),
             ),
           ),
@@ -278,6 +283,8 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
   }
 
   void _startService(BuildContext context, String bookingId) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
     showDialog(
       context: context,
       builder: (context) {
@@ -308,8 +315,8 @@ class _CarWashNewBookingsState extends State<CarWashNewBookings> {
                     // TODO: Call backend API to mark car wash service started
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red[800],
-                    foregroundColor: Colors.white,
+                    backgroundColor: isDarkMode ? theme.primaryColor : Colors.red[800],
+                    foregroundColor: isDarkMode ? Colors.white : Colors.white,
                     padding: const EdgeInsets.symmetric(
                       horizontal: 24,
                       vertical: 14,

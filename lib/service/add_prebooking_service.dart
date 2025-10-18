@@ -9,12 +9,18 @@ class AddPrebookingService {
   static Future<bool?> addPreBooking({
     required AddPreBookingList preBooking,
   }) async {
+
     final uri = Uri.parse(
       '${ApiConstants.baseUrl}api/method/carwash.Api.auth.create_pre_booking',
     );
 
-    final branch = await const FlutterSecureStorage().read(key: 'branch');
+    var branch = await const FlutterSecureStorage().read(key: 'branch');
     final sid = await const FlutterSecureStorage().read(key: 'sid');
+
+    // Handle "Not Assigned" branch
+    if (branch == null || branch == 'Not Assigned') {
+      branch = 'Qatar';
+    }
 
     // ✅ Fixed Cookie header syntax
     var headers = {
@@ -28,7 +34,11 @@ class AddPrebookingService {
     // Override the branch from secure storage
     bookingData['branch'] = branch;
 
+    print('📤 REQUEST URL: $uri');
+    print('📤 REQUEST BODY: ${jsonEncode(bookingData)}');
+
     final body = jsonEncode(bookingData); // ✅ Now this will work correctly
+
 
     try {
       final response = await http.post(
@@ -36,6 +46,9 @@ class AddPrebookingService {
         headers: headers, // ✅ Use the headers with SID
         body: body,
       );
+
+      print('📥 RESPONSE STATUS: ${response.statusCode}');
+      print('📥 RESPONSE BODY: ${response.body}');
 
       if (response.statusCode == 200) {
         return true;
@@ -46,8 +59,21 @@ class AddPrebookingService {
           throw Exception(errorMessage);
         } else {
           final result = jsonDecode(response.body);
-          final String errorMessage =
-              result['message'] ?? result['detail'] ?? 'Request failed';
+          String errorMessage = 'Request failed';
+
+          // Handle nested message structure
+          if (result['message'] != null) {
+            if (result['message'] is Map) {
+              errorMessage = result['message']['message'] ??
+                           result['message']['error'] ??
+                           'Request failed';
+            } else if (result['message'] is String) {
+              errorMessage = result['message'];
+            }
+          } else if (result['detail'] != null) {
+            errorMessage = result['detail'];
+          }
+
           throw Exception(errorMessage);
         }
       }
