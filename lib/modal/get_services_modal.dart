@@ -1,10 +1,12 @@
 class ServiceType {
   final String name;
   final String? description;
+  final double? price;
 
   ServiceType({
     required this.name,
     this.description,
+    this.price,
   });
 
   // Factory constructor to create ServiceType from JSON
@@ -12,6 +14,7 @@ class ServiceType {
     return ServiceType(
       name: json['name'] ?? '',
       description: json['description'],
+      price: json['price']?.toDouble(),
     );
   }
 
@@ -20,12 +23,13 @@ class ServiceType {
     return {
       'name': name,
       'description': description,
+      'price': price,
     };
   }
 
   @override
   String toString() {
-    return 'ServiceType(name: $name, description: $description)';
+    return 'ServiceType(name: $name, description: $description, price: $price)';
   }
 }
 class ServiceTypeResponse {

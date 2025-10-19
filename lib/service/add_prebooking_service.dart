@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:champion_car_wash_app/config/api_constants.dart';
 import 'package:champion_car_wash_app/modal/add_prebooking_modal.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
@@ -34,8 +35,8 @@ class AddPrebookingService {
     // Override the branch from secure storage
     bookingData['branch'] = branch;
 
-    print('📤 REQUEST URL: $uri');
-    print('📤 REQUEST BODY: ${jsonEncode(bookingData)}');
+    debugPrint('📤 REQUEST URL: $uri');
+   debugPrint('📤 REQUEST BODY: ${jsonEncode(bookingData)}');
 
     final body = jsonEncode(bookingData); // ✅ Now this will work correctly
 
@@ -47,8 +48,8 @@ class AddPrebookingService {
         body: body,
       );
 
-      print('📥 RESPONSE STATUS: ${response.statusCode}');
-      print('📥 RESPONSE BODY: ${response.body}');
+     debugPrint('📥 RESPONSE STATUS: ${response.statusCode}');
+     debugPrint('📥 RESPONSE BODY: ${response.body}');
 
       if (response.statusCode == 200) {
         return true;

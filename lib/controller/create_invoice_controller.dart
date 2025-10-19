@@ -23,7 +23,7 @@ class SalesInvoiceController extends ChangeNotifier {
 
       if (response != null && response.statusCode == 200) {
         responseMessage = 'Invoice created successfully!';
-        print(response.body); // or parse JSON here
+        debugPrint(response.body); // or parse JSON here
       } else {
         responseMessage =
             'Error: ${response?.statusCode} ${response?.reasonPhrase}';

@@ -40,22 +40,24 @@ class Message {
 
 class OilBrand {
   String name;
+  double? price;
 
-  OilBrand({required this.name});
+  OilBrand({required this.name, this.price});
 
   factory OilBrand.fromJson(Map<String, dynamic> json) =>
-      OilBrand(name: json['name']);
+      OilBrand(name: json['name'], price: json['price']?.toDouble());
 
-  Map<String, dynamic> toJson() => {'name': name};
+  Map<String, dynamic> toJson() => {'name': name, 'price': price};
 }
 
 class OilType {
   String name;
+  double? price;
 
-  OilType({required this.name});
+  OilType({required this.name, this.price});
 
   factory OilType.fromJson(Map<String, dynamic> json) =>
-      OilType(name: json['name']);
+      OilType(name: json['name'], price: json['price']?.toDouble());
 
-  Map<String, dynamic> toJson() => {'name': name};
+  Map<String, dynamic> toJson() => {'name': name, 'price': price};
 }

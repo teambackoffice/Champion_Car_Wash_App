@@ -32,12 +32,12 @@ class CarWashController extends ChangeNotifier {
         serviceModel,
       );
 
-      if (result['success']) {
-        _responseData = result['data'];
-        _message = result['message'];
+      if (result['success'] as bool) {
+        _responseData = result['data'] as Map<String, dynamic>;
+        _message = result['message'] as String?;
         _setStatus(ServiceStatus.success);
       } else {
-        _errorMessage = result['message'];
+        _errorMessage = result['message'] as String?;
         _setStatus(ServiceStatus.error);
       }
     } catch (e) {

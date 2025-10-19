@@ -1,11 +1,11 @@
 import 'dart:convert';
 
 import 'package:champion_car_wash_app/controller/get_oil_brand_contrtoller.dart';
+import 'package:champion_car_wash_app/controller/oil_subtype_by_brand_controller.dart';
 import 'package:champion_car_wash_app/controller/oil_tech/extra_work_controller.dart';
 import 'package:champion_car_wash_app/controller/oil_tech/inprogress_oil_controller.dart';
 import 'package:champion_car_wash_app/controller/oil_tech/inprogress_status_chnager_controller.dart';
 import 'package:champion_car_wash_app/controller/oil_tech/inspection_list_controller.dart';
-import 'package:champion_car_wash_app/controller/oil_subtype_by_brand_controller.dart';
 import 'package:champion_car_wash_app/modal/oil_tech/inprogress_oil_modal.dart';
 import 'package:champion_car_wash_app/modal/oil_tech/inspection_list_modal.dart';
 import 'package:flutter/material.dart';
@@ -794,8 +794,8 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
         listen: false,
       ).fetchOilSubtypesByBrand(widget.booking.services.first.oilBrand!.trim());
     });
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<GetOilBrandContrtoller>(
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Provider.of<GetOilBrandContrtoller>(
         context,
         listen: false,
       ).fetchOilBrandServices();
@@ -1143,9 +1143,7 @@ class _InspectionDialogState extends State<InspectionDialog> {
                         },
                         activeColor: Colors.red[800],
                         controlAffinity: ListTileControlAffinity.leading,
-                        contentPadding: const EdgeInsets.symmetric(
-                          
-                        ),
+                        contentPadding: const EdgeInsets.symmetric(),
                       );
                     },
                   ),
@@ -1345,9 +1343,7 @@ class _AddExtraWorkDialogState extends State<AddExtraWorkDialog> {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16),
               ),
             ),
             const SizedBox(height: 12),

@@ -55,18 +55,37 @@ class CreateService {
       print('Response Status Code: ${response.statusCode}');
       print('Response Body: $responseBody');
 
+      final decodedBody = jsonDecode(responseBody);
+
       if (response.statusCode == 200) {
-        return {
-          'success': true,
-          'data': jsonDecode(responseBody),
-          'message': 'Service created successfully',
-        };
+        // Check for success message in response body
+        if (decodedBody is Map<String, dynamic> &&
+            decodedBody['message'] != null &&
+            decodedBody['message']['success'] == true) {
+          return {
+            'success': true,
+            'data': decodedBody,
+            'message': decodedBody['message']['message'] ??
+                'Service created successfully',
+          };
+        } else {
+          // Handle cases where API returns 200 but operation failed
+          return {
+            'success': false,
+            'error':
+                decodedBody['message']?['message'] ?? 'Unknown server error',
+            'statusCode': response.statusCode,
+            'message':
+                decodedBody['message']?['message'] ?? 'Failed to create service',
+          };
+        }
       } else {
+        // Handle non-200 status codes
         return {
           'success': false,
           'error': response.reasonPhrase,
           'statusCode': response.statusCode,
-          'message': 'Failed to create service',
+          'message': decodedBody['message']?['message'] ?? 'Failed to create service',
         };
       }
     } catch (e) {

@@ -4,12 +4,14 @@ class ServiceItem {
   final String serviceType;
   final String? washType;
   final String? oilBrand;
+  final String? oilType;
   final double? price;
 
   ServiceItem({
     required this.serviceType,
     this.washType,
     this.oilBrand,
+    this.oilType,
     this.price,
   });
 
@@ -18,6 +20,7 @@ class ServiceItem {
       'service_type': serviceType,
       if (washType != null) 'wash_type': washType,
       if (oilBrand != null) 'oil_brand': oilBrand,
+      if (oilType != null) 'oil_type': oilType,
       'price': price,
     };
   }
@@ -27,6 +30,7 @@ class ServiceItem {
       serviceType: json['service_type'],
       washType: json['wash_type'],
       oilBrand: json['oil_brand'],
+      oilType: json['oil_type'],
       price: json['price'].toDouble(),
     );
   }

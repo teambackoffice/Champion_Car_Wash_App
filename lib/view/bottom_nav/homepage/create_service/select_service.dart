@@ -1,13 +1,18 @@
 import 'package:champion_car_wash_app/controller/create_service_controller.dart';
 import 'package:champion_car_wash_app/controller/get_all_makes_controller.dart';
+import 'package:champion_car_wash_app/controller/get_carwash_controller.dart';
 import 'package:champion_car_wash_app/controller/get_makes_by_modal_controller.dart';
+import 'package:champion_car_wash_app/controller/get_oil_brand_contrtoller.dart';
 import 'package:champion_car_wash_app/controller/get_services_controller.dart';
 import 'package:champion_car_wash_app/modal/create_service_modal.dart';
+import 'package:champion_car_wash_app/modal/get_carwash_modal.dart';
+import 'package:champion_car_wash_app/modal/get_services_modal.dart';
 import 'package:champion_car_wash_app/modal/selected_service_modal.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/car_wash.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/oil_change.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/service_success.dart';
 import 'package:champion_car_wash_app/widgets/common/custom_back_button.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
@@ -64,11 +69,12 @@ class _SelectServiceState extends State<SelectService> {
   final TextEditingController _nextServiceController = TextEditingController();
   late ServiceTypeController _controller;
   late CarWashController _carWashController; // Add CarWash controller
+  late CarwashServiceController _washTypeController; // Add wash type controller
+  late GetOilBrandContrtoller _oilBrandController; // Add oil brand controller
   static const FlutterSecureStorage _secureStorage = FlutterSecureStorage();
 
   // Selected services tracking
-  SelectedService? selectedCarWash;
-  SelectedService? selectedOilChange;
+  List<SelectedService> selectedServices = [];
 
   // Service charge (you can make this dynamic)
   final double serviceCharge = 10.0;
@@ -78,12 +84,20 @@ class _SelectServiceState extends State<SelectService> {
     super.initState();
     _controller = ServiceTypeController();
     _carWashController = CarWashController(); // Initialize CarWash controller
+    _washTypeController =
+        CarwashServiceController(); // Initialize wash type controller
+    _oilBrandController =
+        GetOilBrandContrtoller(); // Initialize oil brand controller
     _controller.loadServiceTypes();
+    _washTypeController.fetchCarwashServices(); // Load wash types
+    _oilBrandController.fetchOilBrandServices(); // Load oil brands
 
     // Debug: Print the received values
-    print('DEBUG - Received Make: ${widget.selectedMake}');
-    print('DEBUG - Received Model: ${widget.selectedModel}');
-    print('DEBUG - Received Car Type: ${widget.selectedCarType}');
+    if (kDebugMode) {
+      debugPrint('DEBUG - Received Make: ${widget.selectedMake}');
+      debugPrint('DEBUG - Received Model: ${widget.selectedModel}');
+      debugPrint('DEBUG - Received Car Type: ${widget.selectedCarType}');
+    }
   }
 
   // Fuel level
@@ -99,6 +113,8 @@ class _SelectServiceState extends State<SelectService> {
     // MEMORY LEAK FIX: Dispose all ChangeNotifier controllers
     _controller.dispose(); // ServiceTypeController - CRITICAL FIX
     _carWashController.dispose(); // CarWashController
+    _washTypeController.dispose(); // CarwashServiceController
+    _oilBrandController.dispose(); // GetOilBrandContrtoller
 
     super.dispose();
   }
@@ -106,8 +122,8 @@ class _SelectServiceState extends State<SelectService> {
   // Calculate totals
   double get subtotal {
     double total = 0.0;
-    if (selectedOilChange != null && selectedOilChange!.price != null) {
-      total += selectedOilChange!.price!;
+    for (var service in selectedServices) {
+      total += service.price ?? 0.0;
     }
     return total;
   }
@@ -122,6 +138,12 @@ class _SelectServiceState extends State<SelectService> {
         ChangeNotifierProvider<CarWashController>.value(
           value: _carWashController,
         ), // Add CarWash provider
+        ChangeNotifierProvider<CarwashServiceController>.value(
+          value: _washTypeController,
+        ), // Add wash type provider
+        ChangeNotifierProvider<GetOilBrandContrtoller>.value(
+          value: _oilBrandController,
+        ), // Add oil brand provider
       ],
       child: Scaffold(
         backgroundColor: const Color(0xFF1A1A1A),
@@ -153,8 +175,7 @@ class _SelectServiceState extends State<SelectService> {
               const SizedBox(height: 16),
 
               // Selected Services Section
-              if (selectedCarWash != null || selectedOilChange != null)
-                _buildSelectedServicesSection(),
+              if (selectedServices.isNotEmpty) _buildSelectedServicesSection(),
               const SizedBox(height: 24),
 
               // Pricing Section
@@ -174,9 +195,6 @@ class _SelectServiceState extends State<SelectService> {
       ),
     );
   }
-
-  // Rest of your existing widget methods remain the same...
-  // [All the _build methods from _buildSelectedServicesSection to _buildTextField]
 
   Widget _buildSelectedServicesSection() {
     return Container(
@@ -209,8 +227,7 @@ class _SelectServiceState extends State<SelectService> {
               TextButton(
                 onPressed: () {
                   setState(() {
-                    selectedCarWash = null;
-                    selectedOilChange = null;
+                    selectedServices.clear();
                   });
                 },
                 child: const Text(
@@ -221,31 +238,18 @@ class _SelectServiceState extends State<SelectService> {
             ],
           ),
           const SizedBox(height: 12),
-          if (selectedCarWash != null) ...[
-            _buildSelectedServiceItem(
-              'Car Wash',
-              selectedCarWash!.name,
-              selectedCarWash!.price!,
+          ...selectedServices.map(
+            (service) => _buildSelectedServiceItem(
+              service.details ?? 'N/A',
+              service.name,
+              service.price ?? 0.0,
               () {
                 setState(() {
-                  selectedCarWash = null;
+                  selectedServices.remove(service);
                 });
               },
             ),
-            const SizedBox(height: 8),
-          ],
-          if (selectedOilChange != null) ...[
-            _buildSelectedServiceItem(
-              'Oil Change',
-              selectedOilChange!.name,
-              selectedOilChange!.price ?? 0.0,
-              () {
-                setState(() {
-                  selectedOilChange = null;
-                });
-              },
-            ),
-          ],
+          ),
         ],
       ),
     );
@@ -310,44 +314,76 @@ class _SelectServiceState extends State<SelectService> {
   }
 
   Widget _buildServicesSection() {
-    return Consumer<ServiceTypeController>(
-      builder: (context, controller, child) {
-        if (controller.isLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        if (controller.hasError) {
-          return Center(child: Text(controller.error ?? 'Unknown error'));
-        }
-
-        final services = controller.serviceTypes;
-        final serviceConfigMap = getServiceConfig(context);
-
-        return ListView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: services.length,
-          itemBuilder: (context, index) {
-            final service = services[index];
-            final configKey = serviceConfigMap.keys.firstWhere(
-              (key) => service.name.contains(key),
-              orElse: () => '',
-            );
-            final config = serviceConfigMap[configKey];
-
-            return Column(
-              children: [
-                _buildServiceItem(
-                  imagePath: config?.imagePath ?? 'assets/carwash.png',
-                  title: service.name,
-                  onTap: config?.onTap ?? () {},
+    return Consumer3<
+      ServiceTypeController,
+      CarwashServiceController,
+      GetOilBrandContrtoller
+    >(
+      builder:
+          (context, serviceController, washController, oilController, child) {
+            // Show loading if any controller is loading
+            if (serviceController.isLoading ||
+                washController.isLoading ||
+                oilController.isLoading) {
+              return SizedBox(
+                height: 200,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Color(0xFFD82332),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      _getLoadingMessage(
+                        serviceController,
+                        washController,
+                        oilController,
+                      ),
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
                 ),
-                if (index < services.length - 1) const SizedBox(height: 12),
-              ],
+              );
+            }
+
+            if (serviceController.hasError) {
+              return Center(
+                child: Text(serviceController.error ?? 'Unknown error'),
+              );
+            }
+
+            final services = serviceController.serviceTypes;
+            final serviceConfigMap = getServiceConfig(context);
+
+            return ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: services.length,
+              itemBuilder: (context, index) {
+                final service = services[index];
+                final configKey = serviceConfigMap.keys.firstWhere(
+                  (key) => service.name.contains(key),
+                  orElse: () => '',
+                );
+                final config = serviceConfigMap[configKey];
+
+                return Column(
+                  children: [
+                    _buildServiceItem(
+                      imagePath: config?.imagePath ?? 'assets/carwash.png',
+                      title: service.name,
+                      onTap: config?.onTap ?? () {},
+                    ),
+                    if (index < services.length - 1) const SizedBox(height: 12),
+                  ],
+                );
+              },
             );
           },
-        );
-      },
     );
   }
 
@@ -391,61 +427,6 @@ class _SelectServiceState extends State<SelectService> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildPricingSection() {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          _buildPriceRow('Sub Total', '₹${subtotal.toStringAsFixed(2)}'),
-          const SizedBox(height: 8),
-
-          const Divider(),
-          const SizedBox(height: 8),
-          _buildPriceRow(
-            'Total',
-            '₹${subtotal.toStringAsFixed(2)}',
-            isTotal: true,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPriceRow(String label, String amount, {bool isTotal = false}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: isTotal ? 16 : 14,
-            fontWeight: isTotal ? FontWeight.w600 : FontWeight.w400,
-            color: Colors.white,
-          ),
-        ),
-        Text(
-          amount,
-          style: TextStyle(
-            fontSize: isTotal ? 16 : 14,
-            fontWeight: isTotal ? FontWeight.w600 : FontWeight.w400,
-            color: Colors.white,
-          ),
-        ),
-      ],
     );
   }
 
@@ -604,7 +585,6 @@ class _SelectServiceState extends State<SelectService> {
     );
   }
 
-  // Updated Submit Button with API call
   Widget _buildSubmitButton() {
     return Consumer<CarWashController>(
       builder: (context, carWashController, child) {
@@ -613,8 +593,7 @@ class _SelectServiceState extends State<SelectService> {
           height: 50,
           child: ElevatedButton(
             onPressed:
-                (selectedCarWash != null || selectedOilChange != null) &&
-                    !carWashController.isLoading
+                selectedServices.isNotEmpty && !carWashController.isLoading
                 ? () => _submitService(carWashController)
                 : null,
             style: ElevatedButton.styleFrom(
@@ -696,7 +675,6 @@ class _SelectServiceState extends State<SelectService> {
     }
   }
 
-  // Method to handle service submission
   Future<void> _submitService(CarWashController carWashController) async {
     try {
       // Validate required fields
@@ -710,24 +688,122 @@ class _SelectServiceState extends State<SelectService> {
         // Create services list
         List<ServiceItem> services = [];
 
-        if (selectedCarWash != null) {
-          services.add(
-            ServiceItem(
-              serviceType: selectedCarWash!.name,
-              washType: selectedCarWash!.name,
-              price: selectedCarWash!.price,
-            ),
+        for (var service in selectedServices) {
+          // Find matching service type from API
+          ServiceType? validServiceType = _controller.getServiceTypeByName(
+            service.name,
           );
-        }
 
-        if (selectedOilChange != null) {
-          services.add(
-            ServiceItem(
-              serviceType: 'Oil Change',
-              oilBrand: selectedOilChange!.name,
-              price: selectedOilChange!.price,
-            ),
-          );
+          if (validServiceType != null) {
+            // Use the exact service type name from API
+            if (service.details == 'Car Wash Service') {
+              // Find matching wash type from API
+              WashType? validWashType = _washTypeController.washTypes
+                  .where(
+                    (washType) =>
+                        washType.name.toLowerCase().contains(
+                          service.name.toLowerCase(),
+                        ) ||
+                        service.name.toLowerCase().contains(
+                          washType.name.toLowerCase(),
+                        ),
+                  )
+                  .firstOrNull;
+
+              // If no match found, try to find closest match
+              validWashType ??= _washTypeController.washTypes
+                  .where(
+                    (washType) => washType.name.toLowerCase().contains('wash'),
+                  )
+                  .firstOrNull;
+
+              // Use the first available wash type if still no match
+              validWashType ??= _washTypeController.washTypes.isNotEmpty
+                  ? _washTypeController.washTypes.first
+                  : null;
+
+              services.add(
+                ServiceItem(
+                  serviceType: validServiceType.name,
+                  washType: validWashType?.name ?? service.name.toLowerCase(),
+                  price: service.price,
+                ),
+              );
+            } else if (service.details == 'Oil Change Service') {
+              services.add(
+                ServiceItem(
+                  serviceType: validServiceType.name,
+                  oilBrand: service.brand,
+                  oilType: service.type,
+                  price: service.price,
+                ),
+              );
+            } else {
+              // For other service types, use the API service type name
+              services.add(
+                ServiceItem(
+                  serviceType: validServiceType.name,
+                  price: service.price,
+                ),
+              );
+            }
+          } else {
+            // Service type not found in API - try to find closest match
+            ServiceType? closestMatch;
+            if (service.details == 'Car Wash Service') {
+              try {
+                closestMatch = _controller.serviceTypes.firstWhere(
+                  (apiService) =>
+                      apiService.name.toLowerCase().contains('wash'),
+                );
+              } catch (e) {
+                closestMatch = _controller.serviceTypes.isNotEmpty
+                    ? _controller.serviceTypes.first
+                    : null;
+              }
+            } else if (service.details == 'Oil Change Service') {
+              try {
+                closestMatch = _controller.serviceTypes.firstWhere(
+                  (apiService) => apiService.name.toLowerCase().contains('oil'),
+                );
+              } catch (e) {
+                closestMatch = _controller.serviceTypes.isNotEmpty
+                    ? _controller.serviceTypes.first
+                    : null;
+              }
+            }
+
+            if (closestMatch != null) {
+              if (kDebugMode) {
+                debugPrint(
+                  'Warning: Service "${service.name}" not found, using closest match: "${closestMatch.name}"',
+                );
+              }
+              services.add(
+                ServiceItem(
+                  serviceType: closestMatch.name,
+                  washType: service.details == 'Car Wash Service'
+                      ? (_washTypeController.washTypes.isNotEmpty
+                            ? _washTypeController.washTypes.first.name
+                            : service.name.toLowerCase())
+                      : null,
+                  oilBrand: service.details == 'Oil Change Service'
+                      ? service.brand
+                      : null,
+                  oilType: service.details == 'Oil Change Service'
+                      ? service.type
+                      : null,
+                  price: service.price,
+                ),
+              );
+            } else {
+              if (kDebugMode) {
+                debugPrint(
+                  'Error: No valid service types available from API and no match found for: ${service.name}',
+                );
+              }
+            }
+          }
         }
 
         // Create service model
@@ -798,7 +874,7 @@ class _SelectServiceState extends State<SelectService> {
       return false;
     }
 
-    if (selectedCarWash == null && selectedOilChange == null) {
+    if (selectedServices.isEmpty) {
       _showErrorDialog('Please select at least one service');
       return false;
     }
@@ -853,9 +929,13 @@ class _SelectServiceState extends State<SelectService> {
                         model: _getSelectedModel(),
                         purchaseDate: widget.purchaseDate.text,
                         engineNumber: widget.engineNumber.text,
-                        serviceType: selectedCarWash?.name ?? selectedOilChange?.name ?? '',
-                        washType: selectedCarWash?.name ?? selectedOilChange?.name ?? 'N/A',
-                        price: selectedCarWash?.price ?? selectedOilChange?.price ?? 0.0,
+                        serviceType: selectedServices
+                            .map((e) => e.name)
+                            .join(', '),
+                        washType: selectedServices
+                            .map((e) => e.name)
+                            .join(', '),
+                        price: subtotal,
                         locationName: locationName,
                       ),
                     ),
@@ -906,20 +986,23 @@ class _SelectServiceState extends State<SelectService> {
     );
   }
 
-  // Navigate to CarWash screen and wait for result
   Future<void> _navigateToCarWashing() async {
-    final result = await Navigator.push<SelectedService>(
+    // Use actual wash types from the wash types API
+    final carWashServices = _washTypeController.washTypes;
+
+    final result = await Navigator.push<List<SelectedService>>(
       context,
-      MaterialPageRoute(builder: (context) => const CarWashScreen()),
+      MaterialPageRoute(
+        builder: (context) => CarWashScreen(carWashServices: carWashServices),
+      ),
     );
 
-    print('DEBUG - CarWash result: $result'); // <-- ADD THIS
     if (result != null) {
-      print(
-        'DEBUG - CarWash name: ${result.name}, price: ${result.price}',
-      ); // <-- ADD THIS
       setState(() {
-        selectedCarWash = result;
+        selectedServices.removeWhere(
+          (element) => element.details == 'Car Wash Service',
+        );
+        selectedServices.addAll(result);
       });
     }
   }
@@ -930,14 +1013,39 @@ class _SelectServiceState extends State<SelectService> {
       MaterialPageRoute(builder: (context) => const OilChangeScreen()),
     );
 
-    print('DEBUG - OilChange result: $result'); // <-- ADD THIS
     if (result != null) {
-      print(
-        'DEBUG - OilChange name: ${result.name}, price: ${result.price}',
-      ); // <-- ADD THIS
       setState(() {
-        selectedOilChange = result;
+        selectedServices.removeWhere(
+          (element) => element.details == 'Oil Change Service',
+        );
+        selectedServices.add(result);
       });
+    }
+  }
+
+  String _getLoadingMessage(
+    ServiceTypeController serviceController,
+    CarwashServiceController washController,
+    GetOilBrandContrtoller oilController,
+  ) {
+    final loadingItems = <String>[];
+
+    if (serviceController.isLoading) {
+      loadingItems.add('Service Types');
+    }
+    if (washController.isLoading) {
+      loadingItems.add('Wash Types');
+    }
+    if (oilController.isLoading) {
+      loadingItems.add('Oil Brands');
+    }
+
+    if (loadingItems.isEmpty) {
+      return 'Loading...';
+    } else if (loadingItems.length == 1) {
+      return 'Loading ${loadingItems.first}...';
+    } else {
+      return 'Loading ${loadingItems.join(', ')}...';
     }
   }
 

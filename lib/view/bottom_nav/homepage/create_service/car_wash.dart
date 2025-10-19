@@ -1,161 +1,144 @@
-import 'package:champion_car_wash_app/controller/get_carwash_controller.dart';
+import 'package:champion_car_wash_app/modal/get_carwash_modal.dart';
 import 'package:champion_car_wash_app/modal/selected_service_modal.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class CarWashScreen extends StatefulWidget {
-  const CarWashScreen({super.key});
+  final List<WashType> carWashServices;
+  const CarWashScreen({super.key, required this.carWashServices});
 
   @override
   State<CarWashScreen> createState() => _CarWashScreenState();
 }
 
 class _CarWashScreenState extends State<CarWashScreen> {
-  int selectedIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    Provider.of<CarwashServiceController>(
-      context,
-      listen: false,
-    ).fetchCarwashServices();
-  }
+  List<int> selectedIndices = [];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFBF8),
+      backgroundColor: const Color(0xFF1A1A1A), // Dark mode background
       body: SafeArea(
-        child: Consumer<CarwashServiceController>(
-          builder: (context, controller, child) {
-            if (controller.isLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
+        child: Column(
+          children: [
+            const SizedBox(height: 16),
+            _buildHeader(),
+            const SizedBox(height: 16),
+            Expanded(
+              child: ListView.builder(
+                itemCount: widget.carWashServices.length,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                itemBuilder: (context, index) {
+                  final wash = widget.carWashServices[index];
+                  final bool isSelected = selectedIndices.contains(index);
 
-            if (controller.carwashList == null ||
-                controller.carwashList!.message.washType.isEmpty) {
-              return const Center(child: Text('No wash types available'));
-            }
-
-            final washList = controller.carwashList!.message.washType;
-
-            return Column(
-              children: [
-                const SizedBox(height: 16),
-                _buildHeader(),
-                const SizedBox(height: 16),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: washList.length,
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    itemBuilder: (context, index) {
-                      final wash = washList[index];
-                      final bool isSelected = index == selectedIndex;
-
-                      return GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            selectedIndex = index;
-                          });
-                        },
-                        child: Container(
-                          margin: const EdgeInsets.symmetric(vertical: 10),
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(
-                              color: isSelected
-                                  ? const Color(0xFFD82332)
-                                  : Colors.transparent,
-                              width: 1.5,
-                            ),
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withAlpha(18),
-                                spreadRadius: 1,
-                                blurRadius: 6,
-                                offset: const Offset(0, 3),
-                              ),
-                            ],
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        if (isSelected) {
+                          selectedIndices.remove(index);
+                        } else {
+                          selectedIndices.add(index);
+                        }
+                      });
+                    },
+                    child: Container(
+                      margin: const EdgeInsets.symmetric(vertical: 10),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? Colors.red.withValues(alpha: 0.1)
+                            : const Color(0xFF2A2A2A),
+                        border: Border.all(
+                          color: isSelected
+                              ? const Color(0xFFD82332)
+                              : Colors.transparent,
+                          width: 1.5,
+                        ),
+                        borderRadius: BorderRadius.circular(12),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withAlpha(18),
+                            spreadRadius: 1,
+                            blurRadius: 6,
+                            offset: const Offset(0, 3),
                           ),
-                          child: Row(
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.asset(
+                              'assets/bodyWash1.jpg',
+                              width: 70,
+                              height: 70,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(8),
-                                child: Image.asset(
-                                  'assets/bodyWash1.jpg',
-                                  width: 70,
-                                  height: 70,
-                                  fit: BoxFit.cover,
+                              Text(
+                                wash.name,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white,
                                 ),
                               ),
-                              const SizedBox(width: 16),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    wash.name,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    '₹${wash.price.toStringAsFixed(2)}',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      color: Color(0xFFD82332),
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
+                              const SizedBox(height: 4),
+                              Text(
+                                '₹${wash.price.toStringAsFixed(2)}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Color(0xFFD82332),
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ],
                           ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFD82332),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      onPressed: () {
-                        // Get the selected wash service
-                        final selectedWash = washList[selectedIndex];
-
-                        // Create SelectedService object
-                        final selectedService = SelectedService(
-                          name: selectedWash.name,
-                          price: selectedWash.price,
-                          details: 'Car Wash Service',
-                        );
-
-                        // Return to previous screen with selected service data
-                        Navigator.pop(context, selectedService);
-                      },
-                      child: const Text(
-                        'Continue',
-                        style: TextStyle(fontSize: 16, color: Colors.white),
+                        ],
                       ),
                     ),
+                  );
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFD82332),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  onPressed: () {
+                    // Get the selected wash services
+                    final selectedServices = selectedIndices.map((index) {
+                      final selectedWash = widget.carWashServices[index];
+                      return SelectedService(
+                        name: selectedWash.name,
+                        price: selectedWash.price,
+                        details: 'Car Wash Service',
+                      );
+                    }).toList();
+
+                    // Return to previous screen with selected services data
+                    Navigator.pop(context, selectedServices);
+                  },
+                  child: const Text(
+                    'Continue',
+                    style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
-              ],
-            );
-          },
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -183,7 +166,11 @@ class _CarWashScreenState extends State<CarWashScreen> {
           const Spacer(),
           const Text(
             'Car Washing',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
           ),
           const Spacer(flex: 2),
         ],
