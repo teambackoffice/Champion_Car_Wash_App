@@ -2,25 +2,25 @@
 class TestResults {
   /// Name of the test that was executed
   final String testName;
-  
+
   /// Whether the test passed or failed
   final bool passed;
-  
+
   /// The actual measured value
   final double actualValue;
-  
+
   /// The target/expected value
   final double targetValue;
-  
+
   /// Unit of measurement (ms, fps, MB, etc.)
   final String unit;
-  
+
   /// When the test was executed
   final DateTime timestamp;
-  
+
   /// Additional metrics and metadata
   final Map<String, dynamic> additionalMetrics;
-  
+
   const TestResults({
     required this.testName,
     required this.passed,
@@ -30,33 +30,33 @@ class TestResults {
     required this.timestamp,
     required this.additionalMetrics,
   });
-  
+
   /// Performance improvement percentage compared to target
   double get improvementPercentage {
     if (targetValue == 0) return 0.0;
-    
+
     // For metrics where lower is better (startup time, response time)
     if (unit == 'ms' || unit.contains('time')) {
       return ((targetValue - actualValue) / targetValue) * 100;
     }
-    
+
     // For metrics where higher is better (fps, success rate)
     return ((actualValue - targetValue) / targetValue) * 100;
   }
-  
+
   /// Whether the test result shows improvement over target
   bool get showsImprovement => improvementPercentage > 0;
-  
+
   /// Formatted string representation of the test result
   String get formattedResult {
     final status = passed ? 'PASS' : 'FAIL';
-    final improvement = showsImprovement 
+    final improvement = showsImprovement
         ? ' (+${improvementPercentage.toStringAsFixed(1)}%)'
         : '';
-    
+
     return '$testName: $status - $actualValue$unit (target: $targetValue$unit)$improvement';
   }
-  
+
   /// Convert to JSON for serialization
   Map<String, dynamic> toJson() {
     return {
@@ -70,7 +70,7 @@ class TestResults {
       'improvementPercentage': improvementPercentage,
     };
   }
-  
+
   /// Create from JSON
   factory TestResults.fromJson(Map<String, dynamic> json) {
     return TestResults(
@@ -83,10 +83,10 @@ class TestResults {
       additionalMetrics: json['additionalMetrics'] as Map<String, dynamic>,
     );
   }
-  
+
   @override
   String toString() => formattedResult;
-  
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -98,7 +98,7 @@ class TestResults {
         other.unit == unit &&
         other.timestamp == timestamp;
   }
-  
+
   @override
   int get hashCode {
     return Object.hash(

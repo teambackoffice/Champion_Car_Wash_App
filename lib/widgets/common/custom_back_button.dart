@@ -50,10 +50,7 @@ class CustomBackButton extends StatelessWidget {
             ),
             shape: isCircular ? BoxShape.circle : BoxShape.rectangle,
             borderRadius: isCircular ? null : BorderRadius.circular(8),
-            border: Border.all(
-              color: Colors.white.withOpacity(0.2),
-              width: 1,
-            ),
+            border: Border.all(color: Colors.white.withOpacity(0.2)),
             boxShadow: [
               BoxShadow(
                 color: backgroundColor.withOpacity(0.4),
@@ -62,11 +59,7 @@ class CustomBackButton extends StatelessWidget {
               ),
             ],
           ),
-          child: Icon(
-            Icons.arrow_back,
-            color: iconColor,
-            size: size * 0.5,
-          ),
+          child: Icon(Icons.arrow_back, color: iconColor, size: size * 0.5),
         ),
       ),
     );

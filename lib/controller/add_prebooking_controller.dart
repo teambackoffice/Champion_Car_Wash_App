@@ -9,9 +9,7 @@ class AddPrebookingController extends ChangeNotifier {
     setIsLoading(true);
     notifyListeners();
     try {
-      await AddPrebookingService.addPreBooking(
-        preBooking: prebook,
-      );
+      await AddPrebookingService.addPreBooking(preBooking: prebook);
       return true;
     } finally {
       setIsLoading(false);

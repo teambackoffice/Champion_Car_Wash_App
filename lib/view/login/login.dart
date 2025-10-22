@@ -136,7 +136,8 @@ class _LoginScreenState extends State<LoginScreen> {
             key: _formKey,
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                minHeight: size.height -
+                minHeight:
+                    size.height -
                     MediaQuery.of(context).padding.top -
                     MediaQuery.of(context).padding.bottom -
                     keyboardHeight,
@@ -183,7 +184,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       decoration: InputDecoration(
                         hintText: 'Login Id',
                         hintStyle: TextStyle(color: Colors.grey.shade500),
-                        prefixIcon: Icon(Icons.person_outline, color: Colors.grey.shade400),
+                        prefixIcon: Icon(
+                          Icons.person_outline,
+                          color: Colors.grey.shade400,
+                        ),
                         filled: true,
                         fillColor: const Color(0xFF2A2A2A),
                         contentPadding: const EdgeInsets.symmetric(
@@ -226,7 +230,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       decoration: InputDecoration(
                         hintText: 'Password',
                         hintStyle: TextStyle(color: Colors.grey.shade500),
-                        prefixIcon: Icon(Icons.lock_outline, color: Colors.grey.shade400),
+                        prefixIcon: Icon(
+                          Icons.lock_outline,
+                          color: Colors.grey.shade400,
+                        ),
                         filled: true,
                         fillColor: const Color(0xFF2A2A2A),
                         contentPadding: const EdgeInsets.symmetric(
@@ -316,10 +323,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                       child: const Text(
                         '🧪 Test Pages (Dev)',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: 14,
-                        ),
+                        style: TextStyle(color: Colors.blue, fontSize: 14),
                       ),
                     ),
 
@@ -348,10 +352,7 @@ class _LoginScreenState extends State<LoginScreen> {
           children: [
             const Text(
               '🧪 Test Pages',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 10),
@@ -373,7 +374,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 backgroundColor: Colors.blue,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                textStyle: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             const SizedBox(height: 20),

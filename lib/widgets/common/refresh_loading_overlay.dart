@@ -21,11 +21,11 @@ class RefreshLoadingOverlay extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    
+
     return Stack(
       children: [
         child,
-        
+
         // Loading overlay
         if (isLoading)
           Container(
@@ -100,25 +100,21 @@ class _ListLoadingIndicatorState extends State<ListLoadingIndicator>
   @override
   void initState() {
     super.initState();
-    
+
     _pulseController = AnimationController(
       duration: const Duration(milliseconds: 1200),
       vsync: this,
     );
-    
+
     _shimmerController = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-    
-    _pulseAnimation = Tween<double>(
-      begin: 0.8,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _pulseController,
-      curve: Curves.easeInOut,
-    ));
-    
+
+    _pulseAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
+      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    );
+
     _pulseController.repeat(reverse: true);
     _shimmerController.repeat();
   }
@@ -135,7 +131,7 @@ class _ListLoadingIndicatorState extends State<ListLoadingIndicator>
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
     final primaryColor = widget.color ?? const Color(0xFFD32F2F);
-    
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -164,9 +160,9 @@ class _ListLoadingIndicatorState extends State<ListLoadingIndicator>
               );
             },
           ),
-          
+
           const SizedBox(height: 24),
-          
+
           // Enhanced message with typing effect
           Text(
             widget.message,
@@ -177,9 +173,9 @@ class _ListLoadingIndicatorState extends State<ListLoadingIndicator>
             ),
             textAlign: TextAlign.center,
           ),
-          
+
           const SizedBox(height: 8),
-          
+
           Text(
             'Please wait...',
             style: TextStyle(
@@ -187,7 +183,7 @@ class _ListLoadingIndicatorState extends State<ListLoadingIndicator>
               fontSize: 14,
             ),
           ),
-          
+
           if (widget.showShimmer) ...[
             const SizedBox(height: 40),
             // Shimmer placeholder cards
@@ -201,7 +197,7 @@ class _ListLoadingIndicatorState extends State<ListLoadingIndicator>
   Widget _buildShimmerCard(BuildContext context, int index) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    
+
     return Container(
       margin: EdgeInsets.only(
         bottom: 12,
@@ -250,7 +246,12 @@ class _ListLoadingIndicatorState extends State<ListLoadingIndicator>
     );
   }
 
-  Widget _buildShimmerBox(double width, double height, {double borderRadius = 6, bool isCircle = false}) {
+  Widget _buildShimmerBox(
+    double width,
+    double height, {
+    double borderRadius = 6,
+    bool isCircle = false,
+  }) {
     return AnimatedBuilder(
       animation: _shimmerController,
       builder: (context, child) {
@@ -263,11 +264,7 @@ class _ListLoadingIndicatorState extends State<ListLoadingIndicator>
             gradient: LinearGradient(
               begin: Alignment(-1.0 + 2.0 * _shimmerController.value, 0.0),
               end: Alignment(1.0 + 2.0 * _shimmerController.value, 0.0),
-              colors: [
-                Colors.grey[300]!,
-                Colors.grey[100]!,
-                Colors.grey[300]!,
-              ],
+              colors: [Colors.grey[300]!, Colors.grey[100]!, Colors.grey[300]!],
             ),
           ),
         );
@@ -291,9 +288,7 @@ class RefreshFeedback {
         backgroundColor: Colors.green,
         duration: const Duration(seconds: 2),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }
@@ -311,9 +306,7 @@ class RefreshFeedback {
         backgroundColor: Colors.red,
         duration: const Duration(seconds: 3),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     );
   }

@@ -5,5 +5,11 @@ class SelectedService {
   final String? brand;
   final String? type;
 
-  SelectedService({required this.name, this.price, this.details, this.brand, this.type});
+  SelectedService({
+    required this.name,
+    this.price,
+    this.details,
+    this.brand,
+    this.type,
+  });
 }

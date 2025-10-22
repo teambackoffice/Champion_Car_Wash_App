@@ -4,7 +4,7 @@ import 'package:flutter/foundation.dart';
 
 class ServiceTypeController extends ChangeNotifier {
   final CarWashService _service = CarWashService();
-  
+
   List<ServiceType> _serviceTypes = [];
   bool _isLoading = false;
   String? _error;
@@ -20,10 +20,10 @@ class ServiceTypeController extends ChangeNotifier {
   Future<void> loadServiceTypes() async {
     _setLoading(true);
     _clearError();
-    
+
     try {
       final response = await _service.getServiceTypes();
-      
+
       if (response.error != null) {
         _setError(response.error!);
       } else {
@@ -55,11 +55,17 @@ class ServiceTypeController extends ChangeNotifier {
   // Filter service types
   List<ServiceType> filterServiceTypes(String query) {
     if (query.isEmpty) return _serviceTypes;
-    
-    return _serviceTypes.where((service) =>
-      service.name.toLowerCase().contains(query.toLowerCase()) ||
-      (service.description?.toLowerCase().contains(query.toLowerCase()) ?? false)
-    ).toList();
+
+    return _serviceTypes
+        .where(
+          (service) =>
+              service.name.toLowerCase().contains(query.toLowerCase()) ||
+              (service.description?.toLowerCase().contains(
+                    query.toLowerCase(),
+                  ) ??
+                  false),
+        )
+        .toList();
   }
 
   // Clear all data

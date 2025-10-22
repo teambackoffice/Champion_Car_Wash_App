@@ -91,9 +91,12 @@ class ServiceData {
         chasisNumber: json['chasis_number'] ?? '',
         registrationNumber: json['registration_number'] ?? '',
         fuelLevel: (json['fuel_level'] as num?)?.toDouble() ?? 0.0,
-        lastServiceOdometer: (json['last_service_odometer'] as num?)?.toDouble() ?? 0.0,
-        currentOdometerReading: (json['current_odometer_reading'] as num?)?.toDouble() ?? 0.0,
-        nextServiceOdometer: (json['next_service_odometer'] as num?)?.toDouble() ?? 0.0,
+        lastServiceOdometer:
+            (json['last_service_odometer'] as num?)?.toDouble() ?? 0.0,
+        currentOdometerReading:
+            (json['current_odometer_reading'] as num?)?.toDouble() ?? 0.0,
+        nextServiceOdometer:
+            (json['next_service_odometer'] as num?)?.toDouble() ?? 0.0,
         video: json['video'],
         services: List<GetAllServiceItem>.from(
           (json['services'] ?? []).map((x) => GetAllServiceItem.fromJson(x)),
@@ -121,7 +124,6 @@ class GetAllServiceItem {
   });
 
   factory GetAllServiceItem.fromJson(Map<String, dynamic> json) {
-
     try {
       final item = GetAllServiceItem(
         serviceType: json['service_type'] ?? '',

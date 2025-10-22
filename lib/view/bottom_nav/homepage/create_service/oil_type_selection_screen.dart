@@ -6,8 +6,11 @@ class OilTypeSelectionScreen extends StatefulWidget {
   final List<OilType> oilTypes;
   final String brandName;
 
-  const OilTypeSelectionScreen(
-      {super.key, required this.oilTypes, required this.brandName});
+  const OilTypeSelectionScreen({
+    super.key,
+    required this.oilTypes,
+    required this.brandName,
+  });
 
   @override
   State<OilTypeSelectionScreen> createState() => _OilTypeSelectionScreenState();
@@ -40,7 +43,9 @@ class _OilTypeSelectionScreenState extends State<OilTypeSelectionScreen> {
                   },
                   child: Container(
                     margin: const EdgeInsets.symmetric(
-                        vertical: 8, horizontal: 20),
+                      vertical: 8,
+                      horizontal: 20,
+                    ),
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: isSelected

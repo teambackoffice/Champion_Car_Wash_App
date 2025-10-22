@@ -13,24 +13,27 @@ List<dynamic> _decodeHistory(String jsonString) {
 /// Payment History Service
 /// Stores and manages all payment transactions across different payment methods
 class PaymentHistoryService {
-  static final PaymentHistoryService _instance = PaymentHistoryService._internal();
+  static final PaymentHistoryService _instance =
+      PaymentHistoryService._internal();
   factory PaymentHistoryService() => _instance;
   PaymentHistoryService._internal();
 
   static PaymentHistoryService get instance => _instance;
 
   final List<PaymentHistoryRecord> _paymentHistory = [];
-  final StreamController<List<PaymentHistoryRecord>> _historyController = 
+  final StreamController<List<PaymentHistoryRecord>> _historyController =
       StreamController<List<PaymentHistoryRecord>>.broadcast();
 
   // Storage keys
   static const String _historyFilename = 'payment_history.json';
 
   /// Get payment history stream
-  Stream<List<PaymentHistoryRecord>> get historyStream => _historyController.stream;
+  Stream<List<PaymentHistoryRecord>> get historyStream =>
+      _historyController.stream;
 
   /// Get current payment history
-  List<PaymentHistoryRecord> get paymentHistory => List.unmodifiable(_paymentHistory);
+  List<PaymentHistoryRecord> get paymentHistory =>
+      List.unmodifiable(_paymentHistory);
 
   /// Initialize payment history service
   Future<void> initialize() async {
@@ -40,7 +43,9 @@ class PaymentHistoryService {
       }
       await _loadPaymentHistory();
       if (kDebugMode) {
-        print('PaymentHistory: Service initialized with ${_paymentHistory.length} records');
+        print(
+          'PaymentHistory: Service initialized with ${_paymentHistory.length} records',
+        );
       }
     } catch (e) {
       if (kDebugMode) {
@@ -91,7 +96,9 @@ class PaymentHistoryService {
       _historyController.add(_paymentHistory);
 
       if (kDebugMode) {
-        print('PaymentHistory: Added record ${record.id} - ${record.paymentMethod} - ${record.status.name}');
+        print(
+          'PaymentHistory: Added record ${record.id} - ${record.paymentMethod} - ${record.status.name}',
+        );
         print('PaymentHistory: Total records: ${_paymentHistory.length}');
       }
     } catch (e) {
@@ -105,8 +112,12 @@ class PaymentHistoryService {
   Future<PaymentStats> getPaymentStats() async {
     try {
       final totalPayments = _paymentHistory.length;
-      final successfulPayments = _paymentHistory.where((p) => p.status == PaymentStatus.completed).length;
-      final failedPayments = _paymentHistory.where((p) => p.status == PaymentStatus.failed).length;
+      final successfulPayments = _paymentHistory
+          .where((p) => p.status == PaymentStatus.completed)
+          .length;
+      final failedPayments = _paymentHistory
+          .where((p) => p.status == PaymentStatus.failed)
+          .length;
       final totalAmount = _paymentHistory
           .where((p) => p.status == PaymentStatus.completed)
           .fold(0.0, (sum, p) => sum + p.amount);
@@ -114,7 +125,8 @@ class PaymentHistoryService {
       // Group by payment method
       final methodStats = <String, int>{};
       for (final payment in _paymentHistory) {
-        methodStats[payment.paymentMethod] = (methodStats[payment.paymentMethod] ?? 0) + 1;
+        methodStats[payment.paymentMethod] =
+            (methodStats[payment.paymentMethod] ?? 0) + 1;
       }
 
       // Group by date (last 7 days)
@@ -122,12 +134,14 @@ class PaymentHistoryService {
       final dailyStats = <String, int>{};
       for (int i = 6; i >= 0; i--) {
         final date = now.subtract(Duration(days: i));
-        final dateKey = '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
+        final dateKey =
+            '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
         dailyStats[dateKey] = 0;
       }
 
       for (final payment in _paymentHistory) {
-        final dateKey = '${payment.timestamp.year}-${payment.timestamp.month.toString().padLeft(2, '0')}-${payment.timestamp.day.toString().padLeft(2, '0')}';
+        final dateKey =
+            '${payment.timestamp.year}-${payment.timestamp.month.toString().padLeft(2, '0')}-${payment.timestamp.day.toString().padLeft(2, '0')}';
         if (dailyStats.containsKey(dateKey)) {
           dailyStats[dateKey] = dailyStats[dateKey]! + 1;
         }
@@ -138,7 +152,9 @@ class PaymentHistoryService {
         successfulPayments: successfulPayments,
         failedPayments: failedPayments,
         totalAmount: totalAmount,
-        successRate: totalPayments > 0 ? (successfulPayments / totalPayments * 100) : 0.0,
+        successRate: totalPayments > 0
+            ? (successfulPayments / totalPayments * 100)
+            : 0.0,
         methodStats: methodStats,
         dailyStats: dailyStats,
         lastUpdated: DateTime.now(),
@@ -162,21 +178,28 @@ class PaymentHistoryService {
   }
 
   /// Get payments by date range
-  List<PaymentHistoryRecord> getPaymentsByDateRange(DateTime start, DateTime end) {
-    return _paymentHistory.where((p) => 
-        p.timestamp.isAfter(start) && p.timestamp.isBefore(end)).toList();
+  List<PaymentHistoryRecord> getPaymentsByDateRange(
+    DateTime start,
+    DateTime end,
+  ) {
+    return _paymentHistory
+        .where((p) => p.timestamp.isAfter(start) && p.timestamp.isBefore(end))
+        .toList();
   }
 
   /// Search payments
   List<PaymentHistoryRecord> searchPayments(String query) {
     final lowerQuery = query.toLowerCase();
-    return _paymentHistory.where((p) => 
-        p.orderId.toLowerCase().contains(lowerQuery) ||
-        (p.transactionId?.toLowerCase().contains(lowerQuery) ?? false) ||
-        (p.customerName?.toLowerCase().contains(lowerQuery) ?? false) ||
-        (p.customerPhone?.toLowerCase().contains(lowerQuery) ?? false) ||
-        p.paymentMethod.toLowerCase().contains(lowerQuery)
-    ).toList();
+    return _paymentHistory
+        .where(
+          (p) =>
+              p.orderId.toLowerCase().contains(lowerQuery) ||
+              (p.transactionId?.toLowerCase().contains(lowerQuery) ?? false) ||
+              (p.customerName?.toLowerCase().contains(lowerQuery) ?? false) ||
+              (p.customerPhone?.toLowerCase().contains(lowerQuery) ?? false) ||
+              p.paymentMethod.toLowerCase().contains(lowerQuery),
+        )
+        .toList();
   }
 
   /// Clear all payment history
@@ -227,13 +250,20 @@ class PaymentHistoryService {
       if (await file.exists()) {
         final historyJson = await file.readAsString();
         if (historyJson.isNotEmpty) {
-          final List<dynamic> historyList = await compute(_decodeHistory, historyJson);
+          final List<dynamic> historyList = await compute(
+            _decodeHistory,
+            historyJson,
+          );
           _paymentHistory.clear();
           _paymentHistory.addAll(
-            historyList.map((json) => PaymentHistoryRecord.fromJson(json)).toList()
+            historyList
+                .map((json) => PaymentHistoryRecord.fromJson(json))
+                .toList(),
           );
           if (kDebugMode) {
-            print('PaymentHistory: Loaded ${_paymentHistory.length} records from storage');
+            print(
+              'PaymentHistory: Loaded ${_paymentHistory.length} records from storage',
+            );
           }
         }
       }
@@ -251,7 +281,10 @@ class PaymentHistoryService {
         _paymentHistory.removeRange(1000, _paymentHistory.length);
       }
 
-      final historyJson = await compute(jsonEncode, _paymentHistory.map((p) => p.toJson()).toList());
+      final historyJson = await compute(
+        jsonEncode,
+        _paymentHistory.map((p) => p.toJson()).toList(),
+      );
       final file = await _getHistoryFile();
       await file.writeAsString(historyJson);
     } catch (e) {
@@ -314,7 +347,9 @@ class PaymentHistoryRecord {
         (s) => s.name == json['status'],
         orElse: () => PaymentStatus.failed,
       ),
-      timestamp: DateTime.parse(json['timestamp'] ?? DateTime.now().toIso8601String()),
+      timestamp: DateTime.parse(
+        json['timestamp'] ?? DateTime.now().toIso8601String(),
+      ),
       transactionId: json['transactionId'],
       cardLastFour: json['cardLastFour'],
       authCode: json['authCode'],

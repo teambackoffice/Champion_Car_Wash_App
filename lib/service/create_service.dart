@@ -65,7 +65,8 @@ class CreateService {
           return {
             'success': true,
             'data': decodedBody,
-            'message': decodedBody['message']['message'] ??
+            'message':
+                decodedBody['message']['message'] ??
                 'Service created successfully',
           };
         } else {
@@ -76,7 +77,8 @@ class CreateService {
                 decodedBody['message']?['message'] ?? 'Unknown server error',
             'statusCode': response.statusCode,
             'message':
-                decodedBody['message']?['message'] ?? 'Failed to create service',
+                decodedBody['message']?['message'] ??
+                'Failed to create service',
           };
         }
       } else {
@@ -85,7 +87,8 @@ class CreateService {
           'success': false,
           'error': response.reasonPhrase,
           'statusCode': response.statusCode,
-          'message': decodedBody['message']?['message'] ?? 'Failed to create service',
+          'message':
+              decodedBody['message']?['message'] ?? 'Failed to create service',
         };
       }
     } catch (e) {

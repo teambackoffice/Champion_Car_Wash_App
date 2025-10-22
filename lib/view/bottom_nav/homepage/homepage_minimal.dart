@@ -42,17 +42,14 @@ class HomePageMinimal extends StatelessWidget {
                     SizedBox(height: 8),
                     Text(
                       'Performance Mode Active',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.white70,
-                      ),
+                      style: TextStyle(fontSize: 14, color: Colors.white70),
                     ),
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               // Simple action buttons
               _buildActionButton(
                 context: context,
@@ -64,9 +61,9 @@ class HomePageMinimal extends StatelessWidget {
                   // TODO: Navigate to create service
                 },
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               _buildActionButton(
                 context: context,
                 title: 'View Bookings',
@@ -77,9 +74,9 @@ class HomePageMinimal extends StatelessWidget {
                   // TODO: Navigate to bookings
                 },
               ),
-              
+
               const SizedBox(height: 16),
-              
+
               _buildActionButton(
                 context: context,
                 title: 'Profile',
@@ -90,9 +87,9 @@ class HomePageMinimal extends StatelessWidget {
                   // TODO: Navigate to profile
                 },
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               // Performance info
               Container(
                 padding: const EdgeInsets.all(16),
@@ -105,19 +102,12 @@ class HomePageMinimal extends StatelessWidget {
                 ),
                 child: const Row(
                   children: [
-                    Icon(
-                      Icons.speed,
-                      color: Colors.orange,
-                      size: 20,
-                    ),
+                    Icon(Icons.speed, color: Colors.orange, size: 20),
                     SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         'Minimal UI loaded for better performance',
-                        style: TextStyle(
-                          color: Colors.orange,
-                          fontSize: 12,
-                        ),
+                        style: TextStyle(color: Colors.orange, fontSize: 12),
                       ),
                     ),
                   ],
@@ -156,10 +146,7 @@ class HomePageMinimal extends StatelessWidget {
             const SizedBox(width: 12),
             Text(
               title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ],
         ),

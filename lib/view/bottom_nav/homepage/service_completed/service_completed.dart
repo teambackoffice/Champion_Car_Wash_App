@@ -36,15 +36,17 @@ class _ServiceCompletedScreenState extends State<ServiceCompletedScreen> {
 
     if (mounted) {
       print('✅ [SERVICE_COMPLETED] Initial fetch starting...');
-      
+
       final controller = Provider.of<GetCompletedController>(
         context,
         listen: false,
       );
-      
+
       try {
         await controller.fetchcompletedlist();
-        print('✅ [SERVICE_COMPLETED] Initial fetch completed - ${controller.bookingData.length} services');
+        print(
+          '✅ [SERVICE_COMPLETED] Initial fetch completed - ${controller.bookingData.length} services',
+        );
       } catch (e) {
         print('❌ [SERVICE_COMPLETED] Initial fetch failed: $e');
       }
@@ -58,33 +60,39 @@ class _ServiceCompletedScreenState extends State<ServiceCompletedScreen> {
   }
 
   Future<void> _refreshData() async {
-    print('🔄 [SERVICE_COMPLETED] Pull-to-refresh triggered - FORCING API CALL');
-    
+    print(
+      '🔄 [SERVICE_COMPLETED] Pull-to-refresh triggered - FORCING API CALL',
+    );
+
     final controller = Provider.of<GetCompletedController>(
       context,
       listen: false,
     );
-    
+
     try {
-      print('📋 [SERVICE_COMPLETED] Fetching fresh completed services from API...');
+      print(
+        '📋 [SERVICE_COMPLETED] Fetching fresh completed services from API...',
+      );
       // FORCE REFRESH: Always call API on pull-to-refresh
       await controller.fetchcompletedlist(forceRefresh: true);
-      print('✅ [SERVICE_COMPLETED] Fresh completed services fetched successfully - ${controller.bookingData.length} services');
-      
+      print(
+        '✅ [SERVICE_COMPLETED] Fresh completed services fetched successfully - ${controller.bookingData.length} services',
+      );
+
       // Show success feedback
       if (mounted) {
         RefreshFeedback.showSuccess(
           context,
-          'Refreshed ${controller.bookingData.length} completed services'
+          'Refreshed ${controller.bookingData.length} completed services',
         );
       }
     } catch (e) {
       print('❌ [SERVICE_COMPLETED] Error refreshing completed services: $e');
-      
+
       if (mounted) {
         RefreshFeedback.showError(
           context,
-          'Failed to refresh completed services: $e'
+          'Failed to refresh completed services: $e',
         );
       }
     }
@@ -177,13 +185,16 @@ class _ServiceCompletedScreenState extends State<ServiceCompletedScreen> {
                   onChanged: (value) {
                     // PERFORMANCE FIX: Debounce search to avoid filtering on every keystroke
                     _debounceTimer?.cancel();
-                    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
-                      if (mounted) {
-                        setState(() {
-                          _searchQuery = value.toLowerCase().trim();
-                        });
-                      }
-                    });
+                    _debounceTimer = Timer(
+                      const Duration(milliseconds: 300),
+                      () {
+                        if (mounted) {
+                          setState(() {
+                            _searchQuery = value.toLowerCase().trim();
+                          });
+                        }
+                      },
+                    );
                   },
                   decoration: InputDecoration(
                     hintText: 'Search Customer by Vehicle Number',
@@ -207,7 +218,6 @@ class _ServiceCompletedScreenState extends State<ServiceCompletedScreen> {
           if (_isInitialLoading || controller.isLoading) {
             return const ListLoadingIndicator(
               message: 'Loading completed services...',
-              showShimmer: true,
             );
           }
 

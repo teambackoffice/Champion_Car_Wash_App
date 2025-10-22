@@ -104,15 +104,14 @@ class _OptimizedTextFieldState extends State<OptimizedTextField> {
         inputFormatters: widget.inputFormatters,
 
         // AutofillHints for better keyboard suggestions
-        autofillHints: widget.autofillHint != null ? [widget.autofillHint!] : null,
+        autofillHints: widget.autofillHint != null
+            ? [widget.autofillHint!]
+            : null,
 
         // Use debounced onChanged
         onChanged: _onChangedDebounced,
 
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-        ),
+        style: const TextStyle(color: Colors.white, fontSize: 16),
 
         decoration: InputDecoration(
           hintText: widget.hintText,
@@ -136,7 +135,10 @@ class _OptimizedTextFieldState extends State<OptimizedTextField> {
           errorBorder: _buildBorder(Colors.red),
           focusedErrorBorder: _buildBorder(Colors.red, width: 2),
 
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 14,
+          ),
 
           // Show error without red border unless required
           errorStyle: const TextStyle(color: Colors.red, fontSize: 12),
@@ -160,7 +162,8 @@ class _OptimizedTextFieldState extends State<OptimizedTextField> {
 
 /// Mixin to preserve scroll position and state in complex forms
 /// Use with StatefulWidget that needs to maintain state during scrolling
-mixin FormPageMixin<T extends StatefulWidget> on State<T>, AutomaticKeepAliveClientMixin<T> {
+mixin FormPageMixin<T extends StatefulWidget>
+    on State<T>, AutomaticKeepAliveClientMixin<T> {
   @override
   bool get wantKeepAlive => true;
 }

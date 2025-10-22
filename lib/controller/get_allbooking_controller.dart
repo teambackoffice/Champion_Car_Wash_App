@@ -23,11 +23,11 @@ class GetAllbookingController extends ChangeNotifier {
   // OPTIMIZATION: Enhanced fetch with time-based caching
   Future<void> fetchBookingList({bool forceRefresh = false}) async {
     final now = DateTime.now();
-    
+
     // Check cache validity
     if (!forceRefresh && _lastFetchTime != null && allbooking != null) {
       final timeSinceLastFetch = now.difference(_lastFetchTime!);
-      
+
       // If cache is still valid, return immediately
       if (timeSinceLastFetch < _cacheValidDuration) {
         // If approaching expiry, trigger background refresh
@@ -102,11 +102,14 @@ class GetAllbookingController extends ChangeNotifier {
   List<ServiceData> searchBookings(String query) {
     if (query.isEmpty) return bookingData;
     final lowerQuery = query.toLowerCase();
-    return bookingData.where((booking) => 
-      booking.customerName.toLowerCase().contains(lowerQuery) ||
-      booking.registrationNumber.toLowerCase().contains(lowerQuery) ||
-      booking.phone.toLowerCase().contains(lowerQuery)
-    ).toList();
+    return bookingData
+        .where(
+          (booking) =>
+              booking.customerName.toLowerCase().contains(lowerQuery) ||
+              booking.registrationNumber.toLowerCase().contains(lowerQuery) ||
+              booking.phone.toLowerCase().contains(lowerQuery),
+        )
+        .toList();
   }
 
   // Clear error

@@ -19,7 +19,6 @@ class OptimizedCreateServiceExample extends StatefulWidget {
 class _OptimizedCreateServiceExampleState
     extends State<OptimizedCreateServiceExample>
     with FocusManagementMixin, AutomaticKeepAliveClientMixin {
-
   // ✅ OPTIMIZATION: Keep state alive during scroll
   @override
   bool get wantKeepAlive => true;
@@ -105,14 +104,8 @@ class _OptimizedCreateServiceExampleState
         suffixIcon: Icons.calendar_today,
         onTap: () => _selectDate(context),
       ),
-      _FieldConfig(
-        controller: _controllers[8],
-        hintText: 'Engine Number',
-      ),
-      _FieldConfig(
-        controller: _controllers[9],
-        hintText: 'Chassis Number',
-      ),
+      _FieldConfig(controller: _controllers[8], hintText: 'Engine Number'),
+      _FieldConfig(controller: _controllers[9], hintText: 'Chassis Number'),
 
       // Additional fields...
       _FieldConfig(
@@ -121,10 +114,7 @@ class _OptimizedCreateServiceExampleState
         keyboardType: TextInputType.number,
         suffixIcon: Icons.speed,
       ),
-      _FieldConfig(
-        controller: _controllers[11],
-        hintText: 'Color',
-      ),
+      _FieldConfig(controller: _controllers[11], hintText: 'Color'),
       _FieldConfig(
         controller: _controllers[12],
         hintText: 'Notes',
@@ -163,7 +153,10 @@ class _OptimizedCreateServiceExampleState
       backgroundColor: const Color(0xFF1A1A1A),
       appBar: AppBar(
         backgroundColor: const Color(0xFF2A2A2A),
-        title: const Text('Create Service', style: TextStyle(color: Colors.white)),
+        title: const Text(
+          'Create Service',
+          style: TextStyle(color: Colors.white),
+        ),
         iconTheme: const IconThemeData(color: Colors.white),
       ),
 

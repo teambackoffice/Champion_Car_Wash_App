@@ -9,7 +9,7 @@ import '../monitoring/performance_monitor.dart';
 /// Provides command-line interface and automated test execution capabilities
 class AutomatedPerformanceTestRunner {
   static const String _version = '1.0.0';
-  
+
   final Map<String, Function> _testSuites = {
     'startup': () => PerformanceTestSuite.runStartupTests(),
     'memory': () => PerformanceTestSuite.runMemoryTests(),
@@ -17,30 +17,29 @@ class AutomatedPerformanceTestRunner {
     'api': () => PerformanceTestSuite.runAPITests(),
     'all': () => PerformanceTestSuite.runAllTests(),
   };
-  
+
   /// Run performance tests based on command-line arguments
   Future<void> runFromCommandLine(List<String> args) async {
     try {
       final config = _parseArguments(args);
-      
+
       if (config['help'] == true) {
         _printHelp();
         return;
       }
-      
+
       if (config['version'] == true) {
         print('Champion Car Wash Performance Test Runner v$_version');
         return;
       }
-      
+
       await _executeTests(config);
-      
     } catch (e) {
       print('Error: $e');
       exit(1);
     }
   }
-  
+
   /// Execute performance tests based on configuration
   Future<void> _executeTests(Map<String, dynamic> config) async {
     final testSuite = config['suite'] as String? ?? 'all';
@@ -54,10 +53,10 @@ class AutomatedPerformanceTestRunner {
         print('Output file: $outputFile');
       }
     }
-    
+
     final startTime = DateTime.now();
     List<TestResults> results = [];
-    
+
     try {
       // Initialize performance monitoring
       PerformanceMonitor.instance.startMonitoring();
@@ -82,12 +81,11 @@ class AutomatedPerformanceTestRunner {
 
       // Generate and display results
       await _processResults(results, duration, config);
-
     } finally {
       PerformanceMonitor.instance.stopMonitoring();
     }
   }
-  
+
   /// Process and output test results
   Future<void> _processResults(
     List<TestResults> results,
@@ -97,10 +95,12 @@ class AutomatedPerformanceTestRunner {
     final verbose = config['verbose'] as bool? ?? false;
     final jsonOutput = config['json'] as bool? ?? false;
     final outputFile = config['output'] as String?;
-    
+
     // Calculate overall score
-    final overallScore = await PerformanceTestSuite.calculatePerformanceScore(results);
-    
+    final overallScore = await PerformanceTestSuite.calculatePerformanceScore(
+      results,
+    );
+
     // Generate report
     String report;
     if (jsonOutput) {
@@ -108,7 +108,7 @@ class AutomatedPerformanceTestRunner {
     } else {
       report = _generateTextReport(results, overallScore, duration, verbose);
     }
-    
+
     // Output results
     if (outputFile != null) {
       await File(outputFile).writeAsString(report);
@@ -116,19 +116,19 @@ class AutomatedPerformanceTestRunner {
     } else {
       print(report);
     }
-    
+
     // Exit with appropriate code
     final allPassed = results.every((result) => result.passed);
     exit(allPassed ? 0 : 1);
   }
-  
+
   /// Parse command-line arguments
   Map<String, dynamic> _parseArguments(List<String> args) {
     final config = <String, dynamic>{};
-    
+
     for (int i = 0; i < args.length; i++) {
       final arg = args[i];
-      
+
       switch (arg) {
         case '--help':
         case '-h':
@@ -166,10 +166,10 @@ class AutomatedPerformanceTestRunner {
           }
       }
     }
-    
+
     return config;
   }
-  
+
   /// Generate JSON format report
   String _generateJsonReport(
     List<TestResults> results,
@@ -184,20 +184,24 @@ class AutomatedPerformanceTestRunner {
         'grade': overallScore.grade,
         'breakdown': overallScore.breakdown,
       },
-      'test_results': results.map((result) => {
-        'test_name': result.testName,
-        'passed': result.passed,
-        'actual_value': result.actualValue,
-        'target_value': result.targetValue,
-        'unit': result.unit,
-        'timestamp': result.timestamp.toIso8601String(),
-        'additional_metrics': result.additionalMetrics,
-      }).toList(),
+      'test_results': results
+          .map(
+            (result) => {
+              'test_name': result.testName,
+              'passed': result.passed,
+              'actual_value': result.actualValue,
+              'target_value': result.targetValue,
+              'unit': result.unit,
+              'timestamp': result.timestamp.toIso8601String(),
+              'additional_metrics': result.additionalMetrics,
+            },
+          )
+          .toList(),
     };
-    
+
     return const JsonEncoder.withIndent('  ').convert(report);
   }
-  
+
   /// Generate text format report
   String _generateTextReport(
     List<TestResults> results,
@@ -206,28 +210,30 @@ class AutomatedPerformanceTestRunner {
     bool verbose,
   ) {
     final buffer = StringBuffer();
-    
+
     buffer.writeln('Champion Car Wash Performance Test Results');
     buffer.writeln('=' * 50);
     buffer.writeln('Test Duration: ${duration.inSeconds}s');
-    buffer.writeln('Overall Score: ${overallScore.score.toStringAsFixed(1)}/10 (${overallScore.grade})');
+    buffer.writeln(
+      'Overall Score: ${overallScore.score.toStringAsFixed(1)}/10 (${overallScore.grade})',
+    );
     buffer.writeln();
-    
+
     // Test results summary
     final passed = results.where((r) => r.passed).length;
     final total = results.length;
     buffer.writeln('Tests Passed: $passed/$total');
     buffer.writeln();
-    
+
     // Individual test results
     for (final result in results) {
       final status = result.passed ? '✓ PASS' : '✗ FAIL';
       buffer.writeln('$status ${result.testName}');
-      
+
       if (verbose || !result.passed) {
         buffer.writeln('  Target: ${result.targetValue} ${result.unit}');
         buffer.writeln('  Actual: ${result.actualValue} ${result.unit}');
-        
+
         if (result.additionalMetrics.isNotEmpty) {
           buffer.writeln('  Additional metrics:');
           result.additionalMetrics.forEach((key, value) {
@@ -237,7 +243,7 @@ class AutomatedPerformanceTestRunner {
       }
       buffer.writeln();
     }
-    
+
     // Performance breakdown
     if (verbose && overallScore.breakdown.isNotEmpty) {
       buffer.writeln('Performance Breakdown:');
@@ -246,10 +252,10 @@ class AutomatedPerformanceTestRunner {
       });
       buffer.writeln();
     }
-    
+
     return buffer.toString();
   }
-  
+
   /// Print help information
   void _printHelp() {
     print('''

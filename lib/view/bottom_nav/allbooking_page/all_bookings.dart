@@ -15,7 +15,7 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
   final TextEditingController _searchController = TextEditingController();
   DateTime? _selectedDate;
   String _searchQuery = '';
-  
+
   // OPTIMIZATION: Debouncing and caching for search
   Timer? _debounceTimer;
   final Map<String, List<dynamic>> _searchCache = {};
@@ -71,11 +71,9 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
       lastDate: DateTime.now().add(const Duration(days: 365)),
       builder: (context, child) {
         return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: Colors.red,
-            ),
-          ),
+          data: Theme.of(
+            context,
+          ).copyWith(colorScheme: const ColorScheme.light(primary: Colors.red)),
           child: child!,
         );
       },
@@ -100,16 +98,17 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
     // Check if we can use cached results
     final currentQuery = _searchQuery;
     final currentDate = _selectedDate;
-    
-    if (_cachedFilteredResults != null && 
-        _lastSearchQuery == currentQuery && 
+
+    if (_cachedFilteredResults != null &&
+        _lastSearchQuery == currentQuery &&
         _lastSelectedDate == currentDate) {
       return _cachedFilteredResults!;
     }
-    
+
     // Create cache key for this filter combination
-    final cacheKey = '${currentQuery}_${currentDate?.toIso8601String() ?? 'null'}';
-    
+    final cacheKey =
+        '${currentQuery}_${currentDate?.toIso8601String() ?? 'null'}';
+
     // Check if we have this combination cached
     if (_searchCache.containsKey(cacheKey)) {
       _cachedFilteredResults = _searchCache[cacheKey]!;
@@ -117,7 +116,7 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
       _lastSelectedDate = currentDate;
       return _cachedFilteredResults!;
     }
-    
+
     // Perform filtering
     final filtered = bookings.where((booking) {
       // Search filter - check registration number
@@ -142,7 +141,7 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
 
       return matchesSearch && matchesDate;
     }).toList();
-    
+
     // Cache the results (limit cache size to prevent memory issues)
     if (_searchCache.length > 20) {
       _searchCache.clear(); // Clear cache if it gets too large
@@ -151,7 +150,7 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
     _cachedFilteredResults = filtered;
     _lastSearchQuery = currentQuery;
     _lastSelectedDate = currentDate;
-    
+
     return filtered;
   }
 
@@ -228,7 +227,9 @@ class _AllBookingsPageState extends State<AllBookingsPage> {
                                 end: Alignment.bottomRight,
                               )
                             : null,
-                        color: _selectedDate != null ? null : const Color(0xFF3D3D3D),
+                        color: _selectedDate != null
+                            ? null
+                            : const Color(0xFF3D3D3D),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
                           color: _selectedDate != null
@@ -532,10 +533,7 @@ class _BookingCard extends StatelessWidget {
                   ),
                   child: Text(
                     booking.status,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                    ),
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
                   ),
                 ),
               ],

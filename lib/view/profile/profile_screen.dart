@@ -26,7 +26,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       storage.read(key: 'branch'),
       storage.read(key: 'email'),
     ]);
-    
+
     setState(() {
       fullname = results[0] ?? '';
       branch = results[1] ?? '';
@@ -43,9 +43,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         foregroundColor: Colors.white,
         title: const Text(
           'Profile',
-          style: TextStyle(
-            fontWeight: FontWeight.w600,
-          ),
+          style: TextStyle(fontWeight: FontWeight.w600),
         ),
         elevation: 0,
         leading: IconButton(
@@ -65,15 +63,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   gradient: const LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [
-                      Color(0xFF2C2C2C),
-                      Color(0xFF404040),
-                    ],
+                    colors: [Color(0xFF2C2C2C), Color(0xFF404040)],
                   ),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(
                     color: Colors.white.withValues(alpha: 0.1),
-                    width: 1,
                   ),
                 ),
                 child: Column(
@@ -122,9 +116,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ],
                 ),
               ),
-              
+
               const SizedBox(height: 24),
-              
+
               // Profile Options
               _buildProfileOption(
                 icon: Icons.person_outline,
@@ -180,7 +174,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: Colors.white.withValues(alpha: 0.1),
-              width: 1,
             ),
           ),
           child: Row(
@@ -219,10 +212,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: const Color(0xFF2C2C2C),
-          title: const Text(
-            'Logout',
-            style: TextStyle(color: Colors.white),
-          ),
+          title: const Text('Logout', style: TextStyle(color: Colors.white)),
           content: const Text(
             'Are you sure you want to logout?',
             style: TextStyle(color: Colors.white70),
@@ -241,10 +231,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 Navigator.pop(context);
                 Navigator.pop(context);
               },
-              child: const Text(
-                'Logout',
-                style: TextStyle(color: Colors.red),
-              ),
+              child: const Text('Logout', style: TextStyle(color: Colors.red)),
             ),
           ],
         );

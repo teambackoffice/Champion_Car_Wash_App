@@ -35,10 +35,6 @@ class CarMakesController extends ChangeNotifier {
     }
   }
 
-  
-
-  
-
   CarMake? findMakeByName(String name) {
     try {
       return _makes.firstWhere(
@@ -51,11 +47,9 @@ class CarMakesController extends ChangeNotifier {
 
   List<CarMake> searchMakes(String query) {
     if (query.isEmpty) return _makes;
-    
-    return _makes.where((make) =>
-      make.name.toLowerCase().contains(query.toLowerCase())
-    ).toList();
+
+    return _makes
+        .where((make) => make.name.toLowerCase().contains(query.toLowerCase()))
+        .toList();
   }
-
-
 }

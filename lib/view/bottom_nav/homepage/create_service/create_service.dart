@@ -412,7 +412,9 @@ class _CreateServicePageState extends State<CreateServicePage> {
                           ? 'Video recorded successfully'
                           : 'Tap to record inspection video',
                       style: TextStyle(
-                        color: _videoPath != null ? Colors.green : Colors.orange,
+                        color: _videoPath != null
+                            ? Colors.green
+                            : Colors.orange,
                         fontSize: 14,
                       ),
                     ),
@@ -458,7 +460,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
     }
 
     return DropdownButtonFormField<String>(
-      value: _selectedMake,
+      initialValue: _selectedMake,
       hint: Text('Select Make', style: TextStyle(color: Colors.grey[500])),
       style: const TextStyle(color: Colors.white),
       dropdownColor: const Color(0xFF2A2A2A),
@@ -499,14 +501,17 @@ class _CreateServicePageState extends State<CreateServicePage> {
         }
 
         return DropdownButtonFormField<String>(
-          value: _selectedModel,
+          initialValue: _selectedModel,
           hint: Text('Select Model', style: TextStyle(color: Colors.grey[500])),
           style: const TextStyle(color: Colors.white),
           dropdownColor: const Color(0xFF2A2A2A),
           items: _modelsController.models.map((CarModel model) {
             return DropdownMenuItem<String>(
               value: model.model,
-              child: Text(model.model, style: const TextStyle(color: Colors.white)),
+              child: Text(
+                model.model,
+                style: const TextStyle(color: Colors.white),
+              ),
             );
           }).toList(),
           onChanged: (value) {
@@ -544,7 +549,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
     }
 
     return DropdownButtonFormField<String>(
-      value: _selectedType,
+      initialValue: _selectedType,
       hint: Text('Select Car Type', style: TextStyle(color: Colors.grey[500])),
       style: const TextStyle(color: Colors.white),
       dropdownColor: const Color(0xFF2A2A2A),
@@ -701,7 +706,10 @@ class _CreateServicePageState extends State<CreateServicePage> {
           borderRadius: BorderRadius.circular(8),
           borderSide: const BorderSide(color: Colors.red, width: 2),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 16,
+        ),
       ),
       // validator: isRequired
       //     ? (value) {

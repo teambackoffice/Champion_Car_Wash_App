@@ -11,7 +11,9 @@ class GetCompletedController extends ChangeNotifier {
 
   // OPTIMIZATION: Enhanced caching with time-based expiration
   DateTime? _lastFetchTime;
-  static const Duration _cacheValidDuration = Duration(minutes: 10); // Longer for completed data
+  static const Duration _cacheValidDuration = Duration(
+    minutes: 10,
+  ); // Longer for completed data
   static const Duration _backgroundRefreshThreshold = Duration(minutes: 7);
 
   // Getters
@@ -22,19 +24,25 @@ class GetCompletedController extends ChangeNotifier {
 
   // OPTIMIZATION: Enhanced fetch with time-based caching
   Future<void> fetchcompletedlist({bool forceRefresh = false}) async {
-    print('✅ [COMPLETED_CONTROLLER] fetchcompletedlist called - forceRefresh: $forceRefresh');
-    
+    print(
+      '✅ [COMPLETED_CONTROLLER] fetchcompletedlist called - forceRefresh: $forceRefresh',
+    );
+
     final now = DateTime.now();
-    
+
     // Check cache validity
     if (!forceRefresh && _lastFetchTime != null && completedservices != null) {
       final timeSinceLastFetch = now.difference(_lastFetchTime!);
-      print('✅ [COMPLETED_CONTROLLER] Cache check - time since last fetch: ${timeSinceLastFetch.inMinutes} minutes');
-      
+      print(
+        '✅ [COMPLETED_CONTROLLER] Cache check - time since last fetch: ${timeSinceLastFetch.inMinutes} minutes',
+      );
+
       // If cache is still valid, return immediately
       if (timeSinceLastFetch < _cacheValidDuration) {
-        print('✅ [COMPLETED_CONTROLLER] Using cached data (${bookingData.length} services)');
-        
+        print(
+          '✅ [COMPLETED_CONTROLLER] Using cached data (${bookingData.length} services)',
+        );
+
         // If approaching expiry, trigger background refresh
         if (timeSinceLastFetch > _backgroundRefreshThreshold) {
           print('✅ [COMPLETED_CONTROLLER] Triggering background refresh');

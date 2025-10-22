@@ -25,15 +25,15 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
   @override
   void initState() {
     super.initState();
-    
+
     // Set initial loading state
     _isLoading = true;
-    
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // PERFORMANCE FIX: Early exit if widget is already disposed
       if (!mounted) return;
 
-      print('📋 [NEW_BOOKINGS] Initial fetch starting...');
+      debugPrint('📋 [NEW_BOOKINGS] Initial fetch starting...');
 
       final controller = Provider.of<GetNewbookingController>(
         context,
@@ -42,7 +42,9 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
 
       try {
         await controller.fetchBookingList();
-        print('✅ [NEW_BOOKINGS] Initial fetch completed - ${controller.bookingData.length} bookings');
+        debugPrint(
+          '✅ [NEW_BOOKINGS] Initial fetch completed - ${controller.bookingData.length} bookings',
+        );
 
         // PERFORMANCE FIX: Check mounted again after async operation
         if (!mounted) return;
@@ -52,8 +54,8 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
           _isLoading = false;
         });
       } catch (e) {
-        print('❌ [NEW_BOOKINGS] Initial fetch failed: $e');
-        
+        debugPrint('❌ [NEW_BOOKINGS] Initial fetch failed: $e');
+
         if (mounted) {
           setState(() {
             _isLoading = false;
@@ -84,8 +86,8 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
 
   // Pull to refresh functionality
   Future<void> _handleRefresh() async {
-    print('🔄 [NEW_BOOKINGS] Pull-to-refresh triggered - FORCING API CALL');
-    
+    debugPrint('🔄 [NEW_BOOKINGS] Pull-to-refresh triggered - FORCING API CALL');
+
     // Add haptic feedback
     HapticFeedback.mediumImpact();
 
@@ -102,37 +104,38 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
         listen: false,
       );
 
-      print('📋 [NEW_BOOKINGS] Fetching fresh booking list from API...');
+      debugPrint('📋 [NEW_BOOKINGS] Fetching fresh booking list from API...');
       // FORCE REFRESH: Always call API on pull-to-refresh
       await controller.fetchBookingList(forceRefresh: true);
-      
-      print('✅ [NEW_BOOKINGS] Fresh booking list fetched successfully - ${controller.bookingData.length} bookings');
+
+      debugPrint(
+        '✅ [NEW_BOOKINGS] Fresh booking list fetched successfully - ${controller.bookingData.length} bookings',
+      );
 
       if (mounted) {
         setState(() {
           _filteredBookings = controller.bookingData;
           _isLoading = false;
         });
-        print('🔄 [NEW_BOOKINGS] UI updated with ${_filteredBookings.length} fresh bookings');
-        
+        debugPrint(
+          '🔄 [NEW_BOOKINGS] UI updated with ${_filteredBookings.length} fresh bookings',
+        );
+
         // Show success feedback
         RefreshFeedback.showSuccess(
-          context, 
-          'Refreshed ${controller.bookingData.length} bookings'
+          context,
+          'Refreshed ${controller.bookingData.length} bookings',
         );
       }
     } catch (e) {
-      print('❌ [NEW_BOOKINGS] Error refreshing bookings: $e');
-      
+      debugPrint('❌ [NEW_BOOKINGS] Error refreshing bookings: $e');
+
       if (mounted) {
         setState(() {
           _isLoading = false;
         });
-        
-        RefreshFeedback.showError(
-          context, 
-          'Failed to refresh bookings: $e'
-        );
+
+        RefreshFeedback.showError(context, 'Failed to refresh bookings: $e');
       }
     }
   }
@@ -242,184 +245,190 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
                     padding: const EdgeInsets.all(16),
                     itemCount: bookings.length,
                     itemBuilder: (context, index) {
-                    final booking = bookings[index];
+                      final booking = bookings[index];
 
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withAlpha(13),
-                            blurRadius: 10,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      padding: const EdgeInsets.all(20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  booking.registrationNumber,
-                                  style: const TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.black,
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(16),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withAlpha(13),
+                              blurRadius: 10,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    booking.registrationNumber,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
                                   ),
                                 ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: Colors.green,
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: const Text(
-                                  'New',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w500,
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.green,
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: const Text(
+                                    'New',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          _buildInfoRow('Customer Name', booking.customerName),
-                          _buildInfoRow('Mobile No', booking.phone),
-                          _buildInfoRow('Email ID', booking.email),
-                          _buildInfoRow('Make', booking.make),
-                          _buildInfoRow('Vehicle Type', booking.carType),
-                          _buildInfoRow('Vehicle Model', booking.model),
-                          _buildInfoRow('Engine No', booking.engineNumber),
-                          _buildInfoRow('Chasis No', booking.chasisNumber),
-                          _buildInfoRow('Fuel Level', '${booking.fuelLevel}%'),
-                          const SizedBox(height: 8),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      ViewMorePage(booking: booking),
+                              ],
+                            ),
+                            const SizedBox(height: 16),
+                            _buildInfoRow(
+                              'Customer Name',
+                              booking.customerName,
+                            ),
+                            _buildInfoRow('Mobile No', booking.phone),
+                            _buildInfoRow('Email ID', booking.email),
+                            _buildInfoRow('Make', booking.make),
+                            _buildInfoRow('Vehicle Type', booking.carType),
+                            _buildInfoRow('Vehicle Model', booking.model),
+                            _buildInfoRow('Engine No', booking.engineNumber),
+                            _buildInfoRow('Chasis No', booking.chasisNumber),
+                            _buildInfoRow(
+                              'Fuel Level',
+                              '${booking.fuelLevel}%',
+                            ),
+                            const SizedBox(height: 8),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        ViewMorePage(booking: booking),
+                                  ),
+                                );
+                              },
+                              child: const Text(
+                                'View More',
+                                style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
                                 ),
-                              );
-                            },
-                            child: const Text(
-                              'View More',
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Selected Services',
                               style: TextStyle(
-                                color: Colors.red,
+                                color: Colors.grey[600],
                                 fontSize: 14,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Selected Services',
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          ...booking.services.map(
-                            (service) => Padding(
-                              padding: const EdgeInsets.only(bottom: 4),
-                              child: Text(
-                                service.serviceType +
-                                    (service.washType != null
-                                        ? ' - ${service.washType}'
-                                        : '') +
-                                    (service.oilBrand != null
-                                        ? ' - ${service.oilBrand}'
-                                        : ''),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black,
+                            const SizedBox(height: 8),
+                            ...booking.services.map(
+                              (service) => Padding(
+                                padding: const EdgeInsets.only(bottom: 4),
+                                child: Text(
+                                  service.serviceType +
+                                      (service.washType != null
+                                          ? ' - ${service.washType}'
+                                          : '') +
+                                      (service.oilBrand != null
+                                          ? ' - ${service.oilBrand}'
+                                          : ''),
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black,
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                          const SizedBox(height: 20),
-                          // SizedBox(
-                          //   width: double.infinity,
-                          //   child: ElevatedButton(
-                          //     onPressed: () async {
-                          //       final confirm = await showDialog<bool>(
-                          //         context: context,
-                          //         builder: (context) => AlertDialog(
-                          //           title: Text('Confirm'),
-                          //           content: Text(
-                          //             'Are you sure you want to start the service?',
-                          //           ),
-                          //           actions: [
-                          //             TextButton(
-                          //               onPressed: () =>
-                          //                   Navigator.of(context).pop(false),
-                          //               child: Text('Cancel'),
-                          //             ),
-                          //             ElevatedButton(
-                          //               onPressed: () =>
-                          //                   Navigator.of(context).pop(true),
-                          //               style: ElevatedButton.styleFrom(
-                          //                 backgroundColor: Colors.red,
-                          //                 foregroundColor: Colors.white,
-                          //                 shape: RoundedRectangleBorder(
-                          //                   borderRadius: BorderRadius.circular(
-                          //                     12,
-                          //                   ),
-                          //                 ),
-                          //               ),
-                          //               child: Text('Start'),
-                          //             ),
-                          //           ],
-                          //         ),
-                          //       );
+                            const SizedBox(height: 20),
+                            // SizedBox(
+                            //   width: double.infinity,
+                            //   child: ElevatedButton(
+                            //     onPressed: () async {
+                            //       final confirm = await showDialog<bool>(
+                            //         context: context,
+                            //         builder: (context) => AlertDialog(
+                            //           title: Text('Confirm'),
+                            //           content: Text(
+                            //             'Are you sure you want to start the service?',
+                            //           ),
+                            //           actions: [
+                            //             TextButton(
+                            //               onPressed: () =>
+                            //                   Navigator.of(context).pop(false),
+                            //               child: Text('Cancel'),
+                            //             ),
+                            //             ElevatedButton(
+                            //               onPressed: () =>
+                            //                   Navigator.of(context).pop(true),
+                            //               style: ElevatedButton.styleFrom(
+                            //                 backgroundColor: Colors.red,
+                            //                 foregroundColor: Colors.white,
+                            //                 shape: RoundedRectangleBorder(
+                            //                   borderRadius: BorderRadius.circular(
+                            //                     12,
+                            //                   ),
+                            //                 ),
+                            //               ),
+                            //               child: Text('Start'),
+                            //             ),
+                            //           ],
+                            //         ),
+                            //       );
 
-                          //       if (confirm == true) {
-                          //         await Provider.of<
-                          //               ServiceUnderproccessingController
-                          //             >(context, listen: false)
-                          //             .markServiceInProgress(booking.serviceId);
-                          //         await Provider.of<GetNewbookingController>(
-                          //           context,
-                          //           listen: false,
-                          //         ).fetchBookingList();
-                          //       }
-                          //     },
-                          //     style: ElevatedButton.styleFrom(
-                          //       backgroundColor: Colors.red,
-                          //       foregroundColor: Colors.white,
-                          //       padding: EdgeInsets.symmetric(vertical: 16),
-                          //       shape: RoundedRectangleBorder(
-                          //         borderRadius: BorderRadius.circular(12),
-                          //       ),
-                          //       elevation: 0,
-                          //     ),
-                          //     child: Text(
-                          //       'Start Service',
-                          //       style: TextStyle(
-                          //         fontSize: 16,
-                          //         fontWeight: FontWeight.w600,
-                          //       ),
-                          //     ),
-                          //   ),
-                          // ),
-                        ],
-                      ),
-                    );
+                            //       if (confirm == true) {
+                            //         await Provider.of<
+                            //               ServiceUnderproccessingController
+                            //             >(context, listen: false)
+                            //             .markServiceInProgress(booking.serviceId);
+                            //         await Provider.of<GetNewbookingController>(
+                            //           context,
+                            //           listen: false,
+                            //         ).fetchBookingList();
+                            //       }
+                            //     },
+                            //     style: ElevatedButton.styleFrom(
+                            //       backgroundColor: Colors.red,
+                            //       foregroundColor: Colors.white,
+                            //       padding: EdgeInsets.symmetric(vertical: 16),
+                            //       shape: RoundedRectangleBorder(
+                            //         borderRadius: BorderRadius.circular(12),
+                            //       ),
+                            //       elevation: 0,
+                            //     ),
+                            //     child: Text(
+                            //       'Start Service',
+                            //       style: TextStyle(
+                            //         fontSize: 16,
+                            //         fontWeight: FontWeight.w600,
+                            //       ),
+                            //     ),
+                            //   ),
+                            // ),
+                          ],
+                        ),
+                      );
                     },
                   ),
                 );

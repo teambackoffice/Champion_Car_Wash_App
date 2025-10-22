@@ -3,7 +3,8 @@ import 'package:flutter/foundation.dart';
 import 'car_wash_inprogress_to_complete_service.dart';
 
 class CarWashInProgressToCompleteController with ChangeNotifier {
-  final CarWashInprogressToCompleteService _service = CarWashInprogressToCompleteService();
+  final CarWashInprogressToCompleteService _service =
+      CarWashInprogressToCompleteService();
 
   bool _isLoading = false;
   String? _errorMessage;

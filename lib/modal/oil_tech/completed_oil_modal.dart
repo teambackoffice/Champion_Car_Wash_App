@@ -100,8 +100,8 @@ class Datum {
     make: json['make'],
     model: json['model'],
     carType: json['car_type'],
-    purchaseDate: json['purchase_date'] != null 
-        ? DateTime.tryParse(json['purchase_date']) 
+    purchaseDate: json['purchase_date'] != null
+        ? DateTime.tryParse(json['purchase_date'])
         : null,
     engineNumber: json['engine_number'],
     chasisNumber: json['chasis_number'],
@@ -111,7 +111,7 @@ class Datum {
     currentOdometerReading: json['current_odometer_reading']?.toDouble(),
     nextServiceOdometer: json['next_service_odometer']?.toDouble(),
     video: json['video'],
-    services: json['services'] != null 
+    services: json['services'] != null
         ? List<Service>.from(json['services'].map((x) => Service.fromJson(x)))
         : [],
   );
@@ -148,11 +148,7 @@ class Service {
   String? status;
   String? oilBrand;
 
-  Service({
-    this.serviceType,
-    this.status,
-    this.oilBrand,
-  });
+  Service({this.serviceType, this.status, this.oilBrand});
 
   factory Service.fromJson(Map<String, dynamic> json) => Service(
     serviceType: json['service_type'],

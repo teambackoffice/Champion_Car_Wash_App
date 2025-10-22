@@ -79,11 +79,7 @@ class PulsingDot extends StatefulWidget {
   final Color color;
   final double size;
 
-  const PulsingDot({
-    super.key,
-    required this.color,
-    this.size = 8.0,
-  });
+  const PulsingDot({super.key, required this.color, this.size = 8.0});
 
   @override
   State<PulsingDot> createState() => _PulsingDotState();
@@ -103,13 +99,15 @@ class _PulsingDotState extends State<PulsingDot>
       duration: const Duration(milliseconds: 1200),
     )..repeat(reverse: true);
 
-    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.4).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _scaleAnimation = Tween<double>(
+      begin: 0.8,
+      end: 1.4,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
 
-    _opacityAnimation = Tween<double>(begin: 0.4, end: 1.0).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    _opacityAnimation = Tween<double>(
+      begin: 0.4,
+      end: 1.0,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -147,11 +145,7 @@ class ThreeDotsLoading extends StatefulWidget {
   final Color color;
   final double size;
 
-  const ThreeDotsLoading({
-    super.key,
-    required this.color,
-    this.size = 8.0,
-  });
+  const ThreeDotsLoading({super.key, required this.color, this.size = 8.0});
 
   @override
   State<ThreeDotsLoading> createState() => _ThreeDotsLoadingState();
@@ -182,8 +176,14 @@ class _ThreeDotsLoadingState extends State<ThreeDotsLoading>
       builder: (context, child) {
         double delay = index * 0.2;
         double value = (_controller.value - delay) % 1.0;
-        double opacity = (0.4 + (0.6 * (1 - (value - 0.5).abs() * 2))).clamp(0.0, 1.0);
-        double scale = (0.7 + (0.6 * (1 - (value - 0.5).abs() * 2))).clamp(0.7, 1.3);
+        double opacity = (0.4 + (0.6 * (1 - (value - 0.5).abs() * 2))).clamp(
+          0.0,
+          1.0,
+        );
+        double scale = (0.7 + (0.6 * (1 - (value - 0.5).abs() * 2))).clamp(
+          0.7,
+          1.3,
+        );
 
         return Transform.scale(
           scale: scale,
@@ -223,11 +223,7 @@ class TileLoadingSpinner extends StatefulWidget {
   final Color color;
   final double size;
 
-  const TileLoadingSpinner({
-    super.key,
-    required this.color,
-    this.size = 32.0,
-  });
+  const TileLoadingSpinner({super.key, required this.color, this.size = 32.0});
 
   @override
   State<TileLoadingSpinner> createState() => _TileLoadingSpinnerState();

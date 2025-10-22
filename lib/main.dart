@@ -1,6 +1,7 @@
 import 'package:champion_car_wash_app/providers.dart';
 import 'package:champion_car_wash_app/view/splashscreen/splash_screen.dart';
-import 'package:champion_car_wash_app/service/payment_history_service.dart' as history;
+import 'package:champion_car_wash_app/service/payment_history_service.dart'
+    as history;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -11,40 +12,36 @@ void main() {
   // Initialize services in background after app starts
   Future.microtask(() => _initializeServicesAsync());
 
-  runApp(
-    const AppProviders(
-      child: MyApp(),
-    ),
-  );
+  runApp(const AppProviders(child: MyApp()));
 }
 
 Future<void> _initializeServicesAsync() async {
   try {
     if (kDebugMode) {
-      print('Initializing Stripe...');
+      debugPrint('Initializing Stripe...');
     }
     if (kDebugMode) {
-      print('Stripe initialized successfully');
+      debugPrint('Stripe initialized successfully');
     }
   } catch (e) {
     if (kDebugMode) {
-      print('Stripe initialization failed: $e');
-      print('App will continue without Stripe functionality');
+      debugPrint('Stripe initialization failed: $e');
+      debugPrint('App will continue without Stripe functionality');
     }
   }
 
   try {
     if (kDebugMode) {
-      print('Initializing Payment History Service...');
+      debugPrint('Initializing Payment History Service...');
     }
     await history.PaymentHistoryService.instance.initialize();
     if (kDebugMode) {
-      print('Payment History Service initialized successfully');
+      debugPrint('Payment History Service initialized successfully');
     }
   } catch (e) {
     if (kDebugMode) {
-      print('Payment History Service initialization failed: $e');
-      print('App will continue without payment history functionality');
+      debugPrint('Payment History Service initialization failed: $e');
+      debugPrint('App will continue without payment history functionality');
     }
   }
 }
@@ -67,7 +64,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.red,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      themeMode: ThemeMode.dark, // Automatically switch between light and dark mode
+      themeMode:
+          ThemeMode.dark, // Automatically switch between light and dark mode
       home: const SplashScreen(),
     );
   }

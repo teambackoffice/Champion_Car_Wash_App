@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 class CarModelsController extends ChangeNotifier {
   final CarModelsService _service = CarModelsService();
-  
+
   List<CarModel> _models = [];
   String _errorMessage = '';
   bool _isLoading = false;
@@ -33,7 +33,7 @@ class CarModelsController extends ChangeNotifier {
     _errorMessage = '';
     _currentMake = make;
     notifyListeners();
-    
+
     try {
       final response = await _service.getModelsByMake(make);
       _models = response.models;
@@ -55,9 +55,6 @@ class CarModelsController extends ChangeNotifier {
     _isLoading = false;
     notifyListeners();
   }
-
-  
-  
 
   void clearData() {
     _clearModels();

@@ -39,24 +39,66 @@ class AppProviders extends StatelessWidget {
           create: (_) => GetPrebookingListController(),
           lazy: true,
         ),
-        ChangeNotifierProvider(create: (_) => ServiceTypeController(), lazy: true),
-        ChangeNotifierProvider(create: (_) => AddPrebookingController(), lazy: true),
-        ChangeNotifierProvider(create: (_) => CarwashServiceController(), lazy: true),
-        ChangeNotifierProvider(create: (_) => GetOilBrandContrtoller(), lazy: true),
-        ChangeNotifierProvider(create: (_) => ConfirmPrebookController(), lazy: true),
-        ChangeNotifierProvider(create: (_) => CancelPrebookController(), lazy: true),
-        ChangeNotifierProvider(create: (_) => GetNewbookingController(), lazy: true),
+        ChangeNotifierProvider(
+          create: (_) => ServiceTypeController(),
+          lazy: true,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => AddPrebookingController(),
+          lazy: true,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => CarwashServiceController(),
+          lazy: true,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => GetOilBrandContrtoller(),
+          lazy: true,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ConfirmPrebookController(),
+          lazy: true,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => CancelPrebookController(),
+          lazy: true,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => GetNewbookingController(),
+          lazy: true,
+        ),
         ChangeNotifierProvider(
           create: (_) => ServiceUnderproccessingController(),
           lazy: true,
         ),
-        ChangeNotifierProvider(create: (_) => UnderProcessingController(), lazy: true),
-        ChangeNotifierProvider(create: (_) => GetAllbookingController(), lazy: true),
-        ChangeNotifierProvider(create: (_) => GetCompletedController(), lazy: true),
-        ChangeNotifierProvider(create: (_) => GetNewCarWashController(), lazy: true),
-        ChangeNotifierProvider(create: (_) => NewOilTechController(), lazy: true),
-        ChangeNotifierProvider(create: (_) => ExtraWorkController(), lazy: true),
-        ChangeNotifierProvider(create: (_) => InspectionListController(), lazy: true),
+        ChangeNotifierProvider(
+          create: (_) => UnderProcessingController(),
+          lazy: true,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => GetAllbookingController(),
+          lazy: true,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => GetCompletedController(),
+          lazy: true,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => GetNewCarWashController(),
+          lazy: true,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => NewOilTechController(),
+          lazy: true,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ExtraWorkController(),
+          lazy: true,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => InspectionListController(),
+          lazy: true,
+        ),
         ChangeNotifierProvider(
           create: (_) => OilsubtypeBybrandController(),
           lazy: true,
@@ -65,11 +107,26 @@ class AppProviders extends StatelessWidget {
           create: (_) => InprogressCarWashController(),
           lazy: true,
         ),
-        ChangeNotifierProvider(create: (_) => InProgressOilController(), lazy: true),
-        ChangeNotifierProvider(create: (_) => CompletedOilController(), lazy: true),
-        ChangeNotifierProvider(create: (_) => CompletedCarController(), lazy: true),
-        ChangeNotifierProvider(create: (_) => CarWashInProgressToCompleteController(), lazy: true),
-        ChangeNotifierProvider(create: (_) => ServiceCountsController(), lazy: true),
+        ChangeNotifierProvider(
+          create: (_) => InProgressOilController(),
+          lazy: true,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => CompletedOilController(),
+          lazy: true,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => CompletedCarController(),
+          lazy: true,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => CarWashInProgressToCompleteController(),
+          lazy: true,
+        ),
+        ChangeNotifierProvider(
+          create: (_) => ServiceCountsController(),
+          lazy: true,
+        ),
       ],
       child: child,
     );

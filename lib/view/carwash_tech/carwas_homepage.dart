@@ -53,7 +53,7 @@ class CarWashTechnicianHomePage extends StatelessWidget {
                           color: Colors.white.withOpacity(0.2),
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: Icon(
+                        child: const Icon(
                           Icons.local_car_wash,
                           color: Colors.white,
                           size: 24,
@@ -63,7 +63,7 @@ class CarWashTechnicianHomePage extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             'Car Wash Technician',
                             style: TextStyle(
                               color: Colors.white,
@@ -96,7 +96,11 @@ class CarWashTechnicianHomePage extends StatelessWidget {
                   child: IconButton(
                     icon: Stack(
                       children: [
-                        Icon(Icons.notifications_outlined, color: Colors.white, size: 24),
+                        const Icon(
+                          Icons.notifications_outlined,
+                          color: Colors.white,
+                          size: 24,
+                        ),
                         Positioned(
                           right: 0,
                           top: 0,
@@ -110,7 +114,7 @@ class CarWashTechnicianHomePage extends StatelessWidget {
                               minWidth: 12,
                               minHeight: 12,
                             ),
-                            child: Text(
+                            child: const Text(
                               '2',
                               style: TextStyle(
                                 color: Colors.white,
@@ -134,7 +138,7 @@ class CarWashTechnicianHomePage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: IconButton(
-                    icon: Icon(Icons.logout, color: Colors.white, size: 24),
+                    icon: const Icon(Icons.logout, color: Colors.white, size: 24),
                     onPressed: () => _showLogoutDialog(context),
                     tooltip: 'Logout',
                   ),
@@ -143,13 +147,15 @@ class CarWashTechnicianHomePage extends StatelessWidget {
               bottom: PreferredSize(
                 preferredSize: const Size.fromHeight(60.0),
                 child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  margin: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.15),
                     borderRadius: BorderRadius.circular(25),
                     border: Border.all(
                       color: Colors.white.withOpacity(0.2),
-                      width: 1,
                     ),
                   ),
                   child: TabBar(
@@ -168,14 +174,17 @@ class CarWashTechnicianHomePage extends StatelessWidget {
                     ),
                     indicatorSize: TabBarIndicatorSize.tab,
                     dividerColor: Colors.transparent,
-                    tabs: [
+                    tabs: const [
                       Tab(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(Icons.fiber_new, size: 18),
-                            const SizedBox(width: 6),
-                            Text('New', style: TextStyle(fontWeight: FontWeight.w600)),
+                            SizedBox(width: 6),
+                            Text(
+                              'New',
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
                           ],
                         ),
                       ),
@@ -184,8 +193,11 @@ class CarWashTechnicianHomePage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(Icons.build, size: 18),
-                            const SizedBox(width: 6),
-                            Text('Active', style: TextStyle(fontWeight: FontWeight.w600)),
+                            SizedBox(width: 6),
+                            Text(
+                              'Active',
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
                           ],
                         ),
                       ),
@@ -194,8 +206,11 @@ class CarWashTechnicianHomePage extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Icon(Icons.check_circle, size: 18),
-                            const SizedBox(width: 6),
-                            Text('Done', style: TextStyle(fontWeight: FontWeight.w600)),
+                            SizedBox(width: 6),
+                            Text(
+                              'Done',
+                              style: TextStyle(fontWeight: FontWeight.w600),
+                            ),
                           ],
                         ),
                       ),
@@ -213,7 +228,8 @@ class CarWashTechnicianHomePage extends StatelessWidget {
             CarWashCompletedBookings(),
           ],
         ),
-    ));
+      ),
+    );
   }
 
   String _getGreeting() {
@@ -268,11 +284,13 @@ class CarWashTechnicianHomePage extends StatelessWidget {
                     color: Colors.blue,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(Icons.assignment, color: Colors.white, size: 20),
+                  child: const Icon(Icons.assignment, color: Colors.white, size: 20),
                 ),
-                title: Text('New booking assigned', 
-                  style: TextStyle(fontWeight: FontWeight.w600)),
-                subtitle: Text('Service ID: CW-003 • 2 minutes ago'),
+                title: const Text(
+                  'New booking assigned',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                subtitle: const Text('Service ID: CW-003 • 2 minutes ago'),
               ),
             ),
             const SizedBox(height: 12),
@@ -291,11 +309,13 @@ class CarWashTechnicianHomePage extends StatelessWidget {
                     color: Colors.orange,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(Icons.schedule, color: Colors.white, size: 20),
+                  child: const Icon(Icons.schedule, color: Colors.white, size: 20),
                 ),
-                title: Text('Service reminder', 
-                  style: TextStyle(fontWeight: FontWeight.w600)),
-                subtitle: Text('Check vehicle CW-001 • 15 minutes ago'),
+                title: const Text(
+                  'Service reminder',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+                subtitle: const Text('Check vehicle CW-001 • 15 minutes ago'),
               ),
             ),
           ],
@@ -310,7 +330,9 @@ class CarWashTechnicianHomePage extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryRed,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
             ),
             child: const Text('Mark All Read'),
           ),
@@ -357,15 +379,12 @@ class CarWashTechnicianHomePage extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.info_outline, color: Colors.orange, size: 20),
+                  const Icon(Icons.info_outline, color: Colors.orange, size: 20),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Any unsaved work will be lost.',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.orange[800],
-                      ),
+                      style: TextStyle(fontSize: 13, color: Colors.orange[800]),
                     ),
                   ),
                 ],
@@ -392,12 +411,12 @@ class CarWashTechnicianHomePage extends StatelessWidget {
               Navigator.of(ctx).pop();
               _logout(context);
             },
-            child: Row(
+            child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(Icons.logout, size: 18),
-                const SizedBox(width: 8),
-                const Text('Logout'),
+                SizedBox(width: 8),
+                Text('Logout'),
               ],
             ),
           ),

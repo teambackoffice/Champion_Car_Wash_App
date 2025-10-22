@@ -21,10 +21,7 @@ class GetAllbookingServ {
       final request = http.Request('GET', Uri.parse(url));
       final String? sid = await _secureStorage.read(key: 'sid');
 
-      developer.log(
-        'Request URL: $url',
-        name: 'GetAllbookingService',
-      );
+      developer.log('Request URL: $url', name: 'GetAllbookingService');
 
       if (sid == null) {
         developer.log(
@@ -69,10 +66,7 @@ class GetAllbookingServ {
       );
 
       if (response.statusCode == 200) {
-        developer.log(
-          'Parsing JSON response...',
-          name: 'GetAllbookingService',
-        );
+        developer.log('Parsing JSON response...', name: 'GetAllbookingService');
 
         final jsonData = json.decode(responseBody);
 

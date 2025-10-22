@@ -26,10 +26,7 @@ class ServiceCountsService {
       final request = http.Request('GET', Uri.parse(_url));
       final String? sid = await _secureStorage.read(key: 'sid');
 
-      developer.log(
-        'Request URL: $_url',
-        name: 'ServiceCountsService',
-      );
+      developer.log('Request URL: $_url', name: 'ServiceCountsService');
 
       if (sid == null) {
         developer.log(
@@ -72,8 +69,9 @@ class ServiceCountsService {
         );
 
         if (jsonData['message'] != null) {
-          final countsResponse =
-              ServiceCountsResponse.fromJson(jsonData['message']);
+          final countsResponse = ServiceCountsResponse.fromJson(
+            jsonData['message'],
+          );
 
           developer.log(
             'Service Counts Retrieved Successfully:',

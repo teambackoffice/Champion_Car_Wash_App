@@ -18,6 +18,7 @@ class UnderProcessScreen extends StatefulWidget {
 class _UnderProcessScreenState extends State<UnderProcessScreen> {
   List<ServiceCars> _filteredBookings = [];
   bool _isSearching = false;
+  bool _isInitialLoading = true;
   Timer? _debounceTimer;
 
   final TextEditingController _searchController = TextEditingController();
@@ -29,32 +30,98 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
     // PERFORMANCE FIX: Use named method for listener to properly remove it later
     _searchController.addListener(_onSearchChanged);
 
-    // Fetch data after the first frame is built
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      print('⏳ [UNDER_PROCESS] Initial fetch starting...');
-      
+    // Load data with proper loading state management
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    debugPrint(
+      '⏳ [UNDER_PROCESS] _loadData called - setting _isInitialLoading = true',
+    );
+    setState(() {
+      _isInitialLoading = true;
+    });
+
+    // Add a small delay to ensure loading indicator is visible
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    if (mounted) {
+      debugPrint('⏳ [UNDER_PROCESS] Initial fetch starting...');
+
       final controller = Provider.of<UnderProcessingController>(
         context,
         listen: false,
       );
-      
+
       try {
         await controller.fetchUnderProcessingBookings();
-        print('✅ [UNDER_PROCESS] Initial fetch completed - ${controller.serviceCars.length} bookings');
-        
+        debugPrint(
+          '✅ [UNDER_PROCESS] Initial fetch completed - ${controller.serviceCars.length} bookings',
+        );
+
         if (mounted) {
           setState(() {
             _filteredBookings = controller.serviceCars;
+            _isInitialLoading = false;
           });
         }
       } catch (e) {
-        print('❌ [UNDER_PROCESS] Initial fetch failed: $e');
+        debugPrint('❌ [UNDER_PROCESS] Initial fetch failed: $e');
+        if (mounted) {
+          setState(() {
+            _isInitialLoading = false;
+          });
+        }
       }
-    });
+    }
   }
 
   void _onSearchChanged() {
     _filterBookings(_searchController.text);
+  }
+
+  Future<void> _refreshData() async {
+    debugPrint('🔄 [UNDER_PROCESS] Pull-to-refresh triggered - FORCING API CALL');
+
+    final controller = Provider.of<UnderProcessingController>(
+      context,
+      listen: false,
+    );
+
+    try {
+      debugPrint(
+        '📋 [UNDER_PROCESS] Fetching fresh under processing bookings from API...',
+      );
+      // FORCE REFRESH: Always call API on pull-to-refresh
+      await controller.fetchUnderProcessingBookings(forceRefresh: true);
+      debugPrint(
+        '✅ [UNDER_PROCESS] Fresh under processing bookings fetched successfully - ${controller.serviceCars.length} bookings',
+      );
+
+      if (mounted) {
+        setState(() {
+          _filteredBookings = controller.serviceCars;
+        });
+        debugPrint(
+          '🔄 [UNDER_PROCESS] UI updated with ${_filteredBookings.length} fresh bookings',
+        );
+
+        // Show success feedback
+        RefreshFeedback.showSuccess(
+          context,
+          'Refreshed ${controller.serviceCars.length} under processing bookings',
+        );
+      }
+    } catch (e) {
+      debugPrint('❌ [UNDER_PROCESS] Error refreshing under processing bookings: $e');
+
+      if (mounted) {
+        RefreshFeedback.showError(
+          context,
+          'Failed to refresh under processing bookings: $e',
+        );
+      }
+    }
   }
 
   @override
@@ -204,7 +271,13 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
       body: SafeArea(
         child: Consumer<UnderProcessingController>(
           builder: (context, controller, _) {
-            if (controller.isLoading) {
+            // Debug print to help track loading state
+            print(
+              '⏳ [UNDER_PROCESS] Build - _isInitialLoading: $_isInitialLoading, controller.isLoading: ${controller.isLoading}',
+            );
+
+            if (_isInitialLoading || controller.isLoading) {
+              print('⏳ [UNDER_PROCESS] Showing loading indicator');
               return const ListLoadingIndicator(
                 message: 'Loading under processing bookings...',
               );
@@ -223,6 +296,10 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                     ElevatedButton(
                       onPressed: () =>
                           controller.fetchUnderProcessingBookings(),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFD32F2F),
+                        foregroundColor: Colors.white,
+                      ),
                       child: const Text('Retry'),
                     ),
                   ],
@@ -238,55 +315,35 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
               return const Center(
                 child: Text(
                   'No bookings under processing',
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  style: TextStyle(fontSize: 16, color: Colors.white70),
                 ),
               );
             }
 
             return RefreshIndicator(
-              onRefresh: () async {
-                print('🔄 [UNDER_PROCESS] Pull-to-refresh triggered - FORCING API CALL');
-                
-                try {
-                  print('📋 [UNDER_PROCESS] Fetching fresh under processing bookings from API...');
-                  // FORCE REFRESH: Always call API on pull-to-refresh
-                  await controller.fetchUnderProcessingBookings(forceRefresh: true);
-                  print('✅ [UNDER_PROCESS] Fresh under processing bookings fetched successfully - ${controller.serviceCars.length} bookings');
-                  
-                  if (mounted) {
-                    setState(() {
-                      _filteredBookings = controller.serviceCars;
-                    });
-                    print('🔄 [UNDER_PROCESS] UI updated with ${_filteredBookings.length} fresh bookings');
-                    
-                    // Show success feedback
-                    RefreshFeedback.showSuccess(
-                      context,
-                      'Refreshed ${controller.serviceCars.length} under processing bookings'
-                    );
-                  }
-                } catch (e) {
-                  print('❌ [UNDER_PROCESS] Error refreshing under processing bookings: $e');
-                  
-                  if (mounted) {
-                    RefreshFeedback.showError(
-                      context,
-                      'Failed to refresh under processing bookings: $e'
-                    );
-                  }
-                }
-              },
+              onRefresh: _refreshData,
               color: const Color(0xFFD32F2F),
               backgroundColor: Colors.white,
               child: Column(
                 children: [
+                  // Enhanced Search Container
                   Container(
+                    margin: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: const [
-                        BoxShadow(color: Colors.black12, blurRadius: 4),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.08),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
                       ],
+                      border: Border.all(color: Colors.grey[300]!),
                     ),
                     child: TextField(
                       controller: _searchController,
@@ -301,19 +358,22 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                         );
                       },
                       decoration: InputDecoration(
-                        hintText: 'Search Customer by Vehicle Number',
+                        hintText: 'Search by vehicle number...',
                         hintStyle: TextStyle(
                           color: Colors.grey[500],
-                          fontSize: 14,
+                          fontSize: 15,
                         ),
                         prefixIcon: Icon(
                           Icons.search,
-                          color: Colors.grey[500],
-                          size: 20,
+                          color: Colors.grey[600],
+                          size: 22,
                         ),
                         suffixIcon: _searchController.text.isNotEmpty
                             ? IconButton(
-                                icon: const Icon(Icons.clear),
+                                icon: Icon(
+                                  Icons.clear,
+                                  color: Colors.grey[500],
+                                ),
                                 onPressed: () {
                                   _searchController.clear();
                                   _filterBookings('');
@@ -322,15 +382,18 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                             : null,
                         border: InputBorder.none,
                         contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 12,
+                          horizontal: 8,
+                          vertical: 16,
                         ),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 20),
                   Expanded(
                     child: ListView.builder(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
                       itemCount: bookings.length,
                       itemBuilder: (context, index) {
                         final booking = bookings[index];
@@ -347,19 +410,26 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                         final progress = _calculateProgress(booking);
 
                         return Container(
-                          margin: const EdgeInsets.only(bottom: 16),
+                          margin: const EdgeInsets.only(bottom: 20),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                            boxShadow: const [
-                              BoxShadow(color: Colors.black12, blurRadius: 6),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.08),
+                                blurRadius: 12,
+                                offset: const Offset(0, 4),
+                              ),
                             ],
+                            border: Border.all(
+                              color: Colors.grey[200]!,
+                            ),
                           ),
                           child: Column(
                             children: [
-                              // Header
+                              // Enhanced Header
                               Container(
-                                padding: const EdgeInsets.all(16),
+                                padding: const EdgeInsets.all(20),
                                 child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -372,9 +442,10 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                                           Text(
                                             booking.registrationNumber,
                                             style: const TextStyle(
-                                              fontSize: 16,
+                                              fontSize: 18,
                                               fontWeight: FontWeight.bold,
-                                              color: Colors.black87,
+                                              color: Colors.black,
+                                              letterSpacing: 0.5,
                                             ),
                                           ),
                                         ],
@@ -382,19 +453,33 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                                     ),
                                     Container(
                                       padding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 4,
+                                        horizontal: 16,
+                                        vertical: 8,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.red,
-                                        borderRadius: BorderRadius.circular(12),
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Colors.orange[600]!,
+                                            Colors.orange[500]!,
+                                          ],
+                                        ),
+                                        borderRadius: BorderRadius.circular(20),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.orange.withOpacity(
+                                              0.3,
+                                            ),
+                                            blurRadius: 6,
+                                            offset: const Offset(0, 2),
+                                          ),
+                                        ],
                                       ),
                                       child: Text(
                                         booking.mainStatus,
                                         style: const TextStyle(
                                           color: Colors.white,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.w600,
                                         ),
                                       ),
                                     ),
@@ -419,9 +504,14 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                                   ),
                                 ),
 
-                              // Details
+                              // Enhanced Details Section
                               Padding(
-                                padding: const EdgeInsets.all(16),
+                                padding: const EdgeInsets.fromLTRB(
+                                  20,
+                                  16,
+                                  20,
+                                  20,
+                                ),
                                 child: Column(
                                   children: [
                                     _buildRow(
@@ -454,39 +544,50 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                                 ),
                               ),
 
-                              // Services list
+                              // Enhanced Services Section
                               if (booking.services.isNotEmpty)
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
+                                  padding: const EdgeInsets.fromLTRB(
+                                    20,
+                                    0,
+                                    20,
+                                    20,
                                   ),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      const Text(
-                                        'Selected Services',
+                                      Text(
+                                        'Selected Services (${booking.services.length})',
                                         style: TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey,
-                                          fontWeight: FontWeight.w500,
+                                          fontSize: 16,
+                                          color: Colors.grey[800],
+                                          fontWeight: FontWeight.w700,
                                         ),
                                       ),
-                                      const SizedBox(height: 12),
+                                      const SizedBox(height: 16),
                                       ...booking.services.map((service) {
                                         return Padding(
                                           padding: const EdgeInsets.only(
-                                            bottom: 12,
+                                            bottom: 16,
                                           ),
                                           child: Container(
-                                            padding: const EdgeInsets.all(12),
+                                            padding: const EdgeInsets.all(16),
                                             decoration: BoxDecoration(
                                               color: Colors.grey[50],
                                               borderRadius:
-                                                  BorderRadius.circular(8),
+                                                  BorderRadius.circular(12),
                                               border: Border.all(
-                                                color: Colors.grey[200]!,
+                                                color: Colors.grey[300]!,
                                               ),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: Colors.black
+                                                      .withOpacity(0.04),
+                                                  blurRadius: 4,
+                                                  offset: const Offset(0, 2),
+                                                ),
+                                              ],
                                             ),
                                             child: Row(
                                               mainAxisAlignment:
@@ -502,29 +603,48 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                                                       Text(
                                                         service.serviceType,
                                                         style: const TextStyle(
-                                                          fontSize: 14,
+                                                          fontSize: 16,
                                                           fontWeight:
-                                                              FontWeight.w600,
+                                                              FontWeight.w700,
+                                                          color: Colors.black,
                                                         ),
                                                       ),
                                                       if (service.washType !=
                                                           null)
-                                                        Text(
-                                                          'Wash Type: ${service.washType}',
-                                                          style: TextStyle(
-                                                            fontSize: 12,
-                                                            color: Colors
-                                                                .grey[600],
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets.only(
+                                                                top: 4,
+                                                              ),
+                                                          child: Text(
+                                                            'Wash Type: ${service.washType}',
+                                                            style: TextStyle(
+                                                              fontSize: 14,
+                                                              color: Colors
+                                                                  .grey[700],
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                            ),
                                                           ),
                                                         ),
                                                       if (service.oilBrand !=
                                                           null)
-                                                        Text(
-                                                          'Oil Brand: ${service.oilBrand}',
-                                                          style: TextStyle(
-                                                            fontSize: 12,
-                                                            color: Colors
-                                                                .grey[600],
+                                                        Padding(
+                                                          padding:
+                                                              const EdgeInsets.only(
+                                                                top: 4,
+                                                              ),
+                                                          child: Text(
+                                                            'Oil Brand: ${service.oilBrand}',
+                                                            style: TextStyle(
+                                                              fontSize: 14,
+                                                              color: Colors
+                                                                  .grey[700],
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w500,
+                                                            ),
                                                           ),
                                                         ),
                                                     ],
@@ -563,15 +683,16 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                                           ),
                                         );
                                       }),
-                                      const SizedBox(height: 20),
+                                      const SizedBox(height: 24),
                                       if (booking
                                           .extraWorkItems
                                           .isNotEmpty) ...[
-                                        const Text(
-                                          'Extra Work Items',
+                                        Text(
+                                          'Extra Work Items (${booking.extraWorkItems.length})',
                                           style: TextStyle(
                                             fontSize: 16,
-                                            fontWeight: FontWeight.w600,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.grey[800],
                                           ),
                                         ),
                                         const SizedBox(height: 10),
@@ -605,6 +726,7 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                                                         item.workItem,
                                                         style: const TextStyle(
                                                           fontSize: 14,
+                                                          color: Colors.black87,
                                                         ),
                                                       ),
                                                     ),
@@ -614,6 +736,7 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                                                         fontSize: 14,
                                                         fontWeight:
                                                             FontWeight.w500,
+                                                        color: Colors.black87,
                                                       ),
                                                     ),
                                                   ],
@@ -664,47 +787,56 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                                         ),
                                       ],
 
-                                      // Continue button - Only enabled when all services are completed
+                                      // Enhanced Continue Button
                                       Padding(
-                                        padding: const EdgeInsets.all(16),
+                                        padding: const EdgeInsets.all(20),
                                         child: SizedBox(
                                           width: double.infinity,
-                                          child: ElevatedButton(
+                                          child: ElevatedButton.icon(
                                             onPressed: allServicesComplete
                                                 ? () => _showCompletionAlert(
                                                     context,
                                                     bookingId,
                                                   )
                                                 : null,
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor:
-                                                  allServicesComplete
-                                                  ? Colors.red
-                                                  : Colors.grey[300],
-                                              foregroundColor:
-                                                  allServicesComplete
-                                                  ? Colors.white
-                                                  : Colors.grey[600],
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    vertical: 16,
-                                                  ),
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                              elevation: 0,
+                                            icon: Icon(
+                                              allServicesComplete
+                                                  ? Icons.check_circle
+                                                  : Icons.hourglass_empty,
+                                              size: 20,
                                             ),
-                                            child: Text(
+                                            label: Text(
                                               allServicesComplete
                                                   ? 'Continue to Invoice'
-                                                  : hasServiceStarted
-                                                  ? 'Complete all services first'
-                                                  : 'Start Services to Continue',
+                                                  : 'Waiting for Service Completion',
                                               style: const TextStyle(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.w600,
                                               ),
+                                            ),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  allServicesComplete
+                                                  ? const Color(0xFFD32F2F)
+                                                  : Colors.grey[400],
+                                              foregroundColor:
+                                                  allServicesComplete
+                                                  ? Colors.white
+                                                  : Colors.grey[700],
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    vertical: 18,
+                                                  ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                              ),
+                                              elevation: allServicesComplete
+                                                  ? 4
+                                                  : 0,
+                                              shadowColor: allServicesComplete
+                                                  ? Colors.red.withOpacity(0.3)
+                                                  : null,
                                             ),
                                           ),
                                         ),
@@ -777,17 +909,18 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
 
   Widget _buildRow(String label, String value) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.only(bottom: 12),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 120,
+            width: 130,
             child: Text(
               label,
               style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-                fontWeight: FontWeight.w500,
+                fontSize: 15,
+                color: Colors.grey[700],
+                fontWeight: FontWeight.w600,
               ),
             ),
           ),
@@ -795,9 +928,10 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
             child: Text(
               value,
               style: const TextStyle(
-                fontSize: 14,
+                fontSize: 15,
                 fontWeight: FontWeight.w600,
-                color: Colors.black87,
+                color: Colors.black,
+                height: 1.3,
               ),
             ),
           ),

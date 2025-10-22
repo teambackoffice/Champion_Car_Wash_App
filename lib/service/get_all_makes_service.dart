@@ -4,8 +4,8 @@ import 'package:champion_car_wash_app/modal/get_all_makes_modal.dart';
 import 'package:http/http.dart' as http;
 
 class CarMakesService {
-  static const String _baseUrl = '${ApiConstants.baseUrl}api/method/carwash.Api.auth';
-
+  static const String _baseUrl =
+      '${ApiConstants.baseUrl}api/method/carwash.Api.auth';
 
   Future<CarMakesResponse> getAllMakes() async {
     try {
@@ -16,7 +16,9 @@ class CarMakesService {
         final jsonData = json.decode(response.body);
         return CarMakesResponse.fromJson(jsonData);
       } else {
-        throw Exception('Failed to load car makes: ${response.statusCode} - ${response.reasonPhrase}');
+        throw Exception(
+          'Failed to load car makes: ${response.statusCode} - ${response.reasonPhrase}',
+        );
       }
     } catch (e) {
       throw Exception('Error fetching car makes: $e');

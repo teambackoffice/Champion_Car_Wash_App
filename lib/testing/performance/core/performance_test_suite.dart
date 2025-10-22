@@ -11,7 +11,7 @@ import '../tests/memory_stability_test.dart';
 /// Provides structured testing methodologies for startup, memory, UI, and API performance
 class PerformanceTestSuite {
   static const Duration _defaultTestTimeout = Duration(minutes: 5);
-  
+
   /// Runs startup performance tests targeting < 2 seconds with 35+ StatefulWidgets
   /// Requirements: 1.1
   static Future<TestResults> runStartupTests({
@@ -36,7 +36,7 @@ class PerformanceTestSuite {
       );
     }
   }
-  
+
   /// Runs memory stability tests for technician workflows over 30+ minutes
   /// Requirements: 1.4
   static Future<TestResults> runMemoryTests({
@@ -66,7 +66,7 @@ class PerformanceTestSuite {
       );
     }
   }
-  
+
   /// Runs UI performance tests for booking list scrolling at 60fps with 100+ items
   /// Requirements: 1.2
   static Future<TestResults> runUIPerformanceTests() async {
@@ -89,7 +89,7 @@ class PerformanceTestSuite {
       );
     }
   }
-  
+
   /// Runs API performance tests for payment processing and response handling
   /// Requirements: 1.3, 1.5
   static Future<TestResults> runAPITests() async {
@@ -112,7 +112,7 @@ class PerformanceTestSuite {
       );
     }
   }
-  
+
   /// Calculates overall performance score from 1-10 based on all test results
   /// Requirements: 2.4
   static Future<OverallScore> calculatePerformanceScore(
@@ -126,26 +126,26 @@ class PerformanceTestSuite {
         breakdown: {},
       );
     }
-    
+
     double totalScore = 0.0;
     final Map<String, double> breakdown = {};
-    
+
     for (final result in testResults) {
       double testScore = result.passed ? 10.0 : 0.0;
-      
+
       // Calculate weighted score based on performance metrics
       if (result.passed && result.actualValue > 0) {
         final ratio = result.targetValue / result.actualValue;
         testScore = (ratio * 10.0).clamp(0.0, 10.0);
       }
-      
+
       breakdown[result.testName] = testScore;
       totalScore += testScore;
     }
-    
+
     final averageScore = totalScore / testResults.length;
     final grade = _calculateGrade(averageScore);
-    
+
     return OverallScore(
       score: averageScore,
       grade: grade,
@@ -153,19 +153,19 @@ class PerformanceTestSuite {
       breakdown: breakdown,
     );
   }
-  
+
   // Helper methods for performance testing suite
-  
+
   /// Runs all Champion Car Wash performance tests in sequence
   static Future<List<TestResults>> runAllTests({
     Duration memoryTestDuration = const Duration(minutes: 30),
   }) async {
     final results = <TestResults>[];
-    
+
     if (kDebugMode) {
       print('Running complete Champion Car Wash performance test suite...');
     }
-    
+
     // Run startup performance test
     try {
       final startupResult = await runStartupTests();
@@ -178,7 +178,7 @@ class PerformanceTestSuite {
         print('Startup test failed with error: $e');
       }
     }
-    
+
     // Run UI performance test (booking list)
     try {
       final uiResult = await runUIPerformanceTests();
@@ -191,36 +191,42 @@ class PerformanceTestSuite {
         print('UI performance test failed with error: $e');
       }
     }
-    
+
     // Run API performance test (payment processing)
     try {
       final apiResult = await runAPITests();
       results.add(apiResult);
       if (kDebugMode) {
-        print('API performance test: ${apiResult.passed ? 'PASSED' : 'FAILED'}');
+        print(
+          'API performance test: ${apiResult.passed ? 'PASSED' : 'FAILED'}',
+        );
       }
     } catch (e) {
       if (kDebugMode) {
         print('API performance test failed with error: $e');
       }
     }
-    
+
     // Run memory stability test
     try {
-      final memoryResult = await runMemoryTests(testDuration: memoryTestDuration);
+      final memoryResult = await runMemoryTests(
+        testDuration: memoryTestDuration,
+      );
       results.add(memoryResult);
       if (kDebugMode) {
-        print('Memory stability test: ${memoryResult.passed ? 'PASSED' : 'FAILED'}');
+        print(
+          'Memory stability test: ${memoryResult.passed ? 'PASSED' : 'FAILED'}',
+        );
       }
     } catch (e) {
       if (kDebugMode) {
         print('Memory stability test failed with error: $e');
       }
     }
-    
+
     return results;
   }
-  
+
   static String _calculateGrade(double score) {
     if (score >= 9.0) return 'A+';
     if (score >= 8.0) return 'A';
@@ -239,14 +245,14 @@ class OverallScore {
   final String grade;
   final DateTime timestamp;
   final Map<String, double> breakdown;
-  
+
   const OverallScore({
     required this.score,
     required this.grade,
     required this.timestamp,
     required this.breakdown,
   });
-  
+
   @override
   String toString() {
     return 'Performance Score: $score/10 (Grade: $grade)';

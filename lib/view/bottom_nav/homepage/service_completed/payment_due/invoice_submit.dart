@@ -527,7 +527,10 @@ class _InvoiceSubmitPageState extends State<InvoiceSubmitPage> {
                     ? const Color(0xFF635BFF)
                     : const Color(0xFFD32F2F),
               ),
-              child: const Text('Confirm', style: TextStyle(color: Colors.white)),
+              child: const Text(
+                'Confirm',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
           ],
         );

@@ -1,15 +1,8 @@
-
-
-
-
 class CarModel {
   final String model;
   final String carType;
 
-  CarModel({
-    required this.model,
-    required this.carType,
-  });
+  CarModel({required this.model, required this.carType});
 
   factory CarModel.fromJson(Map<String, dynamic> json) {
     return CarModel(
@@ -19,10 +12,7 @@ class CarModel {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'model': model,
-      'car_type': carType,
-    };
+    return {'model': model, 'car_type': carType};
   }
 
   @override
@@ -45,7 +35,7 @@ class CarModelsResponse {
   factory CarModelsResponse.fromJson(Map<String, dynamic> json) {
     final message = json['message'] ?? {};
     final modelsList = message['models'] as List<dynamic>? ?? [];
-    
+
     return CarModelsResponse(
       status: message['status'] ?? '',
       make: message['make'] ?? '',

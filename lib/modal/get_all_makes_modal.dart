@@ -4,15 +4,11 @@ class CarMake {
   CarMake({required this.name});
 
   factory CarMake.fromJson(Map<String, dynamic> json) {
-    return CarMake(
-      name: json['name'] ?? '',
-    );
+    return CarMake(name: json['name'] ?? '');
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-    };
+    return {'name': name};
   }
 
   @override
@@ -27,7 +23,7 @@ class CarMakesResponse {
   factory CarMakesResponse.fromJson(Map<String, dynamic> json) {
     final message = json['message'] ?? {};
     final makesList = message['makes'] as List<dynamic>? ?? [];
-    
+
     return CarMakesResponse(
       makes: makesList.map((make) => CarMake.fromJson(make)).toList(),
     );
@@ -35,9 +31,7 @@ class CarMakesResponse {
 
   Map<String, dynamic> toJson() {
     return {
-      'message': {
-        'makes': makes.map((make) => make.toJson()).toList(),
-      },
+      'message': {'makes': makes.map((make) => make.toJson()).toList()},
     };
   }
 }

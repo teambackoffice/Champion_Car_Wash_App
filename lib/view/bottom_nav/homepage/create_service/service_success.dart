@@ -53,12 +53,14 @@ class _ServiceSuccessScreenState extends State<ServiceSuccessScreen> {
       ],
     );
   }
+
   Future<void> _printReceipt() async {
     final doc = pw.Document();
 
     final serviceType = widget.serviceType;
     final now = DateTime.now();
-    final qrData = '''CHAMPION
+    final qrData =
+        '''CHAMPION
 ${widget.customerName}
 ${widget.make} ${widget.model}
 ${widget.purchaseDate}
@@ -70,14 +72,21 @@ ${widget.locationName}''';
 
     doc.addPage(
       pw.Page(
-        pageFormat: const PdfPageFormat(80 * PdfPageFormat.mm, double.infinity, marginAll: 2),
+        pageFormat: const PdfPageFormat(
+          80 * PdfPageFormat.mm,
+          double.infinity,
+          marginAll: 2,
+        ),
         build: (context) {
           return pw.Padding(
             padding: const pw.EdgeInsets.all(4),
             child: pw.Column(
               children: [
                 pw.Container(
-                  padding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                  padding: const pw.EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 3,
+                  ),
                   decoration: pw.BoxDecoration(
                     color: PdfColors.grey800,
                     borderRadius: pw.BorderRadius.circular(4),
@@ -93,7 +102,11 @@ ${widget.locationName}''';
                   ),
                 ),
                 pw.SizedBox(height: 2),
-                pw.Text('${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year} ${DateTime.now().hour}:${DateTime.now().minute.toString().padLeft(2, '0')}', style: const pw.TextStyle(fontSize: 9), textAlign: pw.TextAlign.center),
+                pw.Text(
+                  '${DateTime.now().day}/${DateTime.now().month}/${DateTime.now().year} ${DateTime.now().hour}:${DateTime.now().minute.toString().padLeft(2, '0')}',
+                  style: const pw.TextStyle(fontSize: 9),
+                  textAlign: pw.TextAlign.center,
+                ),
                 pw.SizedBox(height: 2),
                 pw.Container(
                   decoration: pw.BoxDecoration(
@@ -119,20 +132,36 @@ ${widget.locationName}''';
                         _row('Engine', widget.engineNumber),
                         _row('Type', widget.washType),
                         pw.TableRow(
-                          decoration: const pw.BoxDecoration(color: PdfColors.grey800),
+                          decoration: const pw.BoxDecoration(
+                            color: PdfColors.grey800,
+                          ),
                           children: [
                             pw.Padding(
-                              padding: const pw.EdgeInsets.symmetric(horizontal: 4, vertical: 1.5),
+                              padding: const pw.EdgeInsets.symmetric(
+                                horizontal: 4,
+                                vertical: 1.5,
+                              ),
                               child: pw.Text(
                                 'PRICE',
-                                style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, color: PdfColors.white),
+                                style: pw.TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: pw.FontWeight.bold,
+                                  color: PdfColors.white,
+                                ),
                               ),
                             ),
                             pw.Padding(
-                              padding: const pw.EdgeInsets.symmetric(horizontal: 4, vertical: 1.5),
+                              padding: const pw.EdgeInsets.symmetric(
+                                horizontal: 4,
+                                vertical: 1.5,
+                              ),
                               child: pw.Text(
                                 'AED ${widget.price.toStringAsFixed(2)}',
-                                style: pw.TextStyle(fontSize: 12, fontWeight: pw.FontWeight.bold, color: PdfColors.white),
+                                style: pw.TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: pw.FontWeight.bold,
+                                  color: PdfColors.white,
+                                ),
                               ),
                             ),
                           ],
@@ -150,7 +179,13 @@ ${widget.locationName}''';
                   ),
                   child: pw.Column(
                     children: [
-                      pw.Text('SCAN', style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold)),
+                      pw.Text(
+                        'SCAN',
+                        style: pw.TextStyle(
+                          fontSize: 10,
+                          fontWeight: pw.FontWeight.bold,
+                        ),
+                      ),
                       pw.SizedBox(height: 2),
                       pw.BarcodeWidget(
                         barcode: pw.Barcode.qrCode(),
@@ -163,17 +198,24 @@ ${widget.locationName}''';
                 ),
                 pw.SizedBox(height: 2),
                 pw.Container(
-                  padding: const pw.EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const pw.EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: pw.BoxDecoration(
                     color: PdfColors.grey900,
                     borderRadius: pw.BorderRadius.circular(3),
                   ),
                   child: pw.Text(
                     'THANK YOU',
-                    style: pw.TextStyle(fontSize: 10, fontWeight: pw.FontWeight.bold, color: PdfColors.white),
+                    style: pw.TextStyle(
+                      fontSize: 10,
+                      fontWeight: pw.FontWeight.bold,
+                      color: PdfColors.white,
+                    ),
                     textAlign: pw.TextAlign.center,
                   ),
-                )
+                ),
               ],
             ),
           );
@@ -183,6 +225,7 @@ ${widget.locationName}''';
 
     await Printing.layoutPdf(onLayout: (format) async => doc.save());
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -229,7 +272,8 @@ ${widget.locationName}''';
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: QrImageView(
-                      data: '''CHAMPION
+                      data:
+                          '''CHAMPION
 ${widget.customerName}
 ${widget.make} ${widget.model}
 ${widget.purchaseDate}
@@ -253,10 +297,7 @@ ${widget.locationName}''',
                   const SizedBox(height: 4),
                   Text(
                     '${widget.serviceType} • ${widget.washType}',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.white70,
-                    ),
+                    style: const TextStyle(fontSize: 12, color: Colors.white70),
                   ),
                   const SizedBox(height: 32),
                   SizedBox(
@@ -272,7 +313,11 @@ ${widget.locationName}''',
                       ),
                       child: const Text(
                         'Print Receipt',
-                        style: TextStyle(fontSize: 14, color: Colors.white, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -282,8 +327,10 @@ ${widget.locationName}''',
                     child: OutlinedButton(
                       onPressed: () {
                         // Refresh counts before navigating back
-                        Provider.of<ServiceCountsController>(context, listen: false)
-                            .refreshData();
+                        Provider.of<ServiceCountsController>(
+                          context,
+                          listen: false,
+                        ).refreshData();
 
                         // Navigate back to HomePageContent and clear the navigation stack
                         Navigator.of(context).pushAndRemoveUntil(

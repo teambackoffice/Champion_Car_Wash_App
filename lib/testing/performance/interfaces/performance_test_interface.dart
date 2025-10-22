@@ -6,25 +6,25 @@ import '../models/performance_metrics.dart';
 abstract class PerformanceTestInterface {
   /// Name of the performance test
   String get testName;
-  
+
   /// Description of what this test validates
   String get description;
-  
+
   /// Target performance threshold for this test
   double get targetThreshold;
-  
+
   /// Unit of measurement for this test
   String get unit;
-  
+
   /// Execute the performance test
   Future<TestResults> execute();
-  
+
   /// Setup required before test execution
   Future<void> setUp() async {}
-  
+
   /// Cleanup after test execution
   Future<void> tearDown() async {}
-  
+
   /// Validate test results against requirements
   bool validateResults(TestResults results);
 }
@@ -33,10 +33,10 @@ abstract class PerformanceTestInterface {
 abstract class StartupTestInterface extends PerformanceTestInterface {
   /// Measure app startup time with StatefulWidget counting
   Future<double> measureStartupTime();
-  
+
   /// Count active StatefulWidgets during startup
   Future<int> countStatefulWidgets();
-  
+
   /// Measure first meaningful paint time
   Future<double> measureFirstMeaningfulPaint();
 }
@@ -45,13 +45,13 @@ abstract class StartupTestInterface extends PerformanceTestInterface {
 abstract class MemoryTestInterface extends PerformanceTestInterface {
   /// Monitor memory usage over specified duration
   Future<List<double>> monitorMemoryUsage(Duration duration);
-  
+
   /// Detect memory leaks in StatefulWidgets
   Future<List<String>> detectMemoryLeaks();
-  
+
   /// Validate StatefulWidget disposal
   Future<bool> validateWidgetDisposal();
-  
+
   /// Check for undisposed controllers
   Future<List<String>> findUndisposedControllers();
 }
@@ -60,13 +60,13 @@ abstract class MemoryTestInterface extends PerformanceTestInterface {
 abstract class UITestInterface extends PerformanceTestInterface {
   /// Measure scrolling performance with specified item count
   Future<double> measureScrollingPerformance(int itemCount);
-  
+
   /// Monitor frame rate during UI interactions
   Future<double> measureFrameRate();
-  
+
   /// Count frame skips during animations
   Future<int> countFrameSkips();
-  
+
   /// Test search functionality with debouncing
   Future<double> measureSearchPerformance();
 }
@@ -75,13 +75,13 @@ abstract class UITestInterface extends PerformanceTestInterface {
 abstract class APITestInterface extends PerformanceTestInterface {
   /// Measure API response times
   Future<List<double>> measureResponseTimes(List<String> endpoints);
-  
+
   /// Test caching efficiency
   Future<double> measureCacheHitRate();
-  
+
   /// Validate network error handling
   Future<bool> validateErrorHandling();
-  
+
   /// Test concurrent API requests
   Future<double> measureConcurrentRequestPerformance();
 }
@@ -90,13 +90,13 @@ abstract class APITestInterface extends PerformanceTestInterface {
 abstract class DeviceTestInterface extends PerformanceTestInterface {
   /// Test performance on low-end devices
   Future<TestResults> testLowEndDevice();
-  
+
   /// Test performance on high-end devices
   Future<TestResults> testHighEndDevice();
-  
+
   /// Measure battery impact during extended usage
   Future<double> measureBatteryImpact(Duration duration);
-  
+
   /// Get device specifications for testing context
   Future<Map<String, dynamic>> getDeviceSpecs();
 }
@@ -105,13 +105,13 @@ abstract class DeviceTestInterface extends PerformanceTestInterface {
 abstract class WorkflowTestInterface extends PerformanceTestInterface {
   /// Test technician workflow performance
   Future<TestResults> testTechnicianWorkflow();
-  
+
   /// Test booking management performance
   Future<TestResults> testBookingManagement();
-  
+
   /// Test payment processing workflow
   Future<TestResults> testPaymentWorkflow();
-  
+
   /// Test supervisor dashboard performance
   Future<TestResults> testSupervisorDashboard();
 }
@@ -120,19 +120,19 @@ abstract class WorkflowTestInterface extends PerformanceTestInterface {
 abstract class PerformanceMonitorInterface {
   /// Start continuous performance monitoring
   Future<void> startMonitoring();
-  
+
   /// Stop performance monitoring
   Future<void> stopMonitoring();
-  
+
   /// Get current performance metrics
   Future<PerformanceMetrics> getCurrentMetrics();
-  
+
   /// Get performance metrics history
   Future<List<PerformanceMetrics>> getMetricsHistory(Duration period);
-  
+
   /// Set alert thresholds
   void setAlertThresholds(Map<String, double> thresholds);
-  
+
   /// Stream of performance alerts
   Stream<PerformanceAlert> get alertStream;
 }
@@ -145,7 +145,7 @@ class PerformanceAlert {
   final double threshold;
   final String message;
   final DateTime timestamp;
-  
+
   const PerformanceAlert({
     required this.level,
     required this.metric,
@@ -154,20 +154,20 @@ class PerformanceAlert {
     required this.message,
     required this.timestamp,
   });
-  
+
   @override
   String toString() {
     return '${level.name.toUpperCase()} ALERT: $message '
-           '(Current: $currentValue, Threshold: $threshold)';
+        '(Current: $currentValue, Threshold: $threshold)';
   }
 }
 
 /// Alert severity levels
 enum AlertLevel {
-  green,   // Performance is optimal
-  yellow,  // Performance degradation detected
-  red;     // Critical performance issues
-  
+  green, // Performance is optimal
+  yellow, // Performance degradation detected
+  red; // Critical performance issues
+
   /// Human-readable description
   String get description {
     switch (this) {

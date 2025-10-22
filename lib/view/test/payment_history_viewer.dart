@@ -36,7 +36,7 @@ class _PaymentHistoryViewerState extends State<PaymentHistoryViewer> {
       await PaymentHistoryService.instance.initialize();
       await _loadPaymentHistory();
     } catch (e) {
-      print('Error initializing payment history: $e');
+      debugPrint('Error initializing payment history: $e');
     } finally {
       setState(() {
         _isLoading = false;
@@ -57,14 +57,14 @@ class _PaymentHistoryViewerState extends State<PaymentHistoryViewer> {
     try {
       final payments = PaymentHistoryService.instance.paymentHistory;
       final stats = await PaymentHistoryService.instance.getPaymentStats();
-      
+
       setState(() {
         _payments = payments;
         _stats = stats;
         _applyFilters();
       });
     } catch (e) {
-      print('Error loading payment history: $e');
+      debugPrint('Error loading payment history: $e');
     }
   }
 
@@ -83,7 +83,9 @@ class _PaymentHistoryViewerState extends State<PaymentHistoryViewer> {
 
     // Apply method filter
     if (_methodFilter != null && _methodFilter!.isNotEmpty) {
-      filtered = filtered.where((p) => p.paymentMethod == _methodFilter).toList();
+      filtered = filtered
+          .where((p) => p.paymentMethod == _methodFilter)
+          .toList();
     }
 
     setState(() {
@@ -114,9 +116,10 @@ class _PaymentHistoryViewerState extends State<PaymentHistoryViewer> {
 
   Future<void> _exportHistory() async {
     try {
-      final jsonData = await PaymentHistoryService.instance.exportHistoryAsJson();
+      final jsonData = await PaymentHistoryService.instance
+          .exportHistoryAsJson();
       await Clipboard.setData(ClipboardData(text: jsonData));
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -142,7 +145,9 @@ class _PaymentHistoryViewerState extends State<PaymentHistoryViewer> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Clear Payment History'),
-        content: const Text('Are you sure you want to clear all payment history? This action cannot be undone.'),
+        content: const Text(
+          'Are you sure you want to clear all payment history? This action cannot be undone.',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
@@ -204,10 +209,10 @@ class _PaymentHistoryViewerState extends State<PaymentHistoryViewer> {
               children: [
                 // Statistics Section
                 if (_stats != null) _buildStatsSection(),
-                
+
                 // Filters Section
                 _buildFiltersSection(),
-                
+
                 // Payment List
                 Expanded(
                   child: _filteredPayments.isEmpty
@@ -221,7 +226,7 @@ class _PaymentHistoryViewerState extends State<PaymentHistoryViewer> {
 
   Widget _buildStatsSection() {
     final stats = _stats!;
-    
+
     return Container(
       padding: const EdgeInsets.all(16),
       color: Colors.green.shade50,
@@ -284,7 +289,12 @@ class _PaymentHistoryViewerState extends State<PaymentHistoryViewer> {
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+    String title,
+    String value,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
@@ -306,10 +316,7 @@ class _PaymentHistoryViewerState extends State<PaymentHistoryViewer> {
           ),
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 10,
-              color: Colors.grey,
-            ),
+            style: const TextStyle(fontSize: 10, color: Colors.grey),
             textAlign: TextAlign.center,
           ),
         ],
@@ -318,8 +325,11 @@ class _PaymentHistoryViewerState extends State<PaymentHistoryViewer> {
   }
 
   Widget _buildFiltersSection() {
-    final uniqueMethods = _payments.map((p) => p.paymentMethod).toSet().toList();
-    
+    final uniqueMethods = _payments
+        .map((p) => p.paymentMethod)
+        .toSet()
+        .toList();
+
     return Container(
       padding: const EdgeInsets.all(16),
       color: Colors.grey.shade100,
@@ -337,50 +347,56 @@ class _PaymentHistoryViewerState extends State<PaymentHistoryViewer> {
             onChanged: _onSearchChanged,
           ),
           const SizedBox(height: 12),
-          
+
           // Filter chips
           Row(
             children: [
               // Status filter
               Expanded(
                 child: DropdownButtonFormField<PaymentStatus?>(
-                  value: _statusFilter,
+                  initialValue: _statusFilter,
                   decoration: const InputDecoration(
                     labelText: 'Status',
                     border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                   ),
                   items: [
                     const DropdownMenuItem<PaymentStatus?>(
                       child: Text('All Statuses'),
                     ),
-                    ...PaymentStatus.values.map((status) => DropdownMenuItem(
-                      value: status,
-                      child: Text(status.name.toUpperCase()),
-                    )),
+                    ...PaymentStatus.values.map(
+                      (status) => DropdownMenuItem(
+                        value: status,
+                        child: Text(status.name.toUpperCase()),
+                      ),
+                    ),
                   ],
                   onChanged: _onStatusFilterChanged,
                 ),
               ),
               const SizedBox(width: 12),
-              
+
               // Method filter
               Expanded(
                 child: DropdownButtonFormField<String?>(
-                  value: _methodFilter,
+                  initialValue: _methodFilter,
                   decoration: const InputDecoration(
                     labelText: 'Method',
                     border: OutlineInputBorder(),
-                    contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    contentPadding: EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
                   ),
                   items: [
-                    const DropdownMenuItem<String?>(
-                      child: Text('All Methods'),
+                    const DropdownMenuItem<String?>(child: Text('All Methods')),
+                    ...uniqueMethods.map(
+                      (method) =>
+                          DropdownMenuItem(value: method, child: Text(method)),
                     ),
-                    ...uniqueMethods.map((method) => DropdownMenuItem(
-                      value: method,
-                      child: Text(method),
-                    )),
                   ],
                   onChanged: _onMethodFilterChanged,
                 ),
@@ -397,30 +413,20 @@ class _PaymentHistoryViewerState extends State<PaymentHistoryViewer> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(
-            Icons.history,
-            size: 64,
-            color: Colors.grey.shade400,
-          ),
+          Icon(Icons.history, size: 64, color: Colors.grey.shade400),
           const SizedBox(height: 16),
           Text(
-            _payments.isEmpty 
+            _payments.isEmpty
                 ? 'No payment history yet'
                 : 'No payments match your filters',
-            style: TextStyle(
-              fontSize: 18,
-              color: Colors.grey.shade600,
-            ),
+            style: TextStyle(fontSize: 18, color: Colors.grey.shade600),
           ),
           const SizedBox(height: 8),
           Text(
             _payments.isEmpty
                 ? 'Make some payments to see them here'
                 : 'Try adjusting your search or filters',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade500,
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
           ),
         ],
       ),
@@ -442,93 +448,105 @@ class _PaymentHistoryViewerState extends State<PaymentHistoryViewer> {
   Widget _buildPaymentCard(PaymentHistoryRecord payment) {
     final statusColor = _getStatusColor(payment.status);
     final statusIcon = _getStatusIcon(payment.status);
-    
+
     return RepaintBoundary(
       key: ValueKey(payment.id),
       child: Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: ExpansionTile(
-        leading: Icon(statusIcon, color: statusColor),
-        title: Text(
-          'Order: ${payment.orderId}',
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('${payment.amount.toStringAsFixed(2)} ${payment.currency}'),
-            Text(
-              payment.paymentMethod,
-              style: TextStyle(color: Colors.grey.shade600),
-            ),
-          ],
-        ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: statusColor.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: statusColor.withOpacity(0.3)),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        child: ExpansionTile(
+          leading: Icon(statusIcon, color: statusColor),
+          title: Text(
+            'Order: ${payment.orderId}',
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('${payment.amount.toStringAsFixed(2)} ${payment.currency}'),
+              Text(
+                payment.paymentMethod,
+                style: TextStyle(color: Colors.grey.shade600),
               ),
-              child: Text(
-                payment.status.name.toUpperCase(),
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,
-                  color: statusColor,
+            ],
+          ),
+          trailing: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: statusColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: statusColor.withOpacity(0.3)),
+                ),
+                child: Text(
+                  payment.status.name.toUpperCase(),
+                  style: TextStyle(
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    color: statusColor,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              _formatDateTime(payment.timestamp),
-              style: const TextStyle(fontSize: 10, color: Colors.grey),
+              const SizedBox(height: 4),
+              Text(
+                _formatDateTime(payment.timestamp),
+                style: const TextStyle(fontSize: 10, color: Colors.grey),
+              ),
+            ],
+          ),
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildDetailRow('Payment ID', payment.id),
+                  if (payment.transactionId != null)
+                    _buildDetailRow('Transaction ID', payment.transactionId!),
+                  if (payment.cardLastFour != null)
+                    _buildDetailRow(
+                      'Card',
+                      '**** **** **** ${payment.cardLastFour}',
+                    ),
+                  if (payment.authCode != null)
+                    _buildDetailRow('Auth Code', payment.authCode!),
+                  if (payment.customerName != null)
+                    _buildDetailRow('Customer', payment.customerName!),
+                  if (payment.customerPhone != null)
+                    _buildDetailRow('Phone', payment.customerPhone!),
+                  if (payment.customerEmail != null)
+                    _buildDetailRow('Email', payment.customerEmail!),
+                  if (payment.errorMessage != null)
+                    _buildDetailRow(
+                      'Error',
+                      payment.errorMessage!,
+                      isError: true,
+                    ),
+                  _buildDetailRow(
+                    'Timestamp',
+                    payment.timestamp.toIso8601String(),
+                  ),
+
+                  // Metadata
+                  if (payment.metadata.isNotEmpty) ...[
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Metadata:',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    ...payment.metadata.entries.map(
+                      (entry) =>
+                          _buildDetailRow(entry.key, entry.value.toString()),
+                    ),
+                  ],
+                ],
+              ),
             ),
           ],
         ),
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildDetailRow('Payment ID', payment.id),
-                if (payment.transactionId != null)
-                  _buildDetailRow('Transaction ID', payment.transactionId!),
-                if (payment.cardLastFour != null)
-                  _buildDetailRow('Card', '**** **** **** ${payment.cardLastFour}'),
-                if (payment.authCode != null)
-                  _buildDetailRow('Auth Code', payment.authCode!),
-                if (payment.customerName != null)
-                  _buildDetailRow('Customer', payment.customerName!),
-                if (payment.customerPhone != null)
-                  _buildDetailRow('Phone', payment.customerPhone!),
-                if (payment.customerEmail != null)
-                  _buildDetailRow('Email', payment.customerEmail!),
-                if (payment.errorMessage != null)
-                  _buildDetailRow('Error', payment.errorMessage!, isError: true),
-                _buildDetailRow('Timestamp', payment.timestamp.toIso8601String()),
-                
-                // Metadata
-                if (payment.metadata.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  const Text(
-                    'Metadata:',
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  ...payment.metadata.entries.map((entry) =>
-                    _buildDetailRow(entry.key, entry.value.toString())),
-                ],
-              ],
-            ),
-          ),
-        ],
       ),
-    ),
     );
   }
 
@@ -551,9 +569,7 @@ class _PaymentHistoryViewerState extends State<PaymentHistoryViewer> {
           Expanded(
             child: Text(
               value,
-              style: TextStyle(
-                color: isError ? Colors.red : Colors.black87,
-              ),
+              style: TextStyle(color: isError ? Colors.red : Colors.black87),
             ),
           ),
         ],

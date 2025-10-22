@@ -24,15 +24,15 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
     setState(() {
       _isInitialLoading = true;
     });
-    
+
     await Future.delayed(const Duration(milliseconds: 400));
-    
+
     if (mounted) {
       await Provider.of<CompletedCarController>(
         context,
         listen: false,
       ).fetchCompletedCarServiceData();
-      
+
       if (mounted) {
         setState(() {
           _isInitialLoading = false;
@@ -47,7 +47,9 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDarkMode ? theme.scaffoldBackgroundColor : Colors.grey[50],
+      backgroundColor: isDarkMode
+          ? theme.scaffoldBackgroundColor
+          : Colors.grey[50],
       body: Column(
         children: [
           // Enhanced Header
@@ -55,10 +57,7 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  Colors.green[600]!,
-                  Colors.green[400]!,
-                ],
+                colors: [Colors.green[600]!, Colors.green[400]!],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -72,9 +71,9 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
             ),
             child: Row(
               children: [
-                Icon(Icons.check_circle, color: Colors.white, size: 24),
+                const Icon(Icons.check_circle, color: Colors.white, size: 24),
                 const SizedBox(width: 12),
-                Expanded(
+                const Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -88,21 +87,21 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                       ),
                       Text(
                         'Review your completed car wash services',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                        ),
+                        style: TextStyle(color: Colors.white70, fontSize: 14),
                       ),
                     ],
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text(
+                  child: const Text(
                     'History',
                     style: TextStyle(
                       color: Colors.white,
@@ -114,7 +113,7 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
               ],
             ),
           ),
-          
+
           // Completed Services List
           Expanded(
             child: Consumer<CompletedCarController>(
@@ -154,8 +153,10 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                         const SizedBox(height: 16),
                         ElevatedButton(
                           onPressed: () {
-                            Provider.of<CompletedCarController>(context, listen: false)
-                                .fetchCompletedCarServiceData();
+                            Provider.of<CompletedCarController>(
+                              context,
+                              listen: false,
+                            ).fetchCompletedCarServiceData();
                           },
                           child: const Text('Retry'),
                         ),
@@ -165,8 +166,9 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                 }
 
                 final completedBookings =
-                    completedCarController.completedCarModal?.message.data ?? [];
-                    
+                    completedCarController.completedCarModal?.message.data ??
+                    [];
+
                 if (completedBookings.isEmpty) {
                   return Center(
                     child: Column(
@@ -219,17 +221,8 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(16),
-                              gradient: LinearGradient(
-                                colors: [
-                                  theme.cardColor,
-                                  theme.cardColor.withOpacity(0.95),
-                                ],
-                                begin: Alignment.topLeft,
-                                end: Alignment.bottomRight,
-                              ),
                               border: Border.all(
                                 color: Colors.green.withOpacity(0.3),
-                                width: 1,
                               ),
                             ),
                             child: Padding(
@@ -239,7 +232,8 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                                 children: [
                                   // Enhanced Header with completion info
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Expanded(
                                         child: Row(
@@ -247,10 +241,13 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                                             Container(
                                               padding: const EdgeInsets.all(8),
                                               decoration: BoxDecoration(
-                                                color: Colors.green.withOpacity(0.1),
-                                                borderRadius: BorderRadius.circular(8),
+                                                color: Colors.green.withOpacity(
+                                                  0.1,
+                                                ),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                               ),
-                                              child: Icon(
+                                              child: const Icon(
                                                 Icons.check_circle,
                                                 color: Colors.green,
                                                 size: 20,
@@ -259,22 +256,28 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                                             const SizedBox(width: 12),
                                             Expanded(
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     booking.serviceId,
                                                     style: TextStyle(
                                                       fontSize: 18,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: theme.textTheme.titleLarge?.color,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: theme
+                                                          .textTheme
+                                                          .titleLarge
+                                                          ?.color,
                                                     ),
                                                   ),
                                                   Text(
                                                     'Completed • ${_getCompletionTime(booking.purchaseDate)}',
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                       fontSize: 12,
                                                       color: Colors.green,
-                                                      fontWeight: FontWeight.w500,
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                     ),
                                                   ),
                                                 ],
@@ -291,19 +294,11 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                                               vertical: 6,
                                             ),
                                             decoration: BoxDecoration(
-                                              gradient: LinearGradient(
-                                                colors: [Colors.green, Colors.green[600]!],
-                                              ),
-                                              borderRadius: BorderRadius.circular(20),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.green.withOpacity(0.3),
-                                                  blurRadius: 8,
-                                                  offset: const Offset(0, 2),
-                                                ),
-                                              ],
+                                              color: Colors.green,
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
                                             ),
-                                            child: Row(
+                                            child: const Row(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
                                                 Icon(
@@ -311,8 +306,8 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                                                   color: Colors.white,
                                                   size: 14,
                                                 ),
-                                                const SizedBox(width: 4),
-                                                const Text(
+                                                SizedBox(width: 4),
+                                                Text(
                                                   'DONE',
                                                   style: TextStyle(
                                                     color: Colors.white,
@@ -331,12 +326,15 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                                               vertical: 2,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: Colors.blue.withOpacity(0.1),
-                                              borderRadius: BorderRadius.circular(10),
+                                              color: Colors.blue.withOpacity(
+                                                0.1,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
                                             ),
                                             child: Text(
                                               '⭐ ${_getQualityRating()}',
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                 fontSize: 10,
                                                 color: Colors.blue,
                                                 fontWeight: FontWeight.bold,
@@ -348,12 +346,12 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                                     ],
                                   ),
                                   const SizedBox(height: 20),
-                                  
+
                                   // Completion Summary
                                   Container(
                                     padding: const EdgeInsets.all(16),
                                     decoration: BoxDecoration(
-                                      color: isDarkMode 
+                                      color: isDarkMode
                                           ? Colors.green[900]?.withOpacity(0.1)
                                           : Colors.green[50],
                                       borderRadius: BorderRadius.circular(12),
@@ -362,16 +360,17 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                                       ),
                                     ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Row(
+                                        const Row(
                                           children: [
                                             Icon(
                                               Icons.analytics_outlined,
                                               color: Colors.green,
                                               size: 20,
                                             ),
-                                            const SizedBox(width: 8),
+                                            SizedBox(width: 8),
                                             Text(
                                               'Service Summary',
                                               style: TextStyle(
@@ -388,7 +387,9 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                                             Expanded(
                                               child: _buildSummaryItem(
                                                 'Duration',
-                                                _getServiceDuration(booking.purchaseDate),
+                                                _getServiceDuration(
+                                                  booking.purchaseDate,
+                                                ),
                                                 Icons.timer,
                                               ),
                                             ),
@@ -411,23 +412,26 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                                       ],
                                     ),
                                   ),
-                                  
+
                                   const SizedBox(height: 16),
-                                  
+
                                   // Vehicle Information
                                   Container(
                                     padding: const EdgeInsets.all(16),
                                     decoration: BoxDecoration(
-                                      color: isDarkMode 
+                                      color: isDarkMode
                                           ? Colors.grey[800]?.withOpacity(0.3)
                                           : Colors.grey[50],
                                       borderRadius: BorderRadius.circular(12),
                                       border: Border.all(
-                                        color: theme.dividerColor.withOpacity(0.1),
+                                        color: theme.dividerColor.withOpacity(
+                                          0.1,
+                                        ),
                                       ),
                                     ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           children: [
@@ -442,7 +446,10 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.bold,
-                                                color: theme.textTheme.titleMedium?.color,
+                                                color: theme
+                                                    .textTheme
+                                                    .titleMedium
+                                                    ?.color,
                                               ),
                                             ),
                                           ],
@@ -461,21 +468,25 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                                         _buildEnhancedDetailRow(
                                           Icons.calendar_today,
                                           'Completed',
-                                          DateFormat('dd MMM yyyy, hh:mm a').format(
-                                            DateTime.parse(booking.purchaseDate.toString()),
+                                          DateFormat(
+                                            'dd MMM yyyy, hh:mm a',
+                                          ).format(
+                                            DateTime.parse(
+                                              booking.purchaseDate.toString(),
+                                            ),
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                  
+
                                   const SizedBox(height: 16),
-                                  
+
                                   // Completed Services
                                   Container(
                                     padding: const EdgeInsets.all(16),
                                     decoration: BoxDecoration(
-                                      color: isDarkMode 
+                                      color: isDarkMode
                                           ? Colors.blue[900]?.withOpacity(0.1)
                                           : Colors.blue[50],
                                       borderRadius: BorderRadius.circular(12),
@@ -484,11 +495,12 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                                       ),
                                     ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           children: [
-                                            Icon(
+                                            const Icon(
                                               Icons.check_circle_outline,
                                               color: Colors.blue,
                                               size: 20,
@@ -496,7 +508,7 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                                             const SizedBox(width: 8),
                                             Text(
                                               'Completed Services (${booking.services.length})',
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.blue,
@@ -507,21 +519,28 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                                         const SizedBox(height: 12),
                                         ...booking.services.map(
                                           (service) => Container(
-                                            margin: const EdgeInsets.only(bottom: 8),
+                                            margin: const EdgeInsets.only(
+                                              bottom: 8,
+                                            ),
                                             padding: const EdgeInsets.symmetric(
                                               horizontal: 12,
                                               vertical: 8,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              borderRadius: BorderRadius.circular(8),
+                                              color: isDarkMode
+                                                  ? Colors.grey[800]
+                                                  : Colors.white,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                               border: Border.all(
-                                                color: Colors.green.withOpacity(0.2),
+                                                color: Colors.green.withOpacity(
+                                                  0.2,
+                                                ),
                                               ),
                                             ),
                                             child: Row(
                                               children: [
-                                                Icon(
+                                                const Icon(
                                                   Icons.verified,
                                                   color: Colors.green,
                                                   size: 16,
@@ -532,26 +551,36 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                                                     service.washType,
                                                     style: TextStyle(
                                                       fontSize: 14,
-                                                      fontWeight: FontWeight.w500,
-                                                      color: theme.textTheme.bodyLarge?.color,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: theme
+                                                          .textTheme
+                                                          .bodyLarge
+                                                          ?.color,
                                                     ),
                                                   ),
                                                 ),
                                                 Container(
-                                                  padding: const EdgeInsets.symmetric(
-                                                    horizontal: 8,
-                                                    vertical: 2,
-                                                  ),
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 2,
+                                                      ),
                                                   decoration: BoxDecoration(
-                                                    color: Colors.green.withOpacity(0.1),
-                                                    borderRadius: BorderRadius.circular(10),
+                                                    color: Colors.green
+                                                        .withOpacity(0.1),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          10,
+                                                        ),
                                                   ),
-                                                  child: Text(
+                                                  child: const Text(
                                                     'Completed',
                                                     style: TextStyle(
                                                       fontSize: 10,
                                                       color: Colors.green,
-                                                      fontWeight: FontWeight.bold,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                     ),
                                                   ),
                                                 ),
@@ -562,22 +591,33 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                                       ],
                                     ),
                                   ),
-                                  
+
                                   const SizedBox(height: 20),
-                                  
+
                                   // Action Buttons
                                   Row(
                                     children: [
                                       Expanded(
                                         child: OutlinedButton.icon(
-                                          onPressed: () => _showServiceReport(context, booking),
-                                          icon: Icon(Icons.description_outlined, size: 18),
+                                          onPressed: () => _showServiceReport(
+                                            context,
+                                            booking,
+                                          ),
+                                          icon: const Icon(
+                                            Icons.description_outlined,
+                                            size: 18,
+                                          ),
                                           label: const Text('View Report'),
                                           style: OutlinedButton.styleFrom(
-                                            padding: const EdgeInsets.symmetric(vertical: 12),
-                                            side: BorderSide(color: Colors.blue),
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 12,
+                                            ),
+                                            side: const BorderSide(
+                                              color: Colors.blue,
+                                            ),
                                             shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(12),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
                                             ),
                                           ),
                                         ),
@@ -585,14 +625,25 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                                       const SizedBox(width: 12),
                                       Expanded(
                                         child: OutlinedButton.icon(
-                                          onPressed: () => _shareServiceDetails(context, booking),
-                                          icon: Icon(Icons.share_outlined, size: 18),
+                                          onPressed: () => _shareServiceDetails(
+                                            context,
+                                            booking,
+                                          ),
+                                          icon: const Icon(
+                                            Icons.share_outlined,
+                                            size: 18,
+                                          ),
                                           label: const Text('Share'),
                                           style: OutlinedButton.styleFrom(
-                                            padding: const EdgeInsets.symmetric(vertical: 12),
-                                            side: BorderSide(color: Colors.green),
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 12,
+                                            ),
+                                            side: const BorderSide(
+                                              color: Colors.green,
+                                            ),
                                             shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(12),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
                                             ),
                                           ),
                                         ),
@@ -627,14 +678,21 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
             width: 100,
             child: Text(
               label,
-              style: TextStyle(fontSize: 14, color: theme.textTheme.bodySmall?.color),
+              style: TextStyle(
+                fontSize: 14,
+                color: theme.textTheme.bodySmall?.color,
+              ),
             ),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Text(
               value,
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: theme.textTheme.bodyMedium?.color),
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: theme.textTheme.bodyMedium?.color,
+              ),
             ),
           ),
         ],
@@ -706,7 +764,7 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
     final date = DateTime.parse(purchaseDate.toString());
     final now = DateTime.now();
     final difference = now.difference(date);
-    
+
     if (difference.inMinutes < 60) {
       return '${difference.inMinutes}m ago';
     } else if (difference.inHours < 24) {
@@ -738,15 +796,25 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
             children: [
               Text('Customer: ${booking.customerName}'),
               Text('Vehicle: ${booking.make} ${booking.model}'),
-              Text('Completion: ${DateFormat('dd MMM yyyy, hh:mm a').format(DateTime.parse(booking.purchaseDate.toString()))}'),
+              Text(
+                'Completion: ${DateFormat('dd MMM yyyy, hh:mm a').format(DateTime.parse(booking.purchaseDate.toString()))}',
+              ),
               const SizedBox(height: 16),
-              const Text('Services Completed:', style: TextStyle(fontWeight: FontWeight.bold)),
-              ...booking.services.map((service) => Padding(
-                padding: const EdgeInsets.only(left: 16, top: 4),
-                child: Text('✓ ${service.washType}'),
-              )),
+              const Text(
+                'Services Completed:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              ...booking.services.map(
+                (service) => Padding(
+                  padding: const EdgeInsets.only(left: 16, top: 4),
+                  child: Text('✓ ${service.washType}'),
+                ),
+              ),
               const SizedBox(height: 16),
-              const Text('Quality Metrics:', style: TextStyle(fontWeight: FontWeight.bold)),
+              const Text(
+                'Quality Metrics:',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
               const Padding(
                 padding: EdgeInsets.only(left: 16, top: 4),
                 child: Text('• Service Duration: 25 minutes'),
@@ -796,7 +864,10 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
           margin: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.green.withOpacity(0.1), Colors.green.withOpacity(0.05)],
+              colors: [
+                Colors.green.withOpacity(0.1),
+                Colors.green.withOpacity(0.05),
+              ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -811,7 +882,7 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                   color: Colors.green.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: SizedBox(
+                child: const SizedBox(
                   width: 24,
                   height: 24,
                   child: CircularProgressIndicator(
@@ -825,7 +896,7 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Loading Completed Services',
                       style: TextStyle(
                         fontSize: 18,
@@ -847,7 +918,7 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
             ],
           ),
         ),
-        
+
         // Shimmer Loading Cards
         Expanded(
           child: ListView.builder(
@@ -862,7 +933,7 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
 
   Widget _buildShimmerCard(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
@@ -903,7 +974,7 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
             ],
           ),
           const SizedBox(height: 20),
-          
+
           // Summary shimmer
           Row(
             children: [
@@ -915,19 +986,23 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
             ],
           ),
           const SizedBox(height: 16),
-          
+
           // Content shimmer
           _buildShimmerBox(double.infinity, 12),
           const SizedBox(height: 8),
           _buildShimmerBox(200, 12),
           const SizedBox(height: 16),
-          
+
           // Buttons shimmer
           Row(
             children: [
-              Expanded(child: _buildShimmerBox(double.infinity, 40, borderRadius: 12)),
+              Expanded(
+                child: _buildShimmerBox(double.infinity, 40, borderRadius: 12),
+              ),
               const SizedBox(width: 12),
-              Expanded(child: _buildShimmerBox(double.infinity, 40, borderRadius: 12)),
+              Expanded(
+                child: _buildShimmerBox(double.infinity, 40, borderRadius: 12),
+              ),
             ],
           ),
         ],
@@ -935,7 +1010,12 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
     );
   }
 
-  Widget _buildShimmerBox(double width, double height, {double borderRadius = 8, bool isCircle = false}) {
+  Widget _buildShimmerBox(
+    double width,
+    double height, {
+    double borderRadius = 8,
+    bool isCircle = false,
+  }) {
     return Container(
       width: width,
       height: height,
@@ -983,7 +1063,9 @@ class _CarWashCompletedBookingsState extends State<CarWashCompletedBookings> {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Share Service Details'),
-        content: const Text('Share service completion details with customer or supervisor?'),
+        content: const Text(
+          'Share service completion details with customer or supervisor?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

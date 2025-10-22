@@ -32,19 +32,25 @@ class ServiceCountsController extends ChangeNotifier {
   /// Fetch service counts from API
   /// [forceRefresh] - If true, bypasses cache and fetches fresh data
   Future<void> fetchServiceCounts({bool forceRefresh = false}) async {
-    print('📊 [SERVICE_COUNTS] fetchServiceCounts called - forceRefresh: $forceRefresh');
-    
+    print(
+      '📊 [SERVICE_COUNTS] fetchServiceCounts called - forceRefresh: $forceRefresh',
+    );
+
     final now = DateTime.now();
 
     // Check cache validity
     if (!forceRefresh && _lastFetchTime != null && _countsResponse != null) {
       final timeSinceLastFetch = now.difference(_lastFetchTime!);
-      print('📊 [SERVICE_COUNTS] Cache check - time since last fetch: ${timeSinceLastFetch.inMinutes} minutes');
+      print(
+        '📊 [SERVICE_COUNTS] Cache check - time since last fetch: ${timeSinceLastFetch.inMinutes} minutes',
+      );
 
       // If cache is still valid, return immediately
       if (timeSinceLastFetch < _cacheValidDuration) {
-        print('📊 [SERVICE_COUNTS] Using cached data (valid for ${_cacheValidDuration.inMinutes} minutes)');
-        
+        print(
+          '📊 [SERVICE_COUNTS] Using cached data (valid for ${_cacheValidDuration.inMinutes} minutes)',
+        );
+
         // If approaching expiry, trigger background refresh
         if (timeSinceLastFetch > _backgroundRefreshThreshold) {
           print('📊 [SERVICE_COUNTS] Triggering background refresh');
@@ -62,7 +68,9 @@ class ServiceCountsController extends ChangeNotifier {
     if (_countsResponse != null || _error != null) {
       _isLoading = true;
       _error = null;
-      print('📊 [SERVICE_COUNTS] Setting loading state and notifying listeners');
+      print(
+        '📊 [SERVICE_COUNTS] Setting loading state and notifying listeners',
+      );
       notifyListeners();
     } else {
       // Initial load - set loading state without notifying
@@ -75,9 +83,11 @@ class ServiceCountsController extends ChangeNotifier {
       _countsResponse = await _service.getServiceCounts();
       _lastFetchTime = now;
       _error = null;
-      
+
       print('✅ [SERVICE_COUNTS] API call successful');
-      print('📊 [SERVICE_COUNTS] Counts - Open: ${openServiceCount}, Pre: ${prebookingCount}, InProgress: ${inprogressServiceCount}, Completed: ${completedServiceCount}');
+      print(
+        '📊 [SERVICE_COUNTS] Counts - Open: $openServiceCount, Pre: $prebookingCount, InProgress: $inprogressServiceCount, Completed: $completedServiceCount',
+      );
     } catch (e) {
       _error = e.toString();
       _countsResponse = null;
@@ -93,7 +103,7 @@ class ServiceCountsController extends ChangeNotifier {
   /// Silently updates data without showing loading indicators
   Future<void> _backgroundRefresh() async {
     print('🔄 [SERVICE_COUNTS] Background refresh started');
-    
+
     try {
       final freshData = await _service.getServiceCounts();
       _countsResponse = freshData;

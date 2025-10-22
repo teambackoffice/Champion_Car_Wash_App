@@ -15,7 +15,8 @@ class BookingStatus extends StatefulWidget {
   State<BookingStatus> createState() => _BookingStatusState();
 }
 
-class _BookingStatusState extends State<BookingStatus> with AutomaticKeepAliveClientMixin {
+class _BookingStatusState extends State<BookingStatus>
+    with AutomaticKeepAliveClientMixin {
   // OPTIMIZATION: Keep widget alive to prevent unnecessary rebuilds
   @override
   bool get wantKeepAlive => true;
@@ -27,18 +28,18 @@ class _BookingStatusState extends State<BookingStatus> with AutomaticKeepAliveCl
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Future.delayed(const Duration(milliseconds: 100), () async {
         if (mounted) {
-          print('📊 [BOOKING_STATUS] Initial fetch starting...');
-          
+          debugPrint('📊 [BOOKING_STATUS] Initial fetch starting...');
+
           final controller = Provider.of<ServiceCountsController>(
             context,
             listen: false,
           );
-          
+
           try {
             await controller.fetchServiceCounts();
-            print('✅ [BOOKING_STATUS] Initial fetch completed');
+            debugPrint('✅ [BOOKING_STATUS] Initial fetch completed');
           } catch (e) {
-            print('❌ [BOOKING_STATUS] Initial fetch failed: $e');
+            debugPrint('❌ [BOOKING_STATUS] Initial fetch failed: $e');
           }
         }
       });
@@ -77,10 +78,16 @@ class _BookingStatusState extends State<BookingStatus> with AutomaticKeepAliveCl
                       Navigator.push(
                         context,
                         PageRouteBuilder(
-                          pageBuilder: (context, animation, secondaryAnimation) => const NewBookingsScreen(),
-                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                            return FadeTransition(opacity: animation, child: child);
-                          },
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  const NewBookingsScreen(),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                );
+                              },
                           transitionDuration: const Duration(milliseconds: 250),
                         ),
                       );
@@ -104,18 +111,24 @@ class _BookingStatusState extends State<BookingStatus> with AutomaticKeepAliveCl
                       Navigator.push(
                         context,
                         PageRouteBuilder(
-                          pageBuilder: (context, animation, secondaryAnimation) => const PreBookingsScreenContainer(),
-                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                            return FadeTransition(opacity: animation, child: child);
-                          },
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  const PreBookingsScreenContainer(),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                );
+                              },
                           transitionDuration: const Duration(milliseconds: 250),
                         ),
                       );
                     },
                   ),
                 ),
-          ],
-        ),
+              ],
+            ),
             const SizedBox(height: 10),
             Row(
               children: [
@@ -135,10 +148,16 @@ class _BookingStatusState extends State<BookingStatus> with AutomaticKeepAliveCl
                       Navigator.push(
                         context,
                         PageRouteBuilder(
-                          pageBuilder: (context, animation, secondaryAnimation) => const UnderProcessScreen(),
-                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                            return FadeTransition(opacity: animation, child: child);
-                          },
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  const UnderProcessScreen(),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                );
+                              },
                           transitionDuration: const Duration(milliseconds: 250),
                         ),
                       );
@@ -162,10 +181,16 @@ class _BookingStatusState extends State<BookingStatus> with AutomaticKeepAliveCl
                       Navigator.push(
                         context,
                         PageRouteBuilder(
-                          pageBuilder: (context, animation, secondaryAnimation) => const ServiceCompletedScreen(),
-                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                            return FadeTransition(opacity: animation, child: child);
-                          },
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  const ServiceCompletedScreen(),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                );
+                              },
                           transitionDuration: const Duration(milliseconds: 250),
                         ),
                       );
@@ -219,7 +244,7 @@ class _BookingStatusState extends State<BookingStatus> with AutomaticKeepAliveCl
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: Theme.of(context).brightness == Brightness.dark 
+                color: Theme.of(context).brightness == Brightness.dark
                     ? Colors.grey.withValues(alpha: 0.3)
                     : Colors.grey.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
@@ -228,7 +253,7 @@ class _BookingStatusState extends State<BookingStatus> with AutomaticKeepAliveCl
                 title,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Theme.of(context).brightness == Brightness.dark 
+                  color: Theme.of(context).brightness == Brightness.dark
                       ? Colors.black87
                       : Colors.black87,
                   fontWeight: FontWeight.w700,
@@ -247,11 +272,7 @@ class _BookingStatusState extends State<BookingStatus> with AutomaticKeepAliveCl
                       color: color,
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: Icon(
-                      icon,
-                      color: Colors.white,
-                      size: 32,
-                    ),
+                    child: Icon(icon, color: Colors.white, size: 32),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -267,13 +288,18 @@ class _BookingStatusState extends State<BookingStatus> with AutomaticKeepAliveCl
                             borderRadius: BorderRadius.circular(6),
                             child: LinearProgressIndicator(
                               backgroundColor: Colors.transparent,
-                              valueColor: AlwaysStoppedAnimation<Color>(color.withAlpha(77)),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                color.withAlpha(77),
+                              ),
                               minHeight: 32,
                             ),
                           ),
                         )
                       : Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
                           decoration: BoxDecoration(
                             color: color.withValues(alpha: 0.08),
                             borderRadius: BorderRadius.circular(8),

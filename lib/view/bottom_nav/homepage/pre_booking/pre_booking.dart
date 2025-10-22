@@ -23,25 +23,47 @@ class _PreBookingsScreenContainerState
   final TextEditingController _searchController = TextEditingController();
   List<dynamic> _filteredBookings = [];
   Timer? _debounceTimer;
+  bool _isInitialLoading = true;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      print('📅 [PRE_BOOKINGS] Initial fetch starting...');
-      
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    debugPrint('📅 [PRE_BOOKINGS] _loadData called - setting _isInitialLoading = true');
+    setState(() {
+      _isInitialLoading = true;
+    });
+
+    // Add a small delay to ensure loading indicator is visible
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    if (mounted) {
+      debugPrint('📅 [PRE_BOOKINGS] Initial fetch starting...');
+
       final controller = Provider.of<GetPrebookingListController>(
         context,
         listen: false,
       );
-      
+
       try {
         await controller.fetchPreBookingList();
-        print('✅ [PRE_BOOKINGS] Initial fetch completed - ${controller.bookingData.length} bookings');
+        debugPrint(
+          '✅ [PRE_BOOKINGS] Initial fetch completed - ${controller.bookingData.length} bookings',
+        );
       } catch (e) {
-        print('❌ [PRE_BOOKINGS] Initial fetch failed: $e');
+        debugPrint('❌ [PRE_BOOKINGS] Initial fetch failed: $e');
       }
-    });
+
+      if (mounted) {
+        debugPrint('📅 [PRE_BOOKINGS] Setting _isInitialLoading = false');
+        setState(() {
+          _isInitialLoading = false;
+        });
+      }
+    }
   }
 
   void _filterBookings(String query, List<dynamic> bookings) {
@@ -86,8 +108,15 @@ class _PreBookingsScreenContainerState
       ),
       body: Consumer<GetPrebookingListController>(
         builder: (context, controller, child) {
-          if (controller.bookingData.isNotEmpty && _filteredBookings.isEmpty) {
-            _filteredBookings = controller.bookingData;
+          // Update filtered bookings when data is available and not in initial loading
+          if (!_isInitialLoading && controller.bookingData.isNotEmpty && _filteredBookings.isEmpty) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (mounted) {
+                setState(() {
+                  _filteredBookings = controller.bookingData;
+                });
+              }
+            });
           }
 
           return Column(
@@ -141,8 +170,8 @@ class _PreBookingsScreenContainerState
   // Add this method to your _PreBookingsScreenContainerState class:
 
   Future<void> _refreshBookingList() async {
-    print('🔄 [PRE_BOOKINGS] Pull-to-refresh triggered - FORCING API CALL');
-    
+    debugPrint('🔄 [PRE_BOOKINGS] Pull-to-refresh triggered - FORCING API CALL');
+
     try {
       // Add haptic feedback
       HapticFeedback.mediumImpact();
@@ -153,38 +182,46 @@ class _PreBookingsScreenContainerState
         listen: false,
       );
 
-      print('📋 [PRE_BOOKINGS] Fetching fresh pre-booking list from API...');
+      debugPrint('📋 [PRE_BOOKINGS] Fetching fresh pre-booking list from API...');
       // FORCE REFRESH: Always call API on pull-to-refresh
       await controller.fetchPreBookingList(forceRefresh: true);
-      print('✅ [PRE_BOOKINGS] Fresh pre-booking list fetched successfully - ${controller.bookingData.length} bookings');
+      debugPrint(
+        '✅ [PRE_BOOKINGS] Fresh pre-booking list fetched successfully - ${controller.bookingData.length} bookings',
+      );
 
       // Update UI with fresh data
       if (mounted) {
         setState(() {
           _filteredBookings = List.from(controller.bookingData);
         });
-        print('🔄 [PRE_BOOKINGS] UI updated with ${_filteredBookings.length} fresh bookings');
-        
+        debugPrint(
+          '🔄 [PRE_BOOKINGS] UI updated with ${_filteredBookings.length} fresh bookings',
+        );
+
         // Show success feedback
         RefreshFeedback.showSuccess(
           context,
-          'Refreshed ${controller.bookingData.length} pre-bookings'
+          'Refreshed ${controller.bookingData.length} pre-bookings',
         );
       }
     } catch (e) {
-      print('❌ [PRE_BOOKINGS] Error refreshing pre-bookings: $e');
-      
+      debugPrint('❌ [PRE_BOOKINGS] Error refreshing pre-bookings: $e');
+
       if (mounted) {
         RefreshFeedback.showError(
           context,
-          'Failed to refresh booking list: $e'
+          'Failed to refresh booking list: $e',
         );
       }
     }
   }
 
   Widget _buildContent(GetPrebookingListController controller) {
-    if (controller.isLoading) {
+    // Debug print to help track loading state
+    debugPrint('📅 [PRE_BOOKINGS] _buildContent - _isInitialLoading: $_isInitialLoading, controller.isLoading: ${controller.isLoading}');
+    
+    if (_isInitialLoading || controller.isLoading) {
+      debugPrint('📅 [PRE_BOOKINGS] Showing loading indicator');
       return const ListLoadingIndicator(
         message: 'Loading pre-bookings...',
       );

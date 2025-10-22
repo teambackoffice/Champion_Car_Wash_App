@@ -10,7 +10,6 @@ class AddPrebookingService {
   static Future<bool?> addPreBooking({
     required AddPreBookingList preBooking,
   }) async {
-
     final uri = Uri.parse(
       '${ApiConstants.baseUrl}api/method/carwash.Api.auth.create_pre_booking',
     );
@@ -36,10 +35,9 @@ class AddPrebookingService {
     bookingData['branch'] = branch;
 
     debugPrint('📤 REQUEST URL: $uri');
-   debugPrint('📤 REQUEST BODY: ${jsonEncode(bookingData)}');
+    debugPrint('📤 REQUEST BODY: ${jsonEncode(bookingData)}');
 
     final body = jsonEncode(bookingData); // ✅ Now this will work correctly
-
 
     try {
       final response = await http.post(
@@ -48,8 +46,8 @@ class AddPrebookingService {
         body: body,
       );
 
-     debugPrint('📥 RESPONSE STATUS: ${response.statusCode}');
-     debugPrint('📥 RESPONSE BODY: ${response.body}');
+      debugPrint('📥 RESPONSE STATUS: ${response.statusCode}');
+      debugPrint('📥 RESPONSE BODY: ${response.body}');
 
       if (response.statusCode == 200) {
         return true;
@@ -65,9 +63,10 @@ class AddPrebookingService {
           // Handle nested message structure
           if (result['message'] != null) {
             if (result['message'] is Map) {
-              errorMessage = result['message']['message'] ??
-                           result['message']['error'] ??
-                           'Request failed';
+              errorMessage =
+                  result['message']['message'] ??
+                  result['message']['error'] ??
+                  'Request failed';
             } else if (result['message'] is String) {
               errorMessage = result['message'];
             }

@@ -89,43 +89,43 @@ class _BottomNavigationState extends State<BottomNavigation> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(30),
-              // UX ENHANCEMENT: Enhanced shadows for better depth and contrast
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.12),
-                  blurRadius: 28,
-                  offset: const Offset(0, 10),
-                ),
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.06),
-                  blurRadius: 12,
-                  spreadRadius: -2,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildNavItem(
-                  index: 0,
-                  icon: 'assets/home_icon.png',
-                  label: 'Home',
-                ),
-                _buildNavItem(
-                  index: 1,
-                  icon: 'assets/booking.png',
-                  label: 'All Bookings',
-                ),
-                _buildNavItem(
-                  index: 2,
-                  icon: 'assets/profile.png',
-                  label: 'Profile',
-                ),
-              ],
-            ),
-          );
-        },
+                // UX ENHANCEMENT: Enhanced shadows for better depth and contrast
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.12),
+                    blurRadius: 28,
+                    offset: const Offset(0, 10),
+                  ),
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.06),
+                    blurRadius: 12,
+                    spreadRadius: -2,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildNavItem(
+                    index: 0,
+                    icon: 'assets/home_icon.png',
+                    label: 'Home',
+                  ),
+                  _buildNavItem(
+                    index: 1,
+                    icon: 'assets/booking.png',
+                    label: 'All Bookings',
+                  ),
+                  _buildNavItem(
+                    index: 2,
+                    icon: 'assets/profile.png',
+                    label: 'Profile',
+                  ),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );
@@ -145,10 +145,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           curve: Curves.easeInOut,
-          padding: const EdgeInsets.symmetric(
-            horizontal: 10,
-            vertical: 4,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
           decoration: BoxDecoration(
             // UX ENHANCEMENT: Animated background indicator for selected tab with higher contrast
             color: isSelected

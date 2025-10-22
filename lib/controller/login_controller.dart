@@ -28,11 +28,11 @@ class LoginController with ChangeNotifier {
 
     if (isSuccess) {
       isLoggedIn = true;
-      
+
       // Save login status to SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setBool('isLoggedIn', true);
-      
+
       notifyListeners();
       return true;
     } else {
@@ -51,14 +51,14 @@ class LoginController with ChangeNotifier {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setBool('isLoggedIn', false);
     await _authService.logout();
-    
+
     // Clear any user data if needed
     // You might want to clear other stored user data here
-    
+
     isLoggedIn = false;
     isLoading = false;
     errorMessage = null;
-    
+
     notifyListeners();
   }
 

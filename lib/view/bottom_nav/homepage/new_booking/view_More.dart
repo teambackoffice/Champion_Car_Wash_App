@@ -25,10 +25,7 @@ class ViewMorePage extends StatelessWidget {
         preferredSize: const Size.fromHeight(80.0),
         child: AppBar(
           backgroundColor: const Color(0xFF2A2A2A), // Dark grey-black
-          title: const Text(
-            'View More',
-            style: TextStyle(color: Colors.white),
-          ),
+          title: const Text('View More', style: TextStyle(color: Colors.white)),
         ),
       ),
       backgroundColor: const Color(0xFF1A1A1A), // Pure black-grey background

@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ui';
 
 import 'package:champion_car_wash_app/view/bottom_nav/bottom_nav.dart';
 import 'package:champion_car_wash_app/view/carwash_tech/carwas_homepage.dart';
@@ -12,7 +11,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 // Top-level function to be executed in a separate isolate
 Future<Map<String, String?>> _readSecureStorageData(
-    RootIsolateToken? token) async {
+  RootIsolateToken? token,
+) async {
   // Ensure the background isolate can communicate with the platform
   if (token != null) {
     BackgroundIsolateBinaryMessenger.ensureInitialized(token);
@@ -53,7 +53,9 @@ class _SplashScreenState extends State<SplashScreen> {
         if (roles.contains('Carwash Technician')) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (_) => const CarWashTechnicianHomePage()),
+            MaterialPageRoute(
+              builder: (_) => const CarWashTechnicianHomePage(),
+            ),
           );
         } else if (roles.contains('Oil Technician')) {
           Navigator.pushReplacement(

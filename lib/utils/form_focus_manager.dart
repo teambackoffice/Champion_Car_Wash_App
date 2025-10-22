@@ -69,9 +69,9 @@ class FormFocusManager {
 
   /// Get the currently focused node
   FocusNode? get focusedNode => _focusNodes.firstWhere(
-        (node) => node.hasFocus,
-        orElse: () => _focusNodes.first,
-      );
+    (node) => node.hasFocus,
+    orElse: () => _focusNodes.first,
+  );
 }
 
 /// Mixin for forms that need focus management

@@ -20,8 +20,14 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
   List<ExtraWorkItem> get extraWorkItems => widget.booking!.extraWorkItems;
 
   double get subtotal {
-    double servicesTotal = services.fold<double>(0, (sum, s) => sum + (s.price ?? 0));
-    double extraWorksTotal = extraWorkItems.fold<double>(0, (sum, item) => sum + (item.qty * item.rate));
+    double servicesTotal = services.fold<double>(
+      0,
+      (sum, s) => sum + (s.price ?? 0),
+    );
+    double extraWorksTotal = extraWorkItems.fold<double>(
+      0,
+      (sum, item) => sum + (item.qty * item.rate),
+    );
     return servicesTotal + extraWorksTotal;
   }
 
@@ -50,7 +56,8 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
       }
 
       items.add({
-        'item_code': service.serviceType, // Backend should map this to actual item
+        'item_code':
+            service.serviceType, // Backend should map this to actual item
         'item_name': itemDescription,
         'qty': service.qty > 0 ? service.qty : 1,
         'rate': service.price ?? 0,
@@ -72,7 +79,9 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
     // Log items being sent
     print('Total items to send: ${items.length}');
     for (var item in items) {
-      print('Item: ${item['item_code']}, Qty: ${item['qty']}, Price: ${item['price']}');
+      print(
+        'Item: ${item['item_code']}, Qty: ${item['qty']}, Price: ${item['price']}',
+      );
     }
 
     await controller.submitInvoice(
@@ -108,7 +117,9 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
       child: Consumer<SalesInvoiceController>(
         builder: (context, controller, _) {
           return Scaffold(
-            backgroundColor: const Color(0xFF1A1A1A), // Pure black-grey background
+            backgroundColor: const Color(
+              0xFF1A1A1A,
+            ), // Pure black-grey background
             body: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -162,67 +173,70 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
                         padding: const EdgeInsets.all(16.0),
                         children: [
                           // Services
-                          ...services.map((service) => Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                          ...services.map(
+                            (service) => Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          service.serviceType,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w500,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        if (service.washType != null)
+                                          Text(
+                                            'Wash Type: ${service.washType}',
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        if (service.oilBrand != null)
+                                          Text(
+                                            'Oil Brand: ${service.oilBrand}',
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                  Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
                                     children: [
+                                      if (service.qty > 1)
+                                        Text(
+                                          '${service.qty} × ₹${(service.price ?? 0).toInt()}',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey,
+                                          ),
+                                        ),
                                       Text(
-                                        service.serviceType,
+                                        '₹${(service.price ?? 0).toInt()}',
                                         style: const TextStyle(
                                           fontSize: 18,
-                                          fontWeight: FontWeight.w500,
+                                          fontWeight: FontWeight.w600,
                                           color: Colors.black,
                                         ),
                                       ),
-                                      if (service.washType != null)
-                                        Text(
-                                          'Wash Type: ${service.washType}',
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                      if (service.oilBrand != null)
-                                        Text(
-                                          'Oil Brand: ${service.oilBrand}',
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
                                     ],
                                   ),
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
-                                  children: [
-                                    if (service.qty > 1)
-                                      Text(
-                                        '${service.qty} × ₹${(service.price ?? 0).toInt()}',
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    Text(
-                                      '₹${(service.price ?? 0).toInt()}',
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                          )),
+                          ),
 
                           // Extra Work Items
                           if (extraWorkItems.isNotEmpty) ...[
@@ -238,45 +252,49 @@ class _CreateInvoicePageState extends State<CreateInvoicePage> {
                                 ),
                               ),
                             ),
-                            ...extraWorkItems.map((item) => Padding(
-                              padding: const EdgeInsets.only(bottom: 12),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      item.workItem,
-                                      style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w500,
-                                        color: Colors.black,
-                                      ),
-                                    ),
-                                  ),
-                                  Column(
-                                    crossAxisAlignment: CrossAxisAlignment.end,
-                                    children: [
-                                      if (item.qty > 1)
-                                        Text(
-                                          '${item.qty} × ₹${item.rate.toInt()}',
-                                          style: const TextStyle(
-                                            fontSize: 14,
-                                            color: Colors.grey,
-                                          ),
-                                        ),
-                                      Text(
-                                        '₹${(item.qty * item.rate).toInt()}',
+                            ...extraWorkItems.map(
+                              (item) => Padding(
+                                padding: const EdgeInsets.only(bottom: 12),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        item.workItem,
                                         style: const TextStyle(
                                           fontSize: 18,
-                                          fontWeight: FontWeight.w600,
+                                          fontWeight: FontWeight.w500,
                                           color: Colors.black,
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                ],
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.end,
+                                      children: [
+                                        if (item.qty > 1)
+                                          Text(
+                                            '${item.qty} × ₹${item.rate.toInt()}',
+                                            style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        Text(
+                                          '₹${(item.qty * item.rate).toInt()}',
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                               ),
-                            )),
+                            ),
                           ],
                         ],
                       ),

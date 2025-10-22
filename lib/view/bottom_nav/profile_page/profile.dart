@@ -130,16 +130,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     onPressed: loginController.isLoading
                                         ? null
                                         : () async {
+                                            // Capture navigator before async operations
+                                            final navigator = Navigator.of(context);
+                                            final scaffoldMessenger = ScaffoldMessenger.of(context);
+                                            
                                             // Close dialog first
-                                            Navigator.of(context).pop();
+                                            navigator.pop();
 
                                             // Show loading indicator
                                             if (mounted) {
                                               showDialog(
                                                 context: context,
                                                 barrierDismissible: false,
-                                                builder: (context) => const Center(
-                                                  child: CircularProgressIndicator(),
+                                                builder: (dialogContext) => const Center(
+                                                  child:
+                                                      CircularProgressIndicator(),
                                                 ),
                                               );
                                             }
@@ -151,27 +156,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                               // Check if widget is still mounted before navigation
                                               if (mounted) {
                                                 // Close loading dialog
-                                                Navigator.of(context).pop();
+                                                navigator.pop();
 
                                                 // Navigate to login screen
-                                                Navigator.pushAndRemoveUntil(
-                                                  context,
+                                                navigator.pushAndRemoveUntil(
                                                   MaterialPageRoute(
-                                                    builder: (context) => const LoginScreen(),
+                                                    builder: (context) =>
+                                                        const LoginScreen(),
                                                   ),
-                                                  (Route<dynamic> route) => false,
+                                                  (Route<dynamic> route) =>
+                                                      false,
                                                 );
                                               }
                                             } catch (e) {
                                               // Handle logout error
                                               if (mounted) {
                                                 // Close loading dialog if still open
-                                                Navigator.of(context).pop();
-                                                
+                                                navigator.pop();
+
                                                 // Show error message
-                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                scaffoldMessenger.showSnackBar(
                                                   SnackBar(
-                                                    content: Text('Logout failed: $e'),
+                                                    content: Text(
+                                                      'Logout failed: $e',
+                                                    ),
                                                     backgroundColor: Colors.red,
                                                   ),
                                                 );

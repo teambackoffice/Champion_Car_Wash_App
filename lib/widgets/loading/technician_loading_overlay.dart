@@ -15,7 +15,8 @@ class TechnicianLoadingOverlay extends StatefulWidget {
   });
 
   @override
-  State<TechnicianLoadingOverlay> createState() => _TechnicianLoadingOverlayState();
+  State<TechnicianLoadingOverlay> createState() =>
+      _TechnicianLoadingOverlayState();
 }
 
 class _TechnicianLoadingOverlayState extends State<TechnicianLoadingOverlay>
@@ -31,22 +32,16 @@ class _TechnicianLoadingOverlayState extends State<TechnicianLoadingOverlay>
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    
+
     _fadeAnimation = Tween<double>(
       begin: 0.0,
       end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    ));
-    
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+
     _scaleAnimation = Tween<double>(
       begin: 0.8,
       end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.elasticOut,
-    ));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.elasticOut));
   }
 
   @override
@@ -121,7 +116,9 @@ class _TechnicianLoadingOverlayState extends State<TechnicianLoadingOverlay>
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
-                                color: Theme.of(context).textTheme.titleMedium?.color,
+                                color: Theme.of(
+                                  context,
+                                ).textTheme.titleMedium?.color,
                               ),
                               textAlign: TextAlign.center,
                             ),
@@ -130,7 +127,9 @@ class _TechnicianLoadingOverlayState extends State<TechnicianLoadingOverlay>
                               'Please wait...',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Theme.of(context).textTheme.bodySmall?.color,
+                                color: Theme.of(
+                                  context,
+                                ).textTheme.bodySmall?.color,
                               ),
                               textAlign: TextAlign.center,
                             ),

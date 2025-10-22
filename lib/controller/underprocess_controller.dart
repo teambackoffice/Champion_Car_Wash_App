@@ -11,7 +11,9 @@ class UnderProcessingController extends ChangeNotifier {
 
   // OPTIMIZATION: Enhanced caching with time-based expiration
   DateTime? _lastFetchTime;
-  static const Duration _cacheValidDuration = Duration(minutes: 3); // Shorter for active data
+  static const Duration _cacheValidDuration = Duration(
+    minutes: 3,
+  ); // Shorter for active data
   static const Duration _backgroundRefreshThreshold = Duration(minutes: 2);
 
   // Add service status management
@@ -23,19 +25,25 @@ class UnderProcessingController extends ChangeNotifier {
 
   /// OPTIMIZATION: Enhanced fetch with time-based caching
   Future<void> fetchUnderProcessingBookings({bool forceRefresh = false}) async {
-    print('⏳ [UNDER_PROCESS_CONTROLLER] fetchUnderProcessingBookings called - forceRefresh: $forceRefresh');
-    
+    print(
+      '⏳ [UNDER_PROCESS_CONTROLLER] fetchUnderProcessingBookings called - forceRefresh: $forceRefresh',
+    );
+
     final now = DateTime.now();
-    
+
     // Check cache validity
     if (!forceRefresh && _lastFetchTime != null && _underProcessData != null) {
       final timeSinceLastFetch = now.difference(_lastFetchTime!);
-      print('⏳ [UNDER_PROCESS_CONTROLLER] Cache check - time since last fetch: ${timeSinceLastFetch.inMinutes} minutes');
-      
+      print(
+        '⏳ [UNDER_PROCESS_CONTROLLER] Cache check - time since last fetch: ${timeSinceLastFetch.inMinutes} minutes',
+      );
+
       // If cache is still valid, return immediately
       if (timeSinceLastFetch < _cacheValidDuration) {
-        print('⏳ [UNDER_PROCESS_CONTROLLER] Using cached data (${serviceCars.length} bookings)');
-        
+        print(
+          '⏳ [UNDER_PROCESS_CONTROLLER] Using cached data (${serviceCars.length} bookings)',
+        );
+
         // If approaching expiry, trigger background refresh
         if (timeSinceLastFetch > _backgroundRefreshThreshold) {
           print('⏳ [UNDER_PROCESS_CONTROLLER] Triggering background refresh');

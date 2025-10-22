@@ -48,8 +48,6 @@ class LoginService {
     }
   }
 
-
-
   Future<String?> getFullName() async {
     return await _secureStorage.read(key: 'full_name');
   }

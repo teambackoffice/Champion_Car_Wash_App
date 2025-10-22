@@ -2,28 +2,28 @@
 class PerformanceMetrics {
   /// App startup time in milliseconds
   final double startupTimeMs;
-  
+
   /// Number of frame skips detected
   final int frameSkips;
-  
+
   /// Memory usage in megabytes
   final double memoryUsageMB;
-  
+
   /// API response time in milliseconds
   final double apiResponseTimeMs;
-  
+
   /// Current frame rate in frames per second
   final double frameRate;
-  
+
   /// Battery drain per hour as percentage
   final double batteryDrainPerHour;
-  
+
   /// When these metrics were captured
   final DateTime timestamp;
-  
+
   /// Additional device-specific metrics
   final Map<String, dynamic> deviceMetrics;
-  
+
   const PerformanceMetrics({
     required this.startupTimeMs,
     required this.frameSkips,
@@ -34,22 +34,22 @@ class PerformanceMetrics {
     required this.timestamp,
     this.deviceMetrics = const {},
   });
-  
+
   /// Calculate overall performance score from 1-10
   double get performanceScore => _calculateScore();
-  
+
   /// Whether startup time meets Champion Car Wash requirements (< 2 seconds)
   bool get meetsStartupRequirement => startupTimeMs < 2000;
-  
+
   /// Whether frame rate meets 60fps requirement
   bool get meetsFrameRateRequirement => frameRate >= 60.0;
-  
+
   /// Whether memory usage is within acceptable limits (< 120MB)
   bool get meetsMemoryRequirement => memoryUsageMB < 120.0;
-  
+
   /// Whether API response time is acceptable (< 1 second)
   bool get meetsAPIRequirement => apiResponseTimeMs < 1000;
-  
+
   /// Overall health status based on all requirements
   PerformanceHealth get healthStatus {
     final requirementsMet = [
@@ -58,46 +58,62 @@ class PerformanceMetrics {
       meetsMemoryRequirement,
       meetsAPIRequirement,
     ];
-    
+
     final metCount = requirementsMet.where((met) => met).length;
-    
+
     if (metCount == 4) return PerformanceHealth.excellent;
     if (metCount >= 3) return PerformanceHealth.good;
     if (metCount >= 2) return PerformanceHealth.fair;
     return PerformanceHealth.poor;
   }
-  
+
   /// Calculate weighted performance score
   double _calculateScore() {
     double score = 0.0;
-    
+
     // Startup time score (25% weight)
-    final startupScore = startupTimeMs < 1000 ? 10.0 : 
-                        startupTimeMs < 2000 ? 8.0 :
-                        startupTimeMs < 3000 ? 6.0 : 3.0;
+    final startupScore = startupTimeMs < 1000
+        ? 10.0
+        : startupTimeMs < 2000
+        ? 8.0
+        : startupTimeMs < 3000
+        ? 6.0
+        : 3.0;
     score += startupScore * 0.25;
-    
+
     // Frame rate score (25% weight)
-    final frameRateScore = frameRate >= 60 ? 10.0 :
-                          frameRate >= 50 ? 8.0 :
-                          frameRate >= 40 ? 6.0 : 3.0;
+    final frameRateScore = frameRate >= 60
+        ? 10.0
+        : frameRate >= 50
+        ? 8.0
+        : frameRate >= 40
+        ? 6.0
+        : 3.0;
     score += frameRateScore * 0.25;
-    
+
     // Memory usage score (25% weight)
-    final memoryScore = memoryUsageMB < 80 ? 10.0 :
-                       memoryUsageMB < 120 ? 8.0 :
-                       memoryUsageMB < 160 ? 6.0 : 3.0;
+    final memoryScore = memoryUsageMB < 80
+        ? 10.0
+        : memoryUsageMB < 120
+        ? 8.0
+        : memoryUsageMB < 160
+        ? 6.0
+        : 3.0;
     score += memoryScore * 0.25;
-    
+
     // API response time score (25% weight)
-    final apiScore = apiResponseTimeMs < 500 ? 10.0 :
-                    apiResponseTimeMs < 1000 ? 8.0 :
-                    apiResponseTimeMs < 2000 ? 6.0 : 3.0;
+    final apiScore = apiResponseTimeMs < 500
+        ? 10.0
+        : apiResponseTimeMs < 1000
+        ? 8.0
+        : apiResponseTimeMs < 2000
+        ? 6.0
+        : 3.0;
     score += apiScore * 0.25;
-    
+
     return score.clamp(0.0, 10.0);
   }
-  
+
   /// Create metrics with current timestamp
   factory PerformanceMetrics.now({
     required double startupTimeMs,
@@ -119,7 +135,7 @@ class PerformanceMetrics {
       deviceMetrics: deviceMetrics,
     );
   }
-  
+
   /// Convert to JSON for serialization
   Map<String, dynamic> toJson() {
     return {
@@ -135,7 +151,7 @@ class PerformanceMetrics {
       'healthStatus': healthStatus.toString(),
     };
   }
-  
+
   /// Create from JSON
   factory PerformanceMetrics.fromJson(Map<String, dynamic> json) {
     return PerformanceMetrics(
@@ -149,16 +165,16 @@ class PerformanceMetrics {
       deviceMetrics: json['deviceMetrics'] as Map<String, dynamic>? ?? {},
     );
   }
-  
+
   @override
   String toString() {
     return 'PerformanceMetrics('
-           'startup: ${startupTimeMs}ms, '
-           'fps: $frameRate, '
-           'memory: ${memoryUsageMB}MB, '
-           'api: ${apiResponseTimeMs}ms, '
-           'score: ${performanceScore.toStringAsFixed(1)}/10'
-           ')';
+        'startup: ${startupTimeMs}ms, '
+        'fps: $frameRate, '
+        'memory: ${memoryUsageMB}MB, '
+        'api: ${apiResponseTimeMs}ms, '
+        'score: ${performanceScore.toStringAsFixed(1)}/10'
+        ')';
   }
 }
 
@@ -168,7 +184,7 @@ enum PerformanceHealth {
   good,
   fair,
   poor;
-  
+
   /// Human-readable description
   String get description {
     switch (this) {
@@ -182,7 +198,7 @@ enum PerformanceHealth {
         return 'Poor - Significant performance issues';
     }
   }
-  
+
   /// Color indicator for UI display
   String get colorIndicator {
     switch (this) {

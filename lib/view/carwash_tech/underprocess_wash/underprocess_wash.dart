@@ -1,7 +1,6 @@
 import 'package:champion_car_wash_app/controller/car_wash_tech/inprogress_controller.dart';
 import 'package:champion_car_wash_app/controller/oil_tech/inspection_list_controller.dart';
 import 'package:champion_car_wash_app/modal/car_wash_tech/inprogress_modal.dart';
-import 'package:champion_car_wash_app/widgets/loading/technician_loading_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -36,15 +35,15 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
     setState(() {
       _isInitialLoading = true;
     });
-    
+
     await Future.delayed(const Duration(milliseconds: 300));
-    
+
     if (mounted) {
       await Provider.of<InprogressCarWashController>(
         context,
         listen: false,
       ).fetchInProgressServices();
-      
+
       if (mounted) {
         setState(() {
           _isInitialLoading = false;
@@ -57,13 +56,13 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
     setState(() {
       _isRefreshing = true;
     });
-    
+
     if (mounted) {
       await Provider.of<InprogressCarWashController>(
         context,
         listen: false,
       ).fetchInProgressServices();
-      
+
       if (mounted) {
         setState(() {
           _isRefreshing = false;
@@ -78,7 +77,9 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
     final isDarkMode = theme.brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: isDarkMode ? theme.scaffoldBackgroundColor : Colors.grey[50],
+      backgroundColor: isDarkMode
+          ? theme.scaffoldBackgroundColor
+          : Colors.grey[50],
       body: Column(
         children: [
           // Enhanced Header with Timer and Status
@@ -86,10 +87,7 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  Colors.orange[600]!,
-                  Colors.orange[400]!,
-                ],
+                colors: [Colors.orange[600]!, Colors.orange[400]!],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -103,9 +101,9 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
             ),
             child: Row(
               children: [
-                Icon(Icons.hourglass_empty, color: Colors.white, size: 24),
+                const Icon(Icons.hourglass_empty, color: Colors.white, size: 24),
                 const SizedBox(width: 12),
-                Expanded(
+                const Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -119,21 +117,21 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                       ),
                       Text(
                         'Monitor and complete ongoing services',
-                        style: TextStyle(
-                          color: Colors.white70,
-                          fontSize: 14,
-                        ),
+                        style: TextStyle(color: Colors.white70, fontSize: 14),
                       ),
                     ],
                   ),
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Active',
                     style: TextStyle(
                       color: Colors.white,
@@ -145,18 +143,18 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
               ],
             ),
           ),
-          
+
           // Processing List
           Expanded(
             child: Consumer<InprogressCarWashController>(
               builder: (context, controller, child) {
                 final processingBookings =
                     controller.carWashInProgressModal?.message.data ?? [];
-                    
+
                 if (_isInitialLoading || controller.isLoading) {
                   return _buildLoadingState(context);
                 }
-                
+
                 if (processingBookings.isEmpty) {
                   return Center(
                     child: Column(
@@ -220,8 +218,10 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                         const SizedBox(height: 16),
                         ElevatedButton(
                           onPressed: () {
-                            Provider.of<InprogressCarWashController>(context, listen: false)
-                                .fetchInProgressServices();
+                            Provider.of<InprogressCarWashController>(
+                              context,
+                              listen: false,
+                            ).fetchInProgressServices();
                           },
                           child: const Text('Retry'),
                         ),
@@ -260,7 +260,6 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                               ),
                               border: Border.all(
                                 color: Colors.orange.withOpacity(0.3),
-                                width: 1,
                               ),
                             ),
                             child: Padding(
@@ -270,7 +269,8 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                                 children: [
                                   // Enhanced Header with Timer
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Expanded(
                                         child: Row(
@@ -278,10 +278,12 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                                             Container(
                                               padding: const EdgeInsets.all(8),
                                               decoration: BoxDecoration(
-                                                color: Colors.orange.withOpacity(0.1),
-                                                borderRadius: BorderRadius.circular(8),
+                                                color: Colors.orange
+                                                    .withOpacity(0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
                                               ),
-                                              child: Icon(
+                                              child: const Icon(
                                                 Icons.build,
                                                 color: Colors.orange,
                                                 size: 20,
@@ -290,22 +292,28 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                                             const SizedBox(width: 12),
                                             Expanded(
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     booking.serviceId,
                                                     style: TextStyle(
                                                       fontSize: 18,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: theme.textTheme.titleLarge?.color,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      color: theme
+                                                          .textTheme
+                                                          .titleLarge
+                                                          ?.color,
                                                     ),
                                                   ),
                                                   Text(
                                                     'In Progress • ${_getElapsedTime(booking.purchaseDate)}',
-                                                    style: TextStyle(
+                                                    style: const TextStyle(
                                                       fontSize: 12,
                                                       color: Colors.orange,
-                                                      fontWeight: FontWeight.w500,
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                     ),
                                                   ),
                                                 ],
@@ -323,18 +331,23 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                                             ),
                                             decoration: BoxDecoration(
                                               gradient: LinearGradient(
-                                                colors: [Colors.orange, Colors.orange[600]!],
+                                                colors: [
+                                                  Colors.orange,
+                                                  Colors.orange[600]!,
+                                                ],
                                               ),
-                                              borderRadius: BorderRadius.circular(20),
+                                              borderRadius:
+                                                  BorderRadius.circular(20),
                                               boxShadow: [
                                                 BoxShadow(
-                                                  color: Colors.orange.withOpacity(0.3),
+                                                  color: Colors.orange
+                                                      .withOpacity(0.3),
                                                   blurRadius: 8,
                                                   offset: const Offset(0, 2),
                                                 ),
                                               ],
                                             ),
-                                            child: Row(
+                                            child: const Row(
                                               mainAxisSize: MainAxisSize.min,
                                               children: [
                                                 Icon(
@@ -342,8 +355,8 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                                                   color: Colors.white,
                                                   size: 14,
                                                 ),
-                                                const SizedBox(width: 4),
-                                                const Text(
+                                                SizedBox(width: 4),
+                                                Text(
                                                   'ACTIVE',
                                                   style: TextStyle(
                                                     color: Colors.white,
@@ -362,12 +375,15 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                                               vertical: 2,
                                             ),
                                             decoration: BoxDecoration(
-                                              color: Colors.green.withOpacity(0.1),
-                                              borderRadius: BorderRadius.circular(10),
+                                              color: Colors.green.withOpacity(
+                                                0.1,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
                                             ),
                                             child: Text(
                                               '${_getProgressPercentage(booking)}%',
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                 fontSize: 10,
                                                 color: Colors.green,
                                                 fontWeight: FontWeight.bold,
@@ -379,33 +395,38 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                                     ],
                                   ),
                                   const SizedBox(height: 20),
-                                  
+
                                   // Progress Bar
                                   Container(
                                     padding: const EdgeInsets.all(16),
                                     decoration: BoxDecoration(
-                                      color: isDarkMode 
+                                      color: isDarkMode
                                           ? Colors.grey[800]?.withOpacity(0.3)
                                           : Colors.grey[50],
                                       borderRadius: BorderRadius.circular(12),
                                     ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               'Service Progress',
                                               style: TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w600,
-                                                color: theme.textTheme.bodyMedium?.color,
+                                                color: theme
+                                                    .textTheme
+                                                    .bodyMedium
+                                                    ?.color,
                                               ),
                                             ),
                                             Text(
                                               '${_getProgressPercentage(booking)}%',
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.orange,
@@ -415,21 +436,26 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                                         ),
                                         const SizedBox(height: 8),
                                         LinearProgressIndicator(
-                                          value: _getProgressPercentage(booking) / 100,
+                                          value:
+                                              _getProgressPercentage(booking) /
+                                              100,
                                           backgroundColor: Colors.grey[300],
-                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+                                          valueColor:
+                                              const AlwaysStoppedAnimation<Color>(
+                                                Colors.orange,
+                                              ),
                                         ),
                                       ],
                                     ),
                                   ),
-                                  
+
                                   const SizedBox(height: 16),
-                                  
+
                                   // Vehicle Information
                                   Container(
                                     padding: const EdgeInsets.all(16),
                                     decoration: BoxDecoration(
-                                      color: isDarkMode 
+                                      color: isDarkMode
                                           ? Colors.blue[900]?.withOpacity(0.1)
                                           : Colors.blue[50],
                                       borderRadius: BorderRadius.circular(12),
@@ -438,16 +464,17 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                                       ),
                                     ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        Row(
+                                        const Row(
                                           children: [
                                             Icon(
                                               Icons.directions_car,
                                               color: Colors.blue,
                                               size: 20,
                                             ),
-                                            const SizedBox(width: 8),
+                                            SizedBox(width: 8),
                                             Text(
                                               'Vehicle Details',
                                               style: TextStyle(
@@ -477,19 +504,21 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                                         _buildEnhancedDetailRow(
                                           Icons.calendar_today,
                                           'Started',
-                                          DateFormat('dd MMM yyyy, hh:mm a').format(booking.purchaseDate),
+                                          DateFormat(
+                                            'dd MMM yyyy, hh:mm a',
+                                          ).format(booking.purchaseDate),
                                         ),
                                       ],
                                     ),
                                   ),
-                                  
+
                                   const SizedBox(height: 16),
-                                  
+
                                   // Services Section
                                   Container(
                                     padding: const EdgeInsets.all(16),
                                     decoration: BoxDecoration(
-                                      color: isDarkMode 
+                                      color: isDarkMode
                                           ? Colors.green[900]?.withOpacity(0.1)
                                           : Colors.green[50],
                                       borderRadius: BorderRadius.circular(12),
@@ -498,11 +527,12 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                                       ),
                                     ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Row(
                                           children: [
-                                            Icon(
+                                            const Icon(
                                               Icons.cleaning_services,
                                               color: Colors.green,
                                               size: 20,
@@ -510,7 +540,7 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                                             const SizedBox(width: 8),
                                             Text(
                                               'Services in Progress (${booking.services.length})',
-                                              style: TextStyle(
+                                              style: const TextStyle(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.bold,
                                                 color: Colors.green,
@@ -521,21 +551,26 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                                         const SizedBox(height: 12),
                                         ...booking.services.map(
                                           (service) => Container(
-                                            margin: const EdgeInsets.only(bottom: 8),
+                                            margin: const EdgeInsets.only(
+                                              bottom: 8,
+                                            ),
                                             padding: const EdgeInsets.symmetric(
                                               horizontal: 12,
                                               vertical: 8,
                                             ),
                                             decoration: BoxDecoration(
                                               color: Colors.white,
-                                              borderRadius: BorderRadius.circular(8),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                               border: Border.all(
-                                                color: Colors.green.withOpacity(0.2),
+                                                color: Colors.green.withOpacity(
+                                                  0.2,
+                                                ),
                                               ),
                                             ),
                                             child: Row(
                                               children: [
-                                                Icon(
+                                                const Icon(
                                                   Icons.build,
                                                   color: Colors.orange,
                                                   size: 16,
@@ -546,26 +581,36 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                                                     service.washType,
                                                     style: TextStyle(
                                                       fontSize: 14,
-                                                      fontWeight: FontWeight.w500,
-                                                      color: theme.textTheme.bodyLarge?.color,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: theme
+                                                          .textTheme
+                                                          .bodyLarge
+                                                          ?.color,
                                                     ),
                                                   ),
                                                 ),
                                                 Container(
-                                                  padding: const EdgeInsets.symmetric(
-                                                    horizontal: 8,
-                                                    vertical: 2,
-                                                  ),
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 8,
+                                                        vertical: 2,
+                                                      ),
                                                   decoration: BoxDecoration(
-                                                    color: Colors.orange.withOpacity(0.1),
-                                                    borderRadius: BorderRadius.circular(10),
+                                                    color: Colors.orange
+                                                        .withOpacity(0.1),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          10,
+                                                        ),
                                                   ),
-                                                  child: Text(
+                                                  child: const Text(
                                                     'Active',
                                                     style: TextStyle(
                                                       fontSize: 10,
                                                       color: Colors.orange,
-                                                      fontWeight: FontWeight.bold,
+                                                      fontWeight:
+                                                          FontWeight.bold,
                                                     ),
                                                   ),
                                                 ),
@@ -577,20 +622,31 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                                     ),
                                   ),
                                   const SizedBox(height: 24),
-                                  
+
                                   // Action Buttons
                                   Row(
                                     children: [
                                       Expanded(
                                         child: OutlinedButton.icon(
-                                          onPressed: () => _showServiceNotes(context, booking),
-                                          icon: Icon(Icons.note_add_outlined, size: 18),
+                                          onPressed: () => _showServiceNotes(
+                                            context,
+                                            booking,
+                                          ),
+                                          icon: const Icon(
+                                            Icons.note_add_outlined,
+                                            size: 18,
+                                          ),
                                           label: const Text('Add Notes'),
                                           style: OutlinedButton.styleFrom(
-                                            padding: const EdgeInsets.symmetric(vertical: 12),
-                                            side: BorderSide(color: Colors.blue),
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 12,
+                                            ),
+                                            side: const BorderSide(
+                                              color: Colors.blue,
+                                            ),
                                             shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(12),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
                                             ),
                                           ),
                                         ),
@@ -599,20 +655,30 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                                       Expanded(
                                         flex: 2,
                                         child: ElevatedButton.icon(
-                                          onPressed: () => _showInspectionDialog(context, booking),
-                                          icon: Icon(Icons.checklist, size: 20),
-                                          label: const Text('Complete Inspection'),
+                                          onPressed: () =>
+                                              _showInspectionDialog(
+                                                context,
+                                                booking,
+                                              ),
+                                          icon: const Icon(Icons.checklist, size: 20),
+                                          label: const Text(
+                                            'Complete Inspection',
+                                          ),
                                           style: ElevatedButton.styleFrom(
-                                            backgroundColor: isDarkMode 
-                                                ? theme.primaryColor 
+                                            backgroundColor: isDarkMode
+                                                ? theme.primaryColor
                                                 : Colors.green[600],
                                             foregroundColor: Colors.white,
-                                            padding: const EdgeInsets.symmetric(vertical: 16),
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 16,
+                                            ),
                                             shape: RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.circular(12),
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
                                             ),
                                             elevation: 4,
-                                            shadowColor: Colors.green.withOpacity(0.3),
+                                            shadowColor: Colors.green
+                                                .withOpacity(0.3),
                                           ),
                                         ),
                                       ),
@@ -646,14 +712,21 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
             width: 100,
             child: Text(
               label,
-              style: TextStyle(fontSize: 14, color: theme.textTheme.bodySmall?.color),
+              style: TextStyle(
+                fontSize: 14,
+                color: theme.textTheme.bodySmall?.color,
+              ),
             ),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Text(
               value,
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: theme.textTheme.bodyMedium?.color),
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: theme.textTheme.bodyMedium?.color,
+              ),
             ),
           ),
         ],
@@ -699,7 +772,7 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
   String _getElapsedTime(DateTime startTime) {
     final now = DateTime.now();
     final difference = now.difference(startTime);
-    
+
     if (difference.inMinutes < 60) {
       return '${difference.inMinutes} min';
     } else if (difference.inHours < 24) {
@@ -712,7 +785,8 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
   int _getProgressPercentage(Datum booking) {
     // Calculate progress based on elapsed time and estimated completion time
     final elapsed = DateTime.now().difference(booking.purchaseDate).inMinutes;
-    final estimatedTotal = booking.services.length * 20; // 20 minutes per service
+    final estimatedTotal =
+        booking.services.length * 20; // 20 minutes per service
     final progress = (elapsed / estimatedTotal * 100).clamp(0, 95).toInt();
     return progress;
   }
@@ -729,7 +803,10 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
           margin: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [Colors.orange.withOpacity(0.1), Colors.orange.withOpacity(0.05)],
+              colors: [
+                Colors.orange.withOpacity(0.1),
+                Colors.orange.withOpacity(0.05),
+              ],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -744,7 +821,7 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                   color: Colors.orange.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: SizedBox(
+                child: const SizedBox(
                   width: 24,
                   height: 24,
                   child: CircularProgressIndicator(
@@ -758,7 +835,7 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
+                    const Text(
                       'Loading Active Services',
                       style: TextStyle(
                         fontSize: 18,
@@ -780,7 +857,7 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
             ],
           ),
         ),
-        
+
         // Shimmer Loading Cards
         Expanded(
           child: ListView.builder(
@@ -795,7 +872,7 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
 
   Widget _buildShimmerCard(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
@@ -836,17 +913,17 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
             ],
           ),
           const SizedBox(height: 20),
-          
+
           // Progress bar shimmer
           _buildShimmerBox(double.infinity, 8, borderRadius: 4),
           const SizedBox(height: 16),
-          
+
           // Content shimmer
           _buildShimmerBox(double.infinity, 12),
           const SizedBox(height: 8),
           _buildShimmerBox(200, 12),
           const SizedBox(height: 16),
-          
+
           // Button shimmer
           _buildShimmerBox(double.infinity, 48, borderRadius: 12),
         ],
@@ -854,7 +931,12 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
     );
   }
 
-  Widget _buildShimmerBox(double width, double height, {double borderRadius = 8, bool isCircle = false}) {
+  Widget _buildShimmerBox(
+    double width,
+    double height, {
+    double borderRadius = 8,
+    bool isCircle = false,
+  }) {
     return Container(
       width: width,
       height: height,
@@ -899,7 +981,7 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
 
   void _showServiceNotes(BuildContext context, Datum booking) {
     final TextEditingController notesController = TextEditingController();
-    
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -908,7 +990,7 @@ class _CarWashUnderProcessingState extends State<CarWashUnderProcessing> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Add notes about the service progress or any observations:',
               style: TextStyle(fontSize: 14),
             ),
@@ -970,7 +1052,10 @@ class _InspectionDialogState extends State<InspectionDialog> {
   @override
   void initState() {
     super.initState();
+    print('🚗 [CAR_WASH_INSPECTION] Initializing car wash inspection dialog for booking: ${widget.booking.serviceId}');
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      print('🚗 [CAR_WASH_INSPECTION] Fetching inspection list for car wash...');
       Provider.of<InspectionListController>(
         context,
         listen: false,
@@ -1011,7 +1096,10 @@ class _InspectionDialogState extends State<InspectionDialog> {
               children: [
                 Text(
                   'Vehicle: ${widget.booking.make} - ${widget.booking.model}',
-                  style: TextStyle(fontSize: 14, color: theme.textTheme.bodySmall?.color),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: theme.textTheme.bodySmall?.color,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 Flexible(
@@ -1039,9 +1127,7 @@ class _InspectionDialogState extends State<InspectionDialog> {
                         },
                         activeColor: theme.primaryColor,
                         controlAffinity: ListTileControlAffinity.leading,
-                        contentPadding: const EdgeInsets.symmetric(
-                          
-                        ),
+                        contentPadding: const EdgeInsets.symmetric(),
                       );
                     },
                   ),
@@ -1071,34 +1157,51 @@ class _InspectionDialogState extends State<InspectionDialog> {
   }
 
   void _completeInspection(BuildContext context) async {
+    print('🚗 [CAR_WASH_INSPECTION] Starting _completeInspection for booking: ${widget.booking.serviceId}');
+    
     final inspectionController = Provider.of<InspectionListController>(
       context,
       listen: false,
     );
     final completeController =
-    Provider.of<CarWashInProgressToCompleteController>(
-      context,
-      listen: false,
-    );
+        Provider.of<CarWashInProgressToCompleteController>(
+          context,
+          listen: false,
+        );
+
+    print('🚗 [CAR_WASH_INSPECTION] Inspection items count: ${inspectionController.inspectionItems.length}');
 
     // Prepare answers from inspection items
     List<Map<String, dynamic>> answers = inspectionController.inspectionItems
         .map(
           (item) => {
-        'question': item.questions,
-        'answer': item.isChecked ? 'Yes' : 'No',
-        'is_checked': item.isChecked,
-      },
-    )
+            'question': item.questions,
+            'answer': item.isChecked ? 'Yes' : 'No',
+            'is_checked': item.isChecked,
+          },
+        )
         .toList();
 
+    print('🚗 [CAR_WASH_INSPECTION] Prepared answers: ${answers.length} items');
+    for (int i = 0; i < answers.length; i++) {
+      print('🚗 [CAR_WASH_INSPECTION] Answer $i: ${answers[i]}');
+    }
+
     try {
+      print('🚗 [CAR_WASH_INSPECTION] Starting API submission process...');
+      
       // Show loading indicator
       showDialog(
         context: context,
         barrierDismissible: false,
         builder: (context) => const Center(child: CircularProgressIndicator()),
       );
+
+      print('🚗 [CAR_WASH_INSPECTION] Calling submitCarwash with parameters:');
+      print('🚗 [CAR_WASH_INSPECTION] - Service ID: ${widget.booking.serviceId}');
+      print('🚗 [CAR_WASH_INSPECTION] - Price: 200');
+      print('🚗 [CAR_WASH_INSPECTION] - Car wash total: ${widget.booking.services.length}');
+      print('🚗 [CAR_WASH_INSPECTION] - Inspection type: car wash');
 
       // Call the API
       await completeController.submitCarwash(
@@ -1109,6 +1212,8 @@ class _InspectionDialogState extends State<InspectionDialog> {
         answers: answers,
       );
 
+      print('🚗 [CAR_WASH_INSPECTION] API call completed');
+
       // Close loading dialog
       if (context.mounted) Navigator.of(context).pop();
 
@@ -1116,6 +1221,8 @@ class _InspectionDialogState extends State<InspectionDialog> {
       if (context.mounted) Navigator.of(context).pop();
 
       if (completeController.errorMessage != null) {
+        print('❌ [CAR_WASH_INSPECTION] Error from controller: ${completeController.errorMessage}');
+        
         // Show error message
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -1127,6 +1234,8 @@ class _InspectionDialogState extends State<InspectionDialog> {
           );
         }
       } else {
+        print('✅ [CAR_WASH_INSPECTION] Car wash completed successfully');
+        
         // Show success message
         if (context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -1141,6 +1250,7 @@ class _InspectionDialogState extends State<InspectionDialog> {
         }
 
         // Refresh the list
+        print('🚗 [CAR_WASH_INSPECTION] Refreshing in-progress services list...');
         if (context.mounted) {
           Provider.of<InprogressCarWashController>(
             context,
@@ -1149,6 +1259,8 @@ class _InspectionDialogState extends State<InspectionDialog> {
         }
       }
     } catch (e) {
+      print('❌ [CAR_WASH_INSPECTION] Exception during service completion: $e');
+      
       // Close loading dialog if still open
       if (context.mounted) Navigator.of(context).pop();
 
@@ -1165,4 +1277,3 @@ class _InspectionDialogState extends State<InspectionDialog> {
     }
   }
 }
-

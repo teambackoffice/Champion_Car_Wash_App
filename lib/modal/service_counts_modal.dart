@@ -4,10 +4,7 @@ class ServiceCountsResponse {
   final bool success;
   final ServiceCounts counts;
 
-  ServiceCountsResponse({
-    required this.success,
-    required this.counts,
-  });
+  ServiceCountsResponse({required this.success, required this.counts});
 
   factory ServiceCountsResponse.fromJson(Map<String, dynamic> json) {
     return ServiceCountsResponse(
@@ -17,10 +14,7 @@ class ServiceCountsResponse {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'success': success,
-      'counts': counts.toJson(),
-    };
+    return {'success': success, 'counts': counts.toJson()};
   }
 }
 

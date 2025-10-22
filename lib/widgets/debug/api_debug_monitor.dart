@@ -6,11 +6,8 @@ import 'package:flutter/services.dart';
 /// Only shows in debug mode
 class ApiDebugMonitor extends StatefulWidget {
   final Widget child;
-  
-  const ApiDebugMonitor({
-    super.key,
-    required this.child,
-  });
+
+  const ApiDebugMonitor({super.key, required this.child});
 
   @override
   State<ApiDebugMonitor> createState() => _ApiDebugMonitorState();
@@ -19,23 +16,23 @@ class ApiDebugMonitor extends StatefulWidget {
 class _ApiDebugMonitorState extends State<ApiDebugMonitor> {
   bool _showDebugInfo = false;
   final List<String> _debugLogs = [];
-  
+
   @override
   void initState() {
     super.initState();
-    
+
     // Listen to debug prints (in debug mode only)
     if (kDebugMode) {
       // This is a simplified approach - in production you'd use a proper logging system
       _startListeningToLogs();
     }
   }
-  
+
   void _startListeningToLogs() {
     // This is a placeholder - you'd implement proper log listening here
     // For now, we'll just show the toggle button
   }
-  
+
   void _addLog(String log) {
     if (mounted) {
       setState(() {
@@ -46,19 +43,19 @@ class _ApiDebugMonitorState extends State<ApiDebugMonitor> {
       });
     }
   }
-  
+
   void _clearLogs() {
     setState(() {
       _debugLogs.clear();
     });
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         widget.child,
-        
+
         // Debug overlay (only in debug mode)
         if (kDebugMode) ...[
           // Debug toggle button
@@ -80,7 +77,7 @@ class _ApiDebugMonitorState extends State<ApiDebugMonitor> {
               ),
             ),
           ),
-          
+
           // Debug info panel
           if (_showDebugInfo)
             Positioned(
@@ -108,7 +105,11 @@ class _ApiDebugMonitorState extends State<ApiDebugMonitor> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.bug_report, color: Colors.white, size: 16),
+                          const Icon(
+                            Icons.bug_report,
+                            color: Colors.white,
+                            size: 16,
+                          ),
                           const SizedBox(width: 8),
                           const Text(
                             'API Debug Monitor',
@@ -121,14 +122,18 @@ class _ApiDebugMonitorState extends State<ApiDebugMonitor> {
                           const Spacer(),
                           IconButton(
                             onPressed: _clearLogs,
-                            icon: const Icon(Icons.clear, color: Colors.white, size: 16),
+                            icon: const Icon(
+                              Icons.clear,
+                              color: Colors.white,
+                              size: 16,
+                            ),
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
                           ),
                         ],
                       ),
                     ),
-                    
+
                     // Logs
                     Expanded(
                       child: _debugLogs.isEmpty
@@ -145,17 +150,18 @@ class _ApiDebugMonitorState extends State<ApiDebugMonitor> {
                               itemBuilder: (context, index) {
                                 final log = _debugLogs[index];
                                 Color logColor = Colors.white70;
-                                
+
                                 if (log.contains('✅')) {
                                   logColor = Colors.green;
                                 } else if (log.contains('❌')) {
                                   logColor = Colors.red;
                                 } else if (log.contains('🔄')) {
                                   logColor = Colors.blue;
-                                } else if (log.contains('📊') || log.contains('📋')) {
+                                } else if (log.contains('📊') ||
+                                    log.contains('📋')) {
                                   logColor = Colors.orange;
                                 }
-                                
+
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 4),
                                   child: Text(
@@ -170,7 +176,7 @@ class _ApiDebugMonitorState extends State<ApiDebugMonitor> {
                               },
                             ),
                     ),
-                    
+
                     // Instructions
                     Container(
                       padding: const EdgeInsets.all(8),
@@ -183,10 +189,7 @@ class _ApiDebugMonitorState extends State<ApiDebugMonitor> {
                       ),
                       child: const Text(
                         'Pull down on any screen to test refresh APIs\nCheck console for detailed logs',
-                        style: TextStyle(
-                          color: Colors.white60,
-                          fontSize: 10,
-                        ),
+                        style: TextStyle(color: Colors.white60, fontSize: 10),
                         textAlign: TextAlign.center,
                       ),
                     ),

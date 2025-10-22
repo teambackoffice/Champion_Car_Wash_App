@@ -1,4 +1,3 @@
-
 /// Simple API response cache to reduce redundant network calls
 /// Automatically expires cached data after TTL period
 class ApiCache {
@@ -48,12 +47,14 @@ class ApiCache {
     final now = DateTime.now();
     final expired = _cache.values.where((e) => e.isExpired).length;
     final active = _cache.length - expired;
-    
+
     return {
       'total_entries': _cache.length,
       'active_entries': active,
       'expired_entries': expired,
-      'cache_hit_potential': active > 0 ? '${(active / _cache.length * 100).toStringAsFixed(1)}%' : '0%',
+      'cache_hit_potential': active > 0
+          ? '${(active / _cache.length * 100).toStringAsFixed(1)}%'
+          : '0%',
     };
   }
 }
@@ -65,6 +66,6 @@ class CacheEntry {
   CacheEntry({required this.data, required this.expiry});
 
   bool get isExpired => DateTime.now().isAfter(expiry);
-  
+
   Duration get timeToExpiry => expiry.difference(DateTime.now());
 }

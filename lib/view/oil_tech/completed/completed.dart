@@ -67,100 +67,216 @@ class CompletedBookingCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16.0),
       child: Card(
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header with booking ID and Completed badge
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    booking.serviceId,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: isDarkMode ? Colors.white : Colors.black87,
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 4,
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.green,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Text(
-                      'Completed',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
+        elevation: isDarkMode ? 6 : 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        color: theme.cardColor,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: Colors.green.withOpacity(0.3),
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Enhanced Header with icon
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.green.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Icon(
+                              Icons.check_circle,
+                              color: isDarkMode
+                                  ? Colors.green[300]
+                                  : Colors.green[700],
+                              size: 20,
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              booking.serviceId,
+                              style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: theme.textTheme.titleLarge?.color,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              // Car details
-              if (booking.purchaseDate != null)
-                _buildDetailRow(
-                  context,
-                  'Booking Date',
-                  DateFormat('dd MMM YYYY').format(booking.purchaseDate!),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.green,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: const Text(
+                        'DONE',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              if (booking.customerName != null)
-                _buildDetailRow(context, 'User Name', booking.customerName!),
-              // _buildDetailRow('Mobile No', booking.mobileNo),
-              // _buildDetailRow('Email ID', booking.email),
-              if (booking.model != null)
-                _buildDetailRow(context, 'Vehicle', booking.model!),
-              // _buildDetailRow('Engine Model', booking.engineModel),
-              // _buildDetailRow('Completed By', booking.completedBy),
-              // _buildDetailRow(
-              //   'Completed On',
-              //   _formatCompletedDate(booking.completedDate),
-              // ),
+                const SizedBox(height: 20),
 
-              // const SizedBox(height: 16),
-
-              // Selected Services
-              Text(
-                'Selected Services',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: isDarkMode ? Colors.grey[300] : Colors.grey,
-                ),
-              ),
-              const SizedBox(height: 8),
-
-              // Services list
-              ...booking.services.where((service) => service.oilBrand != null).map(
-                (service) => Padding(
-                  padding: const EdgeInsets.only(bottom: 4),
-                  child: Text(
-                    service.oilBrand!,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: isDarkMode ? Colors.white : Colors.black87,
+                // Enhanced Vehicle Info Section
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: isDarkMode
+                        ? Colors.grey[800]?.withOpacity(0.3)
+                        : Colors.grey[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: theme.dividerColor.withOpacity(0.1),
                     ),
                   ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.directions_car,
+                            color: theme.primaryColor,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Vehicle Information',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: theme.textTheme.titleMedium?.color,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      if (booking.purchaseDate != null)
+                        _buildDetailRow(
+                          context,
+                          'Booking Date',
+                          DateFormat('dd MMM yyyy').format(booking.purchaseDate!),
+                        ),
+                      if (booking.customerName != null)
+                        _buildDetailRow(context, 'Customer', booking.customerName!),
+                      if (booking.model != null)
+                        _buildDetailRow(context, 'Vehicle', booking.model!),
+                    ],
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
+
+                // Enhanced Services Section
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: isDarkMode
+                        ? Colors.green[900]?.withOpacity(0.1)
+                        : Colors.green[50],
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.green.withOpacity(0.2),
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.verified,
+                            color: isDarkMode
+                                ? Colors.green[300]
+                                : Colors.green[700],
+                            size: 20,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Completed Services (${booking.services.where((s) => s.oilBrand != null).length})',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: isDarkMode
+                                  ? Colors.green[300]
+                                  : Colors.green[700],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      ...booking.services
+                          .where((service) => service.oilBrand != null)
+                          .map(
+                            (service) => Container(
+                              margin: const EdgeInsets.only(bottom: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
+                              decoration: BoxDecoration(
+                                color: isDarkMode
+                                    ? Colors.grey[800]
+                                    : Colors.white,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: Colors.green.withOpacity(0.2),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.verified,
+                                    color: isDarkMode
+                                        ? Colors.green[300]
+                                        : Colors.green[700],
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      service.oilBrand!,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                        color: theme.textTheme.bodyMedium?.color,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
 
               // Tap to view details hint
               // Row(
@@ -182,13 +298,14 @@ class CompletedBookingCard extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 
   Widget _buildDetailRow(BuildContext context, String label, String value) {
     final theme = Theme.of(context);
     final isDarkMode = theme.brightness == Brightness.dark;
-    
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Row(
@@ -199,7 +316,7 @@ class CompletedBookingCard extends StatelessWidget {
             child: Text(
               label,
               style: TextStyle(
-                fontSize: 14, 
+                fontSize: 14,
                 color: isDarkMode ? Colors.grey[300] : Colors.grey,
               ),
             ),
@@ -211,7 +328,7 @@ class CompletedBookingCard extends StatelessWidget {
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: isDarkMode ? Colors.white : Colors.black87,
+                color: theme.textTheme.bodyMedium?.color,
               ),
             ),
           ),

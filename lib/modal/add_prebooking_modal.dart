@@ -43,15 +43,15 @@ class AddPreBookingList {
       );
 
   Map<String, dynamic> toJson() => {
-        "customer_name": customerName,
-        "phone": phone,
-        "reg_number": regNumber,
-        "date":
-            "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}",
-        "time": time,
-        "branch": branch,
-        "services": List<dynamic>.from(services.map((x) => x.toJson())),
-      };
+    'customer_name': customerName,
+    'phone': phone,
+    'reg_number': regNumber,
+    'date':
+        "${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}",
+    'time': time,
+    'branch': branch,
+    'services': List<dynamic>.from(services.map((x) => x.toJson())),
+  };
 }
 
 class Service {
