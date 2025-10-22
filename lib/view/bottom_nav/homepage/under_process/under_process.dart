@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'package:champion_car_wash_app/controller/underprocess_controller.dart';
 import 'package:champion_car_wash_app/modal/underprocess_modal.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/create_invoice.dart';
 import 'package:champion_car_wash_app/widgets/common/custom_back_button.dart';
+import 'package:champion_car_wash_app/widgets/common/refresh_loading_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -16,6 +18,7 @@ class UnderProcessScreen extends StatefulWidget {
 class _UnderProcessScreenState extends State<UnderProcessScreen> {
   List<ServiceCars> _filteredBookings = [];
   bool _isSearching = false;
+  Timer? _debounceTimer;
 
   final TextEditingController _searchController = TextEditingController();
 
@@ -27,18 +30,26 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
     _searchController.addListener(_onSearchChanged);
 
     // Fetch data after the first frame is built
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      print('⏳ [UNDER_PROCESS] Initial fetch starting...');
+      
       final controller = Provider.of<UnderProcessingController>(
         context,
         listen: false,
       );
-      controller.fetchUnderProcessingBookings().then((_) {
+      
+      try {
+        await controller.fetchUnderProcessingBookings();
+        print('✅ [UNDER_PROCESS] Initial fetch completed - ${controller.serviceCars.length} bookings');
+        
         if (mounted) {
           setState(() {
             _filteredBookings = controller.serviceCars;
           });
         }
-      });
+      } catch (e) {
+        print('❌ [UNDER_PROCESS] Initial fetch failed: $e');
+      }
     });
   }
 
@@ -51,6 +62,7 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
     // PERFORMANCE FIX: Remove listener before disposing to prevent memory leak
     _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
+    _debounceTimer?.cancel();
     super.dispose();
   }
 
@@ -193,8 +205,8 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
         child: Consumer<UnderProcessingController>(
           builder: (context, controller, _) {
             if (controller.isLoading) {
-              return Center(
-                child: CircularProgressIndicator(color: Colors.red[800]),
+              return const ListLoadingIndicator(
+                message: 'Loading under processing bookings...',
               );
             }
 
@@ -233,21 +245,42 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
 
             return RefreshIndicator(
               onRefresh: () async {
-                await controller.fetchUnderProcessingBookings();
-                if (mounted) {
-                  setState(() {
-                    _filteredBookings = controller.serviceCars;
-                  });
+                print('🔄 [UNDER_PROCESS] Pull-to-refresh triggered - FORCING API CALL');
+                
+                try {
+                  print('📋 [UNDER_PROCESS] Fetching fresh under processing bookings from API...');
+                  // FORCE REFRESH: Always call API on pull-to-refresh
+                  await controller.fetchUnderProcessingBookings(forceRefresh: true);
+                  print('✅ [UNDER_PROCESS] Fresh under processing bookings fetched successfully - ${controller.serviceCars.length} bookings');
+                  
+                  if (mounted) {
+                    setState(() {
+                      _filteredBookings = controller.serviceCars;
+                    });
+                    print('🔄 [UNDER_PROCESS] UI updated with ${_filteredBookings.length} fresh bookings');
+                    
+                    // Show success feedback
+                    RefreshFeedback.showSuccess(
+                      context,
+                      'Refreshed ${controller.serviceCars.length} under processing bookings'
+                    );
+                  }
+                } catch (e) {
+                  print('❌ [UNDER_PROCESS] Error refreshing under processing bookings: $e');
+                  
+                  if (mounted) {
+                    RefreshFeedback.showError(
+                      context,
+                      'Failed to refresh under processing bookings: $e'
+                    );
+                  }
                 }
               },
               color: const Color(0xFFD32F2F),
               backgroundColor: Colors.white,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    Container(
+              child: Column(
+                children: [
+                  Container(
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(8),
@@ -257,6 +290,16 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                     ),
                     child: TextField(
                       controller: _searchController,
+                      onChanged: (value) {
+                        // PERFORMANCE FIX: Debounce search to avoid filtering on every keystroke
+                        _debounceTimer?.cancel();
+                        _debounceTimer = Timer(
+                          const Duration(milliseconds: 300),
+                          () {
+                            _filterBookings(value);
+                          },
+                        );
+                      },
                       decoration: InputDecoration(
                         hintText: 'Search Customer by Vehicle Number',
                         hintStyle: TextStyle(
@@ -286,247 +329,164 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  ...bookings.map((booking) {
-                    // Use serviceId as the unique identifier
-                    final bookingId = booking.serviceId;
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: bookings.length,
+                      itemBuilder: (context, index) {
+                        final booking = bookings[index];
+                        // Use serviceId as the unique identifier
+                        final bookingId = booking.serviceId;
 
-                    // Use local methods to check service status
-                    final hasServiceStarted = _hasAnyServiceStarted(booking);
-                    final allServicesComplete = _areAllServicesCompleted(
-                      booking,
-                    );
-                    final progress = _calculateProgress(booking);
+                        // Use local methods to check service status
+                        final hasServiceStarted = _hasAnyServiceStarted(
+                          booking,
+                        );
+                        final allServicesComplete = _areAllServicesCompleted(
+                          booking,
+                        );
+                        final progress = _calculateProgress(booking);
 
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: const [
-                          BoxShadow(color: Colors.black12, blurRadius: 6),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          // Header
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 16),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(12),
+                            boxShadow: const [
+                              BoxShadow(color: Colors.black12, blurRadius: 6),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              // Header
+                              Container(
+                                padding: const EdgeInsets.all(16),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            booking.registrationNumber,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.red,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        booking.mainStatus,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              // Progress bar (only show if service has started)
+                              if (hasServiceStarted && !allServicesComplete)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  child: LinearProgressIndicator(
+                                    value: progress / 100,
+                                    backgroundColor: Colors.grey[300],
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                      progress == 100
+                                          ? Colors.green
+                                          : Colors.red,
+                                    ),
+                                  ),
+                                ),
+
+                              // Details
+                              Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  children: [
+                                    _buildRow(
+                                      'Customer Name',
+                                      booking.customerName,
+                                    ),
+                                    _buildRow('Phone', booking.phone),
+                                    _buildRow(
+                                      'Car Model',
+                                      '${booking.make} ${booking.model}',
+                                    ),
+                                    _buildRow('Car Type', booking.carType),
+                                    _buildRow(
+                                      'Odometer',
+                                      '${booking.currentOdometerReading.toStringAsFixed(0)} KM',
+                                    ),
+                                    _buildRow(
+                                      'Purchase Date',
+                                      DateFormat('dd MMM yyyy').format(
+                                        booking.purchaseDate.toString() ==
+                                                'null'
+                                            ? DateTime.now()
+                                            : DateTime.parse(
+                                                booking.purchaseDate.toString(),
+                                              ),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                  ],
+                                ),
+                              ),
+
+                              // Services list
+                              if (booking.services.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        booking.registrationNumber,
-                                        style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black87,
+                                      const Text(
+                                        'Selected Services',
+                                        style: TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey,
+                                          fontWeight: FontWeight.w500,
                                         ),
                                       ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.red,
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    booking.mainStatus,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          // Progress bar (only show if service has started)
-                          if (hasServiceStarted && !allServicesComplete)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                              ),
-                              child: LinearProgressIndicator(
-                                value: progress / 100,
-                                backgroundColor: Colors.grey[300],
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  progress == 100 ? Colors.green : Colors.red,
-                                ),
-                              ),
-                            ),
-
-                          // Details
-                          Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              children: [
-                                _buildRow(
-                                  'Customer Name',
-                                  booking.customerName,
-                                ),
-                                _buildRow('Phone', booking.phone),
-                                _buildRow(
-                                  'Car Model',
-                                  '${booking.make} ${booking.model}',
-                                ),
-                                _buildRow('Car Type', booking.carType),
-                                _buildRow(
-                                  'Odometer',
-                                  '${booking.currentOdometerReading.toStringAsFixed(0)} KM',
-                                ),
-                                _buildRow(
-                                  'Purchase Date',
-                                  DateFormat('dd MMM yyyy').format(
-                                    booking.purchaseDate.toString() == 'null'
-                                        ? DateTime.now()
-                                        : DateTime.parse(
-                                            booking.purchaseDate.toString(),
+                                      const SizedBox(height: 12),
+                                      ...booking.services.map((service) {
+                                        return Padding(
+                                          padding: const EdgeInsets.only(
+                                            bottom: 12,
                                           ),
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                              ],
-                            ),
-                          ),
-
-                          // Services list
-                          if (booking.services.isNotEmpty)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  const Text(
-                                    'Selected Services',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 12),
-                                  ...booking.services.map((service) {
-                                    return Padding(
-                                      padding: const EdgeInsets.only(
-                                        bottom: 12,
-                                      ),
-                                      child: Container(
-                                        padding: const EdgeInsets.all(12),
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey[50],
-                                          borderRadius: BorderRadius.circular(
-                                            8,
-                                          ),
-                                          border: Border.all(
-                                            color: Colors.grey[200]!,
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Expanded(
-                                              child: Column(
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    service.serviceType,
-                                                    style: const TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                    ),
-                                                  ),
-                                                  if (service.washType != null)
-                                                    Text(
-                                                      'Wash Type: ${service.washType}',
-                                                      style: TextStyle(
-                                                        fontSize: 12,
-                                                        color: Colors.grey[600],
-                                                      ),
-                                                    ),
-                                                  if (service.oilBrand != null)
-                                                    Text(
-                                                      'Oil Brand: ${service.oilBrand}',
-                                                      style: TextStyle(
-                                                        fontSize: 12,
-                                                        color: Colors.grey[600],
-                                                      ),
-                                                    ),
-                                                ],
+                                          child: Container(
+                                            padding: const EdgeInsets.all(12),
+                                            decoration: BoxDecoration(
+                                              color: Colors.grey[50],
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                              border: Border.all(
+                                                color: Colors.grey[200]!,
                                               ),
-                                            ),
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 12,
-                                                    vertical: 6,
-                                                  ),
-                                              decoration: BoxDecoration(
-                                                border: Border.all(
-                                                  color: Colors.grey[300]!,
-                                                ),
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                                color: Colors.white,
-                                              ),
-                                              child: Text(
-                                                service.status ?? 'Pending',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: _getStatusColor(
-                                                    service.status,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  }),
-                                  const SizedBox(height: 20),
-                                  if (booking.extraWorkItems.isNotEmpty) ...[
-                                    const Text(
-                                      'Extra Work Items',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 10),
-                                    Container(
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white,
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(
-                                          color: Colors.grey[200]!,
-                                        ),
-                                      ),
-                                      child: Column(
-                                        children: booking.extraWorkItems.map((
-                                          item,
-                                        ) {
-                                          return Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              vertical: 6,
                                             ),
                                             child: Row(
                                               mainAxisAlignment:
@@ -534,118 +494,231 @@ class _UnderProcessScreenState extends State<UnderProcessScreen> {
                                                       .spaceBetween,
                                               children: [
                                                 Expanded(
-                                                  child: Text(
-                                                    item.workItem,
-                                                    style: const TextStyle(
-                                                      fontSize: 14,
-                                                    ),
+                                                  child: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        service.serviceType,
+                                                        style: const TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                      if (service.washType !=
+                                                          null)
+                                                        Text(
+                                                          'Wash Type: ${service.washType}',
+                                                          style: TextStyle(
+                                                            fontSize: 12,
+                                                            color: Colors
+                                                                .grey[600],
+                                                          ),
+                                                        ),
+                                                      if (service.oilBrand !=
+                                                          null)
+                                                        Text(
+                                                          'Oil Brand: ${service.oilBrand}',
+                                                          style: TextStyle(
+                                                            fontSize: 12,
+                                                            color: Colors
+                                                                .grey[600],
+                                                          ),
+                                                        ),
+                                                    ],
                                                   ),
                                                 ),
-                                                Text(
-                                                  '${item.qty} × ₹${item.rate} = ₹${(item.qty * item.rate).toStringAsFixed(2)}',
-                                                  style: const TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w500,
+                                                Container(
+                                                  padding:
+                                                      const EdgeInsets.symmetric(
+                                                        horizontal: 12,
+                                                        vertical: 6,
+                                                      ),
+                                                  decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                      color: Colors.grey[300]!,
+                                                    ),
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          6,
+                                                        ),
+                                                    color: Colors.white,
+                                                  ),
+                                                  child: Text(
+                                                    service.status ?? 'Pending',
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: _getStatusColor(
+                                                        service.status,
+                                                      ),
+                                                    ),
                                                   ),
                                                 ),
                                               ],
                                             ),
-                                          );
-                                        }).toList(),
-                                      ),
-                                    ),
-                                  ],
-                                  const SizedBox(height: 20),
-
-                                  if (allServicesComplete) ...[
-                                    Container(
-                                      padding: const EdgeInsets.all(16),
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey[50],
-                                        borderRadius: BorderRadius.circular(8),
-                                        border: Border.all(
-                                          color: Colors.grey[200]!,
-                                        ),
-                                      ),
-                                      child: Column(
-                                        children: [
-                                          _buildTotalRow(
-                                            'Oil Total',
-                                            booking.oilTotal,
                                           ),
-                                          _buildTotalRow(
-                                            'Car Wash Total',
-                                            booking.carwashTotal,
-                                          ),
-
-                                          _buildTotalRow(
-                                            'Extra Works Total',
-                                            booking.extraWorksTotal,
-                                          ),
-                                          const Divider(height: 20),
-                                          _buildTotalRow(
-                                            'Grand Total',
-                                            booking.grandTotal,
-                                            isBold: true,
-                                            color: Colors.red,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
-
-                                  // Continue button - Only enabled when all services are completed
-                                  Padding(
-                                    padding: const EdgeInsets.all(16),
-                                    child: SizedBox(
-                                      width: double.infinity,
-                                      child: ElevatedButton(
-                                        onPressed: allServicesComplete
-                                            ? () => _showCompletionAlert(
-                                                context,
-                                                bookingId,
-                                              )
-                                            : null,
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: allServicesComplete
-                                              ? Colors.red
-                                              : Colors.grey[300],
-                                          foregroundColor: allServicesComplete
-                                              ? Colors.white
-                                              : Colors.grey[600],
-                                          padding: const EdgeInsets.symmetric(
-                                            vertical: 16,
-                                          ),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          elevation: 0,
-                                        ),
-                                        child: Text(
-                                          allServicesComplete
-                                              ? 'Continue to Invoice'
-                                              : hasServiceStarted
-                                              ? 'Complete all services first'
-                                              : 'Start Services to Continue',
-                                          style: const TextStyle(
+                                        );
+                                      }),
+                                      const SizedBox(height: 20),
+                                      if (booking
+                                          .extraWorkItems
+                                          .isNotEmpty) ...[
+                                        const Text(
+                                          'Extra Work Items',
+                                          style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w600,
                                           ),
                                         ),
+                                        const SizedBox(height: 10),
+                                        Container(
+                                          padding: const EdgeInsets.all(12),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                            border: Border.all(
+                                              color: Colors.grey[200]!,
+                                            ),
+                                          ),
+                                          child: Column(
+                                            children: booking.extraWorkItems.map((
+                                              item,
+                                            ) {
+                                              return Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      vertical: 6,
+                                                    ),
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Expanded(
+                                                      child: Text(
+                                                        item.workItem,
+                                                        style: const TextStyle(
+                                                          fontSize: 14,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      '${item.qty} × ₹${item.rate} = ₹${(item.qty * item.rate).toStringAsFixed(2)}',
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              );
+                                            }).toList(),
+                                          ),
+                                        ),
+                                      ],
+                                      const SizedBox(height: 20),
+
+                                      if (allServicesComplete) ...[
+                                        Container(
+                                          padding: const EdgeInsets.all(16),
+                                          decoration: BoxDecoration(
+                                            color: Colors.grey[50],
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                            border: Border.all(
+                                              color: Colors.grey[200]!,
+                                            ),
+                                          ),
+                                          child: Column(
+                                            children: [
+                                              _buildTotalRow(
+                                                'Oil Total',
+                                                booking.oilTotal,
+                                              ),
+                                              _buildTotalRow(
+                                                'Car Wash Total',
+                                                booking.carwashTotal,
+                                              ),
+
+                                              _buildTotalRow(
+                                                'Extra Works Total',
+                                                booking.extraWorksTotal,
+                                              ),
+                                              const Divider(height: 20),
+                                              _buildTotalRow(
+                                                'Grand Total',
+                                                booking.grandTotal,
+                                                isBold: true,
+                                                color: Colors.red,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+
+                                      // Continue button - Only enabled when all services are completed
+                                      Padding(
+                                        padding: const EdgeInsets.all(16),
+                                        child: SizedBox(
+                                          width: double.infinity,
+                                          child: ElevatedButton(
+                                            onPressed: allServicesComplete
+                                                ? () => _showCompletionAlert(
+                                                    context,
+                                                    bookingId,
+                                                  )
+                                                : null,
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  allServicesComplete
+                                                  ? Colors.red
+                                                  : Colors.grey[300],
+                                              foregroundColor:
+                                                  allServicesComplete
+                                                  ? Colors.white
+                                                  : Colors.grey[600],
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    vertical: 16,
+                                                  ),
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              elevation: 0,
+                                            ),
+                                            child: Text(
+                                              allServicesComplete
+                                                  ? 'Continue to Invoice'
+                                                  : hasServiceStarted
+                                                  ? 'Complete all services first'
+                                                  : 'Start Services to Continue',
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ),
-                        ],
-                      ),
-                    );
-                  }),
-                  ],
-                ),
+                                ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
               ),
             );
           },

@@ -15,10 +15,12 @@ class InProgressOilController extends ChangeNotifier {
   Future<void> fetchInProgressOilServices() async {
     try {
       setIsLoading(true);
+      _error = null; // Clear previous errors
       _oilInProgressModal = await _inProgressOilService
           .getInProgressOilService();
       setIsLoading(false);
     } catch (e) {
+      _oilInProgressModal = null; // Clear data on error
       setError(e.toString());
     } finally {
       setIsLoading(false);

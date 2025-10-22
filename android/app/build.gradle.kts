@@ -28,9 +28,22 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        
+        // PERFORMANCE: Increase heap size to prevent ProfileInstaller delays
+        manifestPlaceholders["largeHeap"] = "true"
+        
+        // PERFORMANCE: Optimize for faster startup
+        ndk {
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+        }
     }
 
     buildTypes {
+        debug {
+            // PERFORMANCE: Disable ProfileInstaller in debug builds
+            manifestPlaceholders["profileInstaller"] = "false"
+        }
+        
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
@@ -42,6 +55,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            
+            // PERFORMANCE: Enable ProfileInstaller only in release builds
+            manifestPlaceholders["profileInstaller"] = "true"
         }
     }
 }

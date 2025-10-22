@@ -44,53 +44,53 @@ class Message {
 class Datum {
   String serviceId;
   String mainStatus;
-  String customerName;
-  String phone;
-  String email;
-  String address;
-  String city;
-  String branch;
-  String make;
-  String model;
-  String carType;
-  DateTime purchaseDate;
-  String engineNumber;
-  String chasisNumber;
-  String registrationNumber;
-  double fuelLevel;
-  double lastServiceOdometer;
-  double currentOdometerReading;
-  double nextServiceOdometer;
+  String? customerName;
+  String? phone;
+  String? email;
+  String? address;
+  String? city;
+  String? branch;
+  String? make;
+  String? model;
+  String? carType;
+  DateTime? purchaseDate;
+  String? engineNumber;
+  String? chasisNumber;
+  String? registrationNumber;
+  double? fuelLevel;
+  double? lastServiceOdometer;
+  double? currentOdometerReading;
+  double? nextServiceOdometer;
   dynamic video;
   List<Service> services;
 
   Datum({
     required this.serviceId,
     required this.mainStatus,
-    required this.customerName,
-    required this.phone,
-    required this.email,
-    required this.address,
-    required this.city,
-    required this.branch,
-    required this.make,
-    required this.model,
-    required this.carType,
-    required this.purchaseDate,
-    required this.engineNumber,
-    required this.chasisNumber,
-    required this.registrationNumber,
-    required this.fuelLevel,
-    required this.lastServiceOdometer,
-    required this.currentOdometerReading,
-    required this.nextServiceOdometer,
-    required this.video,
+    this.customerName,
+    this.phone,
+    this.email,
+    this.address,
+    this.city,
+    this.branch,
+    this.make,
+    this.model,
+    this.carType,
+    this.purchaseDate,
+    this.engineNumber,
+    this.chasisNumber,
+    this.registrationNumber,
+    this.fuelLevel,
+    this.lastServiceOdometer,
+    this.currentOdometerReading,
+    this.nextServiceOdometer,
+    this.video,
     required this.services,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-    serviceId: json['service_id'],
-    mainStatus: json['main_status'],
+    serviceId: json['service_id'] ?? '',
+    mainStatus: json['main_status'] ?? '',
     customerName: json['customer_name'],
     phone: json['phone'],
     email: json['email'],
@@ -100,18 +100,20 @@ class Datum {
     make: json['make'],
     model: json['model'],
     carType: json['car_type'],
-    purchaseDate: DateTime.parse(json['purchase_date']),
+    purchaseDate: json['purchase_date'] != null 
+        ? DateTime.tryParse(json['purchase_date']) 
+        : null,
     engineNumber: json['engine_number'],
     chasisNumber: json['chasis_number'],
     registrationNumber: json['registration_number'],
-    fuelLevel: json['fuel_level'],
-    lastServiceOdometer: json['last_service_odometer'],
-    currentOdometerReading: json['current_odometer_reading'],
-    nextServiceOdometer: json['next_service_odometer'],
+    fuelLevel: json['fuel_level']?.toDouble(),
+    lastServiceOdometer: json['last_service_odometer']?.toDouble(),
+    currentOdometerReading: json['current_odometer_reading']?.toDouble(),
+    nextServiceOdometer: json['next_service_odometer']?.toDouble(),
     video: json['video'],
-    services: List<Service>.from(
-      json['services'].map((x) => Service.fromJson(x)),
-    ),
+    services: json['services'] != null 
+        ? List<Service>.from(json['services'].map((x) => Service.fromJson(x)))
+        : [],
   );
 
   Map<String, dynamic> toJson() => {
@@ -126,8 +128,9 @@ class Datum {
     'make': make,
     'model': model,
     'car_type': carType,
-    'purchase_date':
-        "${purchaseDate.year.toString().padLeft(4, '0')}-${purchaseDate.month.toString().padLeft(2, '0')}-${purchaseDate.day.toString().padLeft(2, '0')}",
+    'purchase_date': purchaseDate != null
+        ? "${purchaseDate!.year.toString().padLeft(4, '0')}-${purchaseDate!.month.toString().padLeft(2, '0')}-${purchaseDate!.day.toString().padLeft(2, '0')}"
+        : null,
     'engine_number': engineNumber,
     'chasis_number': chasisNumber,
     'registration_number': registrationNumber,
@@ -141,14 +144,14 @@ class Datum {
 }
 
 class Service {
-  String serviceType;
-  String status;
-  String oilBrand;
+  String? serviceType;
+  String? status;
+  String? oilBrand;
 
   Service({
-    required this.serviceType,
-    required this.status,
-    required this.oilBrand,
+    this.serviceType,
+    this.status,
+    this.oilBrand,
   });
 
   factory Service.fromJson(Map<String, dynamic> json) => Service(

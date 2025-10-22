@@ -1,9 +1,11 @@
+import 'dart:async';
 import 'package:champion_car_wash_app/controller/cancel_prebook_controller.dart';
 import 'package:champion_car_wash_app/controller/confirm_prebook_controller.dart';
 import 'package:champion_car_wash_app/controller/get_prebooking_controller.dart';
 import 'package:champion_car_wash_app/modal/get_prebooking_list.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/create_service.dart';
 import 'package:champion_car_wash_app/widgets/common/custom_back_button.dart';
+import 'package:champion_car_wash_app/widgets/common/refresh_loading_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -20,15 +22,25 @@ class _PreBookingsScreenContainerState
     extends State<PreBookingsScreenContainer> {
   final TextEditingController _searchController = TextEditingController();
   List<dynamic> _filteredBookings = [];
+  Timer? _debounceTimer;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<GetPrebookingListController>(
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      print('📅 [PRE_BOOKINGS] Initial fetch starting...');
+      
+      final controller = Provider.of<GetPrebookingListController>(
         context,
         listen: false,
-      ).fetchPreBookingList();
+      );
+      
+      try {
+        await controller.fetchPreBookingList();
+        print('✅ [PRE_BOOKINGS] Initial fetch completed - ${controller.bookingData.length} bookings');
+      } catch (e) {
+        print('❌ [PRE_BOOKINGS] Initial fetch failed: $e');
+      }
     });
   }
 
@@ -98,8 +110,16 @@ class _PreBookingsScreenContainerState
                 ),
                 child: TextField(
                   controller: _searchController,
-                  onChanged: (value) =>
-                      _filterBookings(value, controller.bookingData),
+                  onChanged: (value) {
+                    // PERFORMANCE FIX: Debounce search to avoid filtering on every keystroke
+                    _debounceTimer?.cancel();
+                    _debounceTimer = Timer(
+                      const Duration(milliseconds: 300),
+                      () {
+                        _filterBookings(value, controller.bookingData);
+                      },
+                    );
+                  },
                   decoration: InputDecoration(
                     hintText: 'Search Customer by Vehicle Number',
                     hintStyle: TextStyle(color: Colors.grey[500], fontSize: 14),
@@ -121,17 +141,11 @@ class _PreBookingsScreenContainerState
   // Add this method to your _PreBookingsScreenContainerState class:
 
   Future<void> _refreshBookingList() async {
+    print('🔄 [PRE_BOOKINGS] Pull-to-refresh triggered - FORCING API CALL');
+    
     try {
       // Add haptic feedback
       HapticFeedback.mediumImpact();
-
-      // Clear current data
-      setState(() {
-        _filteredBookings.clear();
-      });
-
-      // Clear search if any
-      _searchController.clear();
 
       // Fetch fresh data
       final controller = Provider.of<GetPrebookingListController>(
@@ -139,21 +153,31 @@ class _PreBookingsScreenContainerState
         listen: false,
       );
 
-      await controller.fetchPreBookingList();
+      print('📋 [PRE_BOOKINGS] Fetching fresh pre-booking list from API...');
+      // FORCE REFRESH: Always call API on pull-to-refresh
+      await controller.fetchPreBookingList(forceRefresh: true);
+      print('✅ [PRE_BOOKINGS] Fresh pre-booking list fetched successfully - ${controller.bookingData.length} bookings');
 
       // Update UI with fresh data
-      if (mounted && controller.bookingData.isNotEmpty) {
+      if (mounted) {
         setState(() {
           _filteredBookings = List.from(controller.bookingData);
         });
+        print('🔄 [PRE_BOOKINGS] UI updated with ${_filteredBookings.length} fresh bookings');
+        
+        // Show success feedback
+        RefreshFeedback.showSuccess(
+          context,
+          'Refreshed ${controller.bookingData.length} pre-bookings'
+        );
       }
     } catch (e) {
+      print('❌ [PRE_BOOKINGS] Error refreshing pre-bookings: $e');
+      
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to refresh booking list'),
-            backgroundColor: Colors.red,
-          ),
+        RefreshFeedback.showError(
+          context,
+          'Failed to refresh booking list: $e'
         );
       }
     }
@@ -161,10 +185,8 @@ class _PreBookingsScreenContainerState
 
   Widget _buildContent(GetPrebookingListController controller) {
     if (controller.isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(
-          valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
-        ),
+      return const ListLoadingIndicator(
+        message: 'Loading pre-bookings...',
       );
     }
 
@@ -280,7 +302,10 @@ class _PreBookingsScreenContainerState
                 ),
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: statusBgColor,
                   borderRadius: BorderRadius.circular(12),
@@ -725,12 +750,12 @@ class _PreBookingsScreenContainerState
                               );
 
                               // If successful, refresh the booking list
-                              // if (isSuccess) {
-                              //   Provider.of<GetPrebookingListController>(
-                              //     this.context,
-                              //     listen: false,
-                              //   ).fetchPreBookingList();
-                              // }
+                              if (isSuccess) {
+                                Provider.of<GetPrebookingListController>(
+                                  this.context,
+                                  listen: false,
+                                ).fetchPreBookingList();
+                              }
                             },
                             child: const Text(
                               'Yes',
@@ -750,6 +775,7 @@ class _PreBookingsScreenContainerState
   @override
   void dispose() {
     _searchController.dispose();
+    _debounceTimer?.cancel();
     super.dispose();
   }
 }

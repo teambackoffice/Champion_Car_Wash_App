@@ -23,22 +23,30 @@ class UnderProcessingController extends ChangeNotifier {
 
   /// OPTIMIZATION: Enhanced fetch with time-based caching
   Future<void> fetchUnderProcessingBookings({bool forceRefresh = false}) async {
+    print('⏳ [UNDER_PROCESS_CONTROLLER] fetchUnderProcessingBookings called - forceRefresh: $forceRefresh');
+    
     final now = DateTime.now();
     
     // Check cache validity
     if (!forceRefresh && _lastFetchTime != null && _underProcessData != null) {
       final timeSinceLastFetch = now.difference(_lastFetchTime!);
+      print('⏳ [UNDER_PROCESS_CONTROLLER] Cache check - time since last fetch: ${timeSinceLastFetch.inMinutes} minutes');
       
       // If cache is still valid, return immediately
       if (timeSinceLastFetch < _cacheValidDuration) {
+        print('⏳ [UNDER_PROCESS_CONTROLLER] Using cached data (${serviceCars.length} bookings)');
+        
         // If approaching expiry, trigger background refresh
         if (timeSinceLastFetch > _backgroundRefreshThreshold) {
+          print('⏳ [UNDER_PROCESS_CONTROLLER] Triggering background refresh');
           // ignore: unawaited_futures
           _backgroundRefresh();
         }
         return; // Use cached data
       }
     }
+
+    print('⏳ [UNDER_PROCESS_CONTROLLER] Fetching fresh data from API...');
 
     // Only notify if we're not in the initial state
     if (_underProcessData != null || _errorMessage != null) {

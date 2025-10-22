@@ -4,6 +4,7 @@ import 'package:champion_car_wash_app/controller/get_completed_controller.dart';
 import 'package:champion_car_wash_app/modal/get_completed_modal.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/payment_due/payment_due.dart';
 import 'package:champion_car_wash_app/widgets/common/custom_back_button.dart';
+import 'package:champion_car_wash_app/widgets/common/refresh_loading_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,16 +18,76 @@ class ServiceCompletedScreen extends StatefulWidget {
 class _ServiceCompletedScreenState extends State<ServiceCompletedScreen> {
   String _searchQuery = '';
   Timer? _debounceTimer;
+  bool _isInitialLoading = true;
 
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<GetCompletedController>(
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    setState(() {
+      _isInitialLoading = true;
+    });
+
+    // Add a small delay to show the loading animation
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    if (mounted) {
+      print('✅ [SERVICE_COMPLETED] Initial fetch starting...');
+      
+      final controller = Provider.of<GetCompletedController>(
         context,
         listen: false,
-      ).fetchcompletedlist();
-    });
+      );
+      
+      try {
+        await controller.fetchcompletedlist();
+        print('✅ [SERVICE_COMPLETED] Initial fetch completed - ${controller.bookingData.length} services');
+      } catch (e) {
+        print('❌ [SERVICE_COMPLETED] Initial fetch failed: $e');
+      }
+
+      if (mounted) {
+        setState(() {
+          _isInitialLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _refreshData() async {
+    print('🔄 [SERVICE_COMPLETED] Pull-to-refresh triggered - FORCING API CALL');
+    
+    final controller = Provider.of<GetCompletedController>(
+      context,
+      listen: false,
+    );
+    
+    try {
+      print('📋 [SERVICE_COMPLETED] Fetching fresh completed services from API...');
+      // FORCE REFRESH: Always call API on pull-to-refresh
+      await controller.fetchcompletedlist(forceRefresh: true);
+      print('✅ [SERVICE_COMPLETED] Fresh completed services fetched successfully - ${controller.bookingData.length} services');
+      
+      // Show success feedback
+      if (mounted) {
+        RefreshFeedback.showSuccess(
+          context,
+          'Refreshed ${controller.bookingData.length} completed services'
+        );
+      }
+    } catch (e) {
+      print('❌ [SERVICE_COMPLETED] Error refreshing completed services: $e');
+      
+      if (mounted) {
+        RefreshFeedback.showError(
+          context,
+          'Failed to refresh completed services: $e'
+        );
+      }
+    }
   }
 
   @override
@@ -143,9 +204,10 @@ class _ServiceCompletedScreenState extends State<ServiceCompletedScreen> {
       body: Consumer<GetCompletedController>(
         builder: (context, controller, child) {
           // Show loading indicator
-          if (controller.isLoading) {
-            return Center(
-              child: CircularProgressIndicator(color: Colors.red[800]),
+          if (_isInitialLoading || controller.isLoading) {
+            return const ListLoadingIndicator(
+              message: 'Loading completed services...',
+              showShimmer: true,
             );
           }
 
@@ -238,9 +300,7 @@ class _ServiceCompletedScreenState extends State<ServiceCompletedScreen> {
 
           // Show completed services list
           return RefreshIndicator(
-            onRefresh: () async {
-              await controller.fetchcompletedlist();
-            },
+            onRefresh: _refreshData,
             child: ListView.builder(
               padding: const EdgeInsets.all(16),
               itemCount: filteredData.length,

@@ -509,7 +509,18 @@ class _CreateServicePageState extends State<CreateServicePage> {
               child: Text(model.model, style: const TextStyle(color: Colors.white)),
             );
           }).toList(),
-          onChanged: (value) => setState(() => _selectedModel = value),
+          onChanged: (value) {
+            setState(() {
+              _selectedModel = value;
+              if (value != null) {
+                final selectedCarModel = _modelsController.models.firstWhere(
+                  (model) => model.model == value,
+                  orElse: () => CarModel(model: '', carType: ''),
+                );
+                _selectedType = selectedCarModel.carType;
+              }
+            });
+          },
           decoration: _dropdownDecoration(),
           validator: (value) =>
               value == null || value.isEmpty ? 'Please select a model' : null,
@@ -530,15 +541,6 @@ class _CreateServicePageState extends State<CreateServicePage> {
 
     if (selectedCarModel.carType.isEmpty) {
       return _buildDisabledDropdown('No car type available');
-    }
-
-    // Auto-set the car type when model is selected
-    if (_selectedType == null || _selectedType != selectedCarModel.carType) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        setState(() {
-          _selectedType = selectedCarModel.carType;
-        });
-      });
     }
 
     return DropdownButtonFormField<String>(

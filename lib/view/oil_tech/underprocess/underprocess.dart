@@ -173,8 +173,10 @@ class _UnderProcessingTabState extends State<UnderProcessingTab> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Consumer<InProgressOilController>(
         builder: (context, inProgressOilController, child) {
           if (inProgressOilController.isLoading) {
@@ -190,6 +192,17 @@ class _UnderProcessingTabState extends State<UnderProcessingTab> {
               ),
             );
           }
+          
+          // Add null check for oilInProgressModal
+          if (inProgressOilController.oilInProgressModal == null) {
+            return const Center(
+              child: Text(
+                'No data available',
+                style: TextStyle(color: Colors.red, fontSize: 16),
+              ),
+            );
+          }
+          
           return ListView.builder(
             padding: const EdgeInsets.all(16.0),
             itemCount:
@@ -297,6 +310,9 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    
     return Container(
       margin: const EdgeInsets.only(bottom: 16.0),
       child: Card(
@@ -313,10 +329,10 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
                 children: [
                   Text(
                     widget.booking.serviceId,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                   ),
                   Container(
@@ -372,12 +388,12 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             'Selected Oil Details:',
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black87,
+                              color: isDarkMode ? Colors.white : Colors.black87,
                             ),
                           ),
                           Row(
@@ -411,10 +427,10 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
                       const SizedBox(height: 4),
                       Text(
                         '${selectedOil!.brand} - ${selectedOil!.litres} × ${selectedOil!.quantity} Qty',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: Colors.black87,
+                          color: isDarkMode ? Colors.white : Colors.black87,
                         ),
                       ),
                     ],
@@ -430,16 +446,18 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: RichText(
-                        text: const TextSpan(
+                        text: TextSpan(
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
-                            color: Colors.black87,
+                            color: isDarkMode ? Colors.white : Colors.black87,
                           ),
                           children: [
                             TextSpan(
                               text: 'Oil Litre: ',
-                              style: TextStyle(color: Colors.grey),
+                              style: TextStyle(
+                                color: isDarkMode ? Colors.grey[300] : Colors.grey,
+                              ),
                             ),
                             TextSpan(
                               text: 'Select Oil & Quantity',
@@ -465,12 +483,12 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Text(
+                          Text(
                             'Extra Work Done',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black87,
+                              color: isDarkMode ? Colors.white : Colors.black87,
                             ),
                           ),
                           TextButton.icon(
@@ -490,12 +508,12 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
 
                       // Display selected extra work items from local state
                       if (extraWorkItems.isEmpty)
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Text(
                             'No extra work added yet',
                             style: TextStyle(
-                              color: Colors.grey,
+                              color: isDarkMode ? Colors.grey[300] : Colors.grey,
                               fontStyle: FontStyle.italic,
                             ),
                           ),
@@ -567,12 +585,12 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
               ),
 
               // Selected Services
-              const Text(
+              Text(
                 'Selected Services',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.grey,
+                  color: isDarkMode ? Colors.grey[300] : Colors.grey,
                 ),
               ),
               const SizedBox(height: 8),
@@ -583,10 +601,10 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Text(
                     service.oilBrand!,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: Colors.black87,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                   ),
                 ),
@@ -685,6 +703,9 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
   }
 
   Widget _buildDetailRow(String label, String value) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Row(
@@ -694,17 +715,20 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
             width: 100,
             child: Text(
               label,
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
+              style: TextStyle(
+                fontSize: 14, 
+                color: isDarkMode ? Colors.grey[300] : Colors.grey,
+              ),
             ),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: Colors.black87,
+                color: isDarkMode ? Colors.white : Colors.black87,
               ),
             ),
           ),

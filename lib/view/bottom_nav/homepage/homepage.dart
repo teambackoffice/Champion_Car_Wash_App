@@ -3,6 +3,7 @@ import 'package:champion_car_wash_app/view/bottom_nav/homepage/booking_status.da
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/create_service.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/pre_booking_now/pre_book.dart';
 import 'package:champion_car_wash_app/view/profile/profile_screen.dart';
+import 'package:champion_car_wash_app/widgets/common/refresh_loading_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -25,14 +26,11 @@ class _HomePageContentState extends State<HomePageContent> {
   void initState() {
     super.initState();
 
-    // OPTIMIZATION: Removed duplicate fetchPreBookingList() call
-    // The BookingStatus widget already fetches this data
-    // OPTIMIZATION: Load user profile data asynchronously after first frame
-    // Use parallel loading for better performance
+    // PERFORMANCE FIX: Defer all heavy operations to prevent blocking initial render
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadUserData(); // Load both fullname and branch in parallel
-      // Precache the profile image to prevent frame drops on first render
-      _precacheImages();
+      // Use microtasks to spread work across multiple frames
+      Future.microtask(() => _loadUserData());
+      Future.microtask(() => _precacheImages());
     });
   }
 
@@ -41,29 +39,64 @@ class _HomePageContentState extends State<HomePageContent> {
     precacheImage(const AssetImage('assets/person.jpeg'), context);
   }
 
-  // OPTIMIZATION: Load both storage values in parallel instead of sequentially
+  // PERFORMANCE FIX: Load storage data without blocking UI
   Future<void> _loadUserData() async {
-    final results = await Future.wait([
-      storage.read(key: 'full_name'),
-      storage.read(key: 'branch'),
-    ]);
+    try {
+      final results = await Future.wait([
+        storage.read(key: 'full_name'),
+        storage.read(key: 'branch'),
+      ]);
 
-    setState(() {
-      fullname = results[0] ?? '';
-      branch = results[1] ?? '';
-    });
+      // Only update if widget is still mounted
+      if (mounted) {
+        setState(() {
+          fullname = results[0] ?? '';
+          branch = results[1] ?? '';
+        });
+      }
+    } catch (e) {
+      // Silently handle storage errors to prevent crashes
+      debugPrint('Storage read error: $e');
+    }
   }
 
   // Pull to refresh functionality
   Future<void> _handleRefresh() async {
+    print('🔄 [HOMEPAGE] Pull-to-refresh triggered');
+    
     // Add haptic feedback
     HapticFeedback.mediumImpact();
 
-    // Refresh count data
-    await Provider.of<ServiceCountsController>(
-      context,
-      listen: false,
-    ).refreshData();
+    try {
+      print('📊 [HOMEPAGE] Refreshing service counts...');
+      
+      // Refresh count data
+      final controller = Provider.of<ServiceCountsController>(
+        context,
+        listen: false,
+      );
+      
+      await controller.refreshData();
+      
+      print('✅ [HOMEPAGE] Service counts refreshed successfully');
+      
+      // Show success feedback
+      if (mounted) {
+        RefreshFeedback.showSuccess(
+          context,
+          'Dashboard refreshed successfully'
+        );
+      }
+    } catch (e) {
+      print('❌ [HOMEPAGE] Error refreshing service counts: $e');
+      
+      if (mounted) {
+        RefreshFeedback.showError(
+          context,
+          'Failed to refresh data: $e'
+        );
+      }
+    }
   }
 
   // Keep individual methods for backward compatibility
@@ -420,7 +453,7 @@ class _HomePageContentState extends State<HomePageContent> {
                   },
                   style: OutlinedButton.styleFrom(
                     foregroundColor: const Color(0xFFD32F2F),
-                    // side: const BorderSide(color: Color(0xFFD32F2F), width: 2),
+                    side: const BorderSide(color: Color(0xFFD32F2F), width: 2),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15),
                     ),

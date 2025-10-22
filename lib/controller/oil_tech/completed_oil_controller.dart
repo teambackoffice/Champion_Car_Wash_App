@@ -11,15 +11,17 @@ class CompletedOilController extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
 
-  Future<OilCompletedModal> fetchCompletedOilData() async {
+  Future<OilCompletedModal?> fetchCompletedOilData() async {
     try {
       setIsLoading(true);
+      _error = null; // Clear previous errors
       _oilCompletedModal = await _completedOilService.getCompletedOilData();
       setIsLoading(false);
-      return _oilCompletedModal!;
+      return _oilCompletedModal;
     } catch (e) {
+      _oilCompletedModal = null; // Clear data on error
       setError(e.toString());
-      rethrow; // Re-throw the error to handle it in the UI if needed
+      return null;
     } finally {
       setIsLoading(false);
     }

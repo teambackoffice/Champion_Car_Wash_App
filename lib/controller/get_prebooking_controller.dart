@@ -22,22 +22,30 @@ class GetPrebookingListController extends ChangeNotifier {
 
   // Fetch pre-booking list
   Future<void> fetchPreBookingList({bool forceRefresh = false}) async {
+    print('📅 [PRE_BOOKING_CONTROLLER] fetchPreBookingList called - forceRefresh: $forceRefresh');
+    
     final now = DateTime.now();
     
     // OPTIMIZATION: Enhanced caching logic with background refresh
     if (!forceRefresh && _lastFetchTime != null && _preBookingList != null) {
       final timeSinceLastFetch = now.difference(_lastFetchTime!);
+      print('📅 [PRE_BOOKING_CONTROLLER] Cache check - time since last fetch: ${timeSinceLastFetch.inMinutes} minutes');
       
       // If cache is still valid, return immediately
       if (timeSinceLastFetch < _cacheValidDuration) {
+        print('📅 [PRE_BOOKING_CONTROLLER] Using cached data (${bookingData.length} bookings)');
+        
         // If approaching expiry, trigger background refresh
         if (timeSinceLastFetch > _backgroundRefreshThreshold) {
+          print('📅 [PRE_BOOKING_CONTROLLER] Triggering background refresh');
           // ignore: unawaited_futures
           _backgroundRefresh();
         }
         return; // Use cached data
       }
     }
+
+    print('📅 [PRE_BOOKING_CONTROLLER] Fetching fresh data from API...');
 
     // Only notify if we're not in the initial state
     if (_preBookingList != null || _error != null) {

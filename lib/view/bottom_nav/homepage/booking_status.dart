@@ -22,13 +22,26 @@ class _BookingStatusState extends State<BookingStatus> with AutomaticKeepAliveCl
   @override
   void initState() {
     super.initState();
-    // OPTIMIZATION: Single API call to fetch all counts at once
-    // This replaces 4 separate API calls with 1 unified call
+    // PERFORMANCE FIX: Delay API calls to prevent main thread blocking
+    // Use multiple frame delays to spread the work
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<ServiceCountsController>(
-        context,
-        listen: false,
-      ).fetchServiceCounts();
+      Future.delayed(const Duration(milliseconds: 100), () async {
+        if (mounted) {
+          print('📊 [BOOKING_STATUS] Initial fetch starting...');
+          
+          final controller = Provider.of<ServiceCountsController>(
+            context,
+            listen: false,
+          );
+          
+          try {
+            await controller.fetchServiceCounts();
+            print('✅ [BOOKING_STATUS] Initial fetch completed');
+          } catch (e) {
+            print('❌ [BOOKING_STATUS] Initial fetch failed: $e');
+          }
+        }
+      });
     });
   }
 
@@ -206,14 +219,18 @@ class _BookingStatusState extends State<BookingStatus> with AutomaticKeepAliveCl
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: Colors.grey.withValues(alpha: 0.1),
+                color: Theme.of(context).brightness == Brightness.dark 
+                    ? Colors.grey.withValues(alpha: 0.3)
+                    : Colors.grey.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
-                  color: Colors.black87,
+                  color: Theme.of(context).brightness == Brightness.dark 
+                      ? Colors.black87
+                      : Colors.black87,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.5,
                 ),

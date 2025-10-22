@@ -22,16 +22,22 @@ class GetNewbookingController extends ChangeNotifier {
 
   // OPTIMIZATION: Enhanced fetch with time-based caching
   Future<void> fetchBookingList({bool forceRefresh = false}) async {
+    print('📋 [NEW_BOOKING_CONTROLLER] fetchBookingList called - forceRefresh: $forceRefresh');
+    
     final now = DateTime.now();
     
     // Check cache validity
     if (!forceRefresh && _lastFetchTime != null && _bookingList != null) {
       final timeSinceLastFetch = now.difference(_lastFetchTime!);
+      print('📋 [NEW_BOOKING_CONTROLLER] Cache check - time since last fetch: ${timeSinceLastFetch.inMinutes} minutes');
       
       // If cache is still valid, return immediately
       if (timeSinceLastFetch < _cacheValidDuration) {
+        print('📋 [NEW_BOOKING_CONTROLLER] Using cached data (${bookingData.length} bookings)');
+        
         // If approaching expiry, trigger background refresh
         if (timeSinceLastFetch > _backgroundRefreshThreshold) {
+          print('📋 [NEW_BOOKING_CONTROLLER] Triggering background refresh');
           // ignore: unawaited_futures
           _backgroundRefresh();
         }
@@ -39,26 +45,34 @@ class GetNewbookingController extends ChangeNotifier {
       }
     }
 
+    print('📋 [NEW_BOOKING_CONTROLLER] Fetching fresh data from API...');
+
     // Only notify if we're not in the initial state
     if (_bookingList != null || _error != null) {
       _isLoading = true;
       _error = null;
+      print('📋 [NEW_BOOKING_CONTROLLER] Setting loading state and notifying listeners');
       notifyListeners();
     } else {
       // Initial load - set loading state without notifying
       _isLoading = true;
       _error = null;
+      print('📋 [NEW_BOOKING_CONTROLLER] Initial load - setting loading state');
     }
 
     try {
       _bookingList = await _service.getnewbookinglist();
       _lastFetchTime = now;
       _error = null;
+      
+      print('✅ [NEW_BOOKING_CONTROLLER] API call successful - ${bookingData.length} bookings fetched');
     } catch (e) {
       _error = e.toString();
       _bookingList = null;
+      print('❌ [NEW_BOOKING_CONTROLLER] API call failed: $e');
     } finally {
       _isLoading = false;
+      print('📋 [NEW_BOOKING_CONTROLLER] Notifying listeners with final state');
       notifyListeners();
     }
   }

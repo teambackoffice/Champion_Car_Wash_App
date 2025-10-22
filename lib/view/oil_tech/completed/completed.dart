@@ -65,6 +65,9 @@ class CompletedBookingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    
     return Container(
       margin: const EdgeInsets.only(bottom: 16.0),
       child: Card(
@@ -81,10 +84,10 @@ class CompletedBookingCard extends StatelessWidget {
                 children: [
                   Text(
                     booking.serviceId,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                   ),
                   Container(
@@ -110,14 +113,18 @@ class CompletedBookingCard extends StatelessWidget {
               const SizedBox(height: 16),
 
               // Car details
-              _buildDetailRow(
-                'Booking Date',
-                DateFormat('dd MMM YYYY').format(booking.purchaseDate),
-              ),
-              _buildDetailRow('User Name', booking.customerName),
+              if (booking.purchaseDate != null)
+                _buildDetailRow(
+                  context,
+                  'Booking Date',
+                  DateFormat('dd MMM YYYY').format(booking.purchaseDate!),
+                ),
+              if (booking.customerName != null)
+                _buildDetailRow(context, 'User Name', booking.customerName!),
               // _buildDetailRow('Mobile No', booking.mobileNo),
               // _buildDetailRow('Email ID', booking.email),
-              _buildDetailRow('Vehicle', booking.model),
+              if (booking.model != null)
+                _buildDetailRow(context, 'Vehicle', booking.model!),
               // _buildDetailRow('Engine Model', booking.engineModel),
               // _buildDetailRow('Completed By', booking.completedBy),
               // _buildDetailRow(
@@ -128,26 +135,26 @@ class CompletedBookingCard extends StatelessWidget {
               // const SizedBox(height: 16),
 
               // Selected Services
-              const Text(
+              Text(
                 'Selected Services',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w600,
-                  color: Colors.grey,
+                  color: isDarkMode ? Colors.grey[300] : Colors.grey,
                 ),
               ),
               const SizedBox(height: 8),
 
               // Services list
-              ...booking.services.map(
+              ...booking.services.where((service) => service.oilBrand != null).map(
                 (service) => Padding(
                   padding: const EdgeInsets.only(bottom: 4),
                   child: Text(
-                    service.oilBrand,
-                    style: const TextStyle(
+                    service.oilBrand!,
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
-                      color: Colors.black87,
+                      color: isDarkMode ? Colors.white : Colors.black87,
                     ),
                   ),
                 ),
@@ -178,7 +185,10 @@ class CompletedBookingCard extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(String label, String value) {
+  Widget _buildDetailRow(BuildContext context, String label, String value) {
+    final theme = Theme.of(context);
+    final isDarkMode = theme.brightness == Brightness.dark;
+    
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Row(
@@ -188,17 +198,20 @@ class CompletedBookingCard extends StatelessWidget {
             width: 100,
             child: Text(
               label,
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
+              style: TextStyle(
+                fontSize: 14, 
+                color: isDarkMode ? Colors.grey[300] : Colors.grey,
+              ),
             ),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: Text(
               value,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
-                color: Colors.black87,
+                color: isDarkMode ? Colors.white : Colors.black87,
               ),
             ),
           ),

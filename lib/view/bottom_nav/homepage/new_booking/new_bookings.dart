@@ -4,6 +4,7 @@ import 'package:champion_car_wash_app/controller/get_newbooking_controller.dart'
 import 'package:champion_car_wash_app/modal/get_newbooking_modal.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/new_booking/view_more.dart';
 import 'package:champion_car_wash_app/widgets/common/custom_back_button.dart';
+import 'package:champion_car_wash_app/widgets/common/refresh_loading_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -24,24 +25,41 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
   @override
   void initState() {
     super.initState();
+    
+    // Set initial loading state
+    _isLoading = true;
+    
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       // PERFORMANCE FIX: Early exit if widget is already disposed
       if (!mounted) return;
+
+      print('📋 [NEW_BOOKINGS] Initial fetch starting...');
 
       final controller = Provider.of<GetNewbookingController>(
         context,
         listen: false,
       );
 
-      await controller.fetchBookingList();
+      try {
+        await controller.fetchBookingList();
+        print('✅ [NEW_BOOKINGS] Initial fetch completed - ${controller.bookingData.length} bookings');
 
-      // PERFORMANCE FIX: Check mounted again after async operation
-      if (!mounted) return;
+        // PERFORMANCE FIX: Check mounted again after async operation
+        if (!mounted) return;
 
-      setState(() {
-        _filteredBookings = controller.bookingData;
-        _isLoading = false;
-      });
+        setState(() {
+          _filteredBookings = controller.bookingData;
+          _isLoading = false;
+        });
+      } catch (e) {
+        print('❌ [NEW_BOOKINGS] Initial fetch failed: $e');
+        
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
     });
   }
 
@@ -66,20 +84,56 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
 
   // Pull to refresh functionality
   Future<void> _handleRefresh() async {
+    print('🔄 [NEW_BOOKINGS] Pull-to-refresh triggered - FORCING API CALL');
+    
     // Add haptic feedback
     HapticFeedback.mediumImpact();
 
-    final controller = Provider.of<GetNewbookingController>(
-      context,
-      listen: false,
-    );
+    try {
+      // Show loading state
+      if (mounted) {
+        setState(() {
+          _isLoading = true;
+        });
+      }
 
-    await controller.fetchBookingList();
+      final controller = Provider.of<GetNewbookingController>(
+        context,
+        listen: false,
+      );
 
-    if (mounted) {
-      setState(() {
-        _filteredBookings = controller.bookingData;
-      });
+      print('📋 [NEW_BOOKINGS] Fetching fresh booking list from API...');
+      // FORCE REFRESH: Always call API on pull-to-refresh
+      await controller.fetchBookingList(forceRefresh: true);
+      
+      print('✅ [NEW_BOOKINGS] Fresh booking list fetched successfully - ${controller.bookingData.length} bookings');
+
+      if (mounted) {
+        setState(() {
+          _filteredBookings = controller.bookingData;
+          _isLoading = false;
+        });
+        print('🔄 [NEW_BOOKINGS] UI updated with ${_filteredBookings.length} fresh bookings');
+        
+        // Show success feedback
+        RefreshFeedback.showSuccess(
+          context, 
+          'Refreshed ${controller.bookingData.length} bookings'
+        );
+      }
+    } catch (e) {
+      print('❌ [NEW_BOOKINGS] Error refreshing bookings: $e');
+      
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        
+        RefreshFeedback.showError(
+          context, 
+          'Failed to refresh bookings: $e'
+        );
+      }
     }
   }
 
@@ -152,8 +206,8 @@ class _NewBookingsScreenState extends State<NewBookingsScreen> {
               builder: (context, controller, child) {
                 // Show loading indicator during initial data fetch
                 if (_isLoading || controller.isLoading) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: Color(0xFFD32F2F)),
+                  return const ListLoadingIndicator(
+                    message: 'Loading bookings...',
                   );
                 }
 

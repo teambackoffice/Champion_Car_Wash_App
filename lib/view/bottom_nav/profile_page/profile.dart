@@ -130,35 +130,53 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     onPressed: loginController.isLoading
                                         ? null
                                         : () async {
-                                            Navigator.of(
-                                              context,
-                                            ).pop(); // Close dialog
-
-                                            // Show loading indicator
-                                            showDialog(
-                                              context: context,
-                                              barrierDismissible: false,
-                                              builder: (context) => const Center(
-                                                child:
-                                                    CircularProgressIndicator(),
-                                              ),
-                                            );
-
-                                            // Perform logout
-                                            await loginController.logout();
-
-                                            // Close loading dialog
+                                            // Close dialog first
                                             Navigator.of(context).pop();
 
-                                            // Navigate to login screen
-                                            Navigator.pushAndRemoveUntil(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const LoginScreen(),
-                                              ),
-                                              (Route<dynamic> route) => false,
-                                            );
+                                            // Show loading indicator
+                                            if (mounted) {
+                                              showDialog(
+                                                context: context,
+                                                barrierDismissible: false,
+                                                builder: (context) => const Center(
+                                                  child: CircularProgressIndicator(),
+                                                ),
+                                              );
+                                            }
+
+                                            try {
+                                              // Perform logout
+                                              await loginController.logout();
+
+                                              // Check if widget is still mounted before navigation
+                                              if (mounted) {
+                                                // Close loading dialog
+                                                Navigator.of(context).pop();
+
+                                                // Navigate to login screen
+                                                Navigator.pushAndRemoveUntil(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => const LoginScreen(),
+                                                  ),
+                                                  (Route<dynamic> route) => false,
+                                                );
+                                              }
+                                            } catch (e) {
+                                              // Handle logout error
+                                              if (mounted) {
+                                                // Close loading dialog if still open
+                                                Navigator.of(context).pop();
+                                                
+                                                // Show error message
+                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                  SnackBar(
+                                                    content: Text('Logout failed: $e'),
+                                                    backgroundColor: Colors.red,
+                                                  ),
+                                                );
+                                              }
+                                            }
                                           },
                                     child: loginController.isLoading
                                         ? const SizedBox(
