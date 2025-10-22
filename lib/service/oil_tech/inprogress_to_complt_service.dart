@@ -77,11 +77,48 @@ class OilInprogressStatusService {
       if (response.statusCode == 200) {
         return json.decode(resBody);
       } else {
-        return null;
+        // Parse error response
+        try {
+          final errorData = json.decode(resBody);
+          String errorMessage = 'Server error: ${response.statusCode}';
+          
+          if (errorData is Map) {
+            if (errorData.containsKey('exception')) {
+              // Extract the actual error message from the exception
+              final exception = errorData['exception'].toString();
+              if (exception.contains('ValidationError:')) {
+                errorMessage = exception.split('ValidationError:')[1].trim();
+              } else {
+                errorMessage = exception;
+              }
+            } else if (errorData.containsKey('message')) {
+              errorMessage = errorData['message'].toString();
+            }
+          }
+          
+          print('❌ [API_ERROR] Parsed error: $errorMessage');
+          
+          // Return error in a structured format
+          return {
+            'success': false,
+            'error': errorMessage,
+            'status_code': response.statusCode,
+          };
+        } catch (parseError) {
+          print('❌ [API_ERROR] Failed to parse error response: $parseError');
+          return {
+            'success': false,
+            'error': 'Server error: ${response.statusCode} - ${response.reasonPhrase}',
+            'status_code': response.statusCode,
+          };
+        }
       }
     } catch (e) {
       print('⚠️ Exception: $e');
-      return null;
+      return {
+        'success': false,
+        'error': e.toString(),
+      };
     }
   }
 }

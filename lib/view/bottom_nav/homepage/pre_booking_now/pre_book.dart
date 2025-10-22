@@ -119,7 +119,7 @@ class _PreBookingButtonState extends State<PreBookingButton> {
         // Navigate back and pass refresh signal
         Navigator.pop(context, true);
       } catch (error) {
-        print('Error creating pre-booking: $error'); // Add this log
+        debugPrint('Error creating pre-booking: $error'); // Add this log
         // Show error message
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

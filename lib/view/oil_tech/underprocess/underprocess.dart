@@ -256,34 +256,61 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
   }
 
   Future<void> _loadSavedData() async {
+    print('🔍 [LOAD_DATA] Loading saved data for booking: ${widget.booking.serviceId}');
+    
     // Load oil selection
     final oilData = _prefs.getString('oil_${widget.booking.serviceId}');
+    print('🔍 [LOAD_DATA] Oil data from storage: $oilData');
+    
     if (oilData != null) {
-      final oilJson = json.decode(oilData);
-      setState(() {
-        selectedOil = OilSelection.fromJson(oilJson);
-      });
+      try {
+        final oilJson = json.decode(oilData);
+        final loadedOil = OilSelection.fromJson(oilJson);
+        setState(() {
+          selectedOil = loadedOil;
+        });
+        print('✅ [LOAD_DATA] Oil selection loaded: ${selectedOil!.brand}');
+      } catch (e) {
+        print('❌ [LOAD_DATA] Error loading oil selection: $e');
+      }
+    } else {
+      print('🔍 [LOAD_DATA] No oil selection found in storage');
     }
 
     // Load extra work items
     final extraWorkData = _prefs.getString(
       'extra_work_${widget.booking.serviceId}',
     );
+    print('🔍 [LOAD_DATA] Extra work data from storage: $extraWorkData');
+    
     if (extraWorkData != null) {
-      final List<dynamic> extraWorkJson = json.decode(extraWorkData);
-      setState(() {
-        extraWorkItems = extraWorkJson
-            .map((item) => ExtraWorkItem.fromJson(item))
-            .toList();
-      });
+      try {
+        final List<dynamic> extraWorkJson = json.decode(extraWorkData);
+        setState(() {
+          extraWorkItems = extraWorkJson
+              .map((item) => ExtraWorkItem.fromJson(item))
+              .toList();
+        });
+        print('✅ [LOAD_DATA] Extra work items loaded: ${extraWorkItems.length}');
+      } catch (e) {
+        print('❌ [LOAD_DATA] Error loading extra work items: $e');
+      }
+    } else {
+      print('🔍 [LOAD_DATA] No extra work items found in storage');
     }
   }
 
   Future<void> _saveOilSelection(OilSelection oil) async {
+    print('🔍 [SAVE_OIL] Saving oil selection for booking: ${widget.booking.serviceId}');
+    print('🔍 [SAVE_OIL] Oil details: ${oil.brand}, ${oil.litres}, ${oil.quantity}');
+    
+    final jsonData = json.encode(oil.toJson());
     await _prefs.setString(
       'oil_${widget.booking.serviceId}',
-      json.encode(oil.toJson()),
+      jsonData,
     );
+    
+    print('✅ [SAVE_OIL] Oil selection saved successfully');
   }
 
   Future<void> _saveExtraWork() async {
@@ -616,8 +643,11 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () =>
-                      _showInspectionDialog(context, widget.booking),
+                  onPressed: () {
+                    print('🔍 [INSPECTION_BUTTON] Inspection button pressed');
+                    print('🔍 [INSPECTION_BUTTON] Current selectedOil: ${selectedOil?.brand ?? 'null'}');
+                    _showInspectionDialog(context, widget.booking);
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red[700],
                     foregroundColor: Colors.white,
@@ -738,6 +768,36 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
   }
 
   void _showInspectionDialog(BuildContext context, Datum booking) {
+    print('🔍 [SHOW_INSPECTION] Showing inspection dialog');
+    print('🔍 [SHOW_INSPECTION] selectedOil: ${selectedOil?.brand ?? 'null'}');
+    print('🔍 [SHOW_INSPECTION] extraWorkItems: ${extraWorkItems.length}');
+    
+    // Check if oil selection exists before showing inspection dialog
+    if (selectedOil == null) {
+      print('❌ [SHOW_INSPECTION] No oil selection found, showing error dialog');
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Oil Selection Required'),
+            content: const Text(
+              'Please select oil details before proceeding with the inspection. '
+              'Click "Select Oil Details" button to choose the oil brand and quantity.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+    
+    print('✅ [SHOW_INSPECTION] Oil selection found, showing inspection dialog');
+    
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -745,7 +805,7 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
           create: (context) => OilInprogressStatusServiceController(),
           child: InspectionDialog(
             booking: booking,
-            selectedOil: selectedOil, // Pass the oil selection
+            selectedOil: selectedOil!, // Pass the oil selection (non-null)
             extraWorkItems: extraWorkItems, // Pass the extra work items
           ),
         );
@@ -1067,13 +1127,13 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
 
 class InspectionDialog extends StatefulWidget {
   final Datum booking;
-  final OilSelection? selectedOil; // Add this
+  final OilSelection selectedOil; // Non-nullable since we check before creating dialog
   final List<ExtraWorkItem> extraWorkItems;
 
   const InspectionDialog({
     super.key,
     required this.booking,
-    required this.selectedOil, // Add this
+    required this.selectedOil,
     required this.extraWorkItems,
   });
 
@@ -1085,6 +1145,11 @@ class _InspectionDialogState extends State<InspectionDialog> {
   @override
   void initState() {
     super.initState();
+    print('🔍 [INSPECTION_DIALOG] Initializing inspection dialog');
+    print('🔍 [INSPECTION_DIALOG] Booking: ${widget.booking.serviceId}');
+    print('🔍 [INSPECTION_DIALOG] selectedOil: ${widget.selectedOil?.brand ?? 'null'}');
+    print('🔍 [INSPECTION_DIALOG] extraWorkItems: ${widget.extraWorkItems.length}');
+    
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<InspectionListController>(
         context,
@@ -1200,27 +1265,47 @@ class _InspectionDialogState extends State<InspectionDialog> {
     BuildContext context,
     List<Question> inspectionItems,
   ) async {
-    // Check if oil selection exists
-    if (widget.selectedOil == null) {
+    print('🔍 [COMPLETE_SERVICE] ========== Starting Service Completion ==========');
+    print('🔍 [COMPLETE_SERVICE] Service ID: ${widget.booking.serviceId}');
+    print('🔍 [COMPLETE_SERVICE] Inspection items count: ${inspectionItems.length}');
+    print('🔍 [COMPLETE_SERVICE] Selected oil: ${widget.selectedOil.brand}');
+    
+    // Validate inspection items
+    if (inspectionItems.isEmpty) {
+      print('❌ [COMPLETE_SERVICE] No inspection items found');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please select oil details before completing service'),
+          content: Text('❌ No inspection items found. Please try again.'),
           backgroundColor: Colors.red,
+          duration: Duration(seconds: 3),
         ),
       );
       return;
     }
-
+    
     // Prepare the data for API call
-    final selectedOil = widget.selectedOil!;
+    final selectedOil = widget.selectedOil;
     final extraWorkItems = widget.extraWorkItems;
 
-    // Calculate totals
+    print('🔍 [COMPLETE_SERVICE] Oil details:');
+    print('🔍 [COMPLETE_SERVICE] - Brand: ${selectedOil.brand}');
+    print('🔍 [COMPLETE_SERVICE] - Litres: ${selectedOil.litres}');
+    print('🔍 [COMPLETE_SERVICE] - Quantity: ${selectedOil.quantity}');
+    print('🔍 [COMPLETE_SERVICE] Extra work items: ${extraWorkItems.length}');
+
+    // Calculate totals with validation
     double extraWorksTotal = extraWorkItems.fold(
       0.0,
-      (sum, item) => sum + item.cost,
+      (sum, item) => sum + (item.cost.isFinite ? item.cost : 0.0),
     );
-    double oilTotal = 50.0 * selectedOil.quantity; // Assuming 50 AED per unit
+    
+    final validQuantity = selectedOil.quantity > 0 ? selectedOil.quantity : 1;
+    double oilTotal = 50.0 * validQuantity; // Assuming 50 AED per unit
+
+    print('🔍 [COMPLETE_SERVICE] Calculated totals:');
+    print('🔍 [COMPLETE_SERVICE] - Extra works total: $extraWorksTotal');
+    print('🔍 [COMPLETE_SERVICE] - Oil total: $oilTotal');
+    print('🔍 [COMPLETE_SERVICE] - Valid quantity: $validQuantity');
 
     // Prepare extra work data for API
     List<Map<String, dynamic>> extraWorkData = extraWorkItems
@@ -1234,6 +1319,8 @@ class _InspectionDialogState extends State<InspectionDialog> {
         )
         .toList();
 
+    print('🔍 [COMPLETE_SERVICE] Extra work data prepared: ${extraWorkData.length} items');
+
     // Prepare inspection answers
     List<Map<String, String>> answers = inspectionItems
         .map(
@@ -1244,73 +1331,253 @@ class _InspectionDialogState extends State<InspectionDialog> {
         )
         .toList();
 
+    print('🔍 [COMPLETE_SERVICE] Inspection answers prepared: ${answers.length} items');
+    for (int i = 0; i < answers.length; i++) {
+      print('🔍 [COMPLETE_SERVICE] Answer $i: ${answers[i]}');
+    }
+
+    // Parse litres safely
+    int litresValue;
     try {
+      final litresString = selectedOil.litres.replaceAll(RegExp(r'[^0-9]'), '');
+      if (litresString.isEmpty) {
+        print('⚠️ [COMPLETE_SERVICE] No numeric value in litres, using default 1');
+        litresValue = 1;
+      } else {
+        litresValue = int.parse(litresString);
+        print('🔍 [COMPLETE_SERVICE] Parsed litres value: $litresValue');
+      }
+    } catch (e) {
+      print('❌ [COMPLETE_SERVICE] Error parsing litres: $e, using default 1');
+      litresValue = 1;
+    }
+
+    final priceValue = validQuantity > 0 ? oilTotal / validQuantity : 0.0;
+    print('🔍 [COMPLETE_SERVICE] Calculated price per unit: $priceValue');
+
+    try {
+      print('🔍 [COMPLETE_SERVICE] Showing loading dialog...');
       // Show loading
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => const Center(child: CircularProgressIndicator()),
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.red),
+          ),
+        ),
       );
 
       // Call the API
+      print('🔍 [COMPLETE_SERVICE] Getting controller...');
       final controller = Provider.of<OilInprogressStatusServiceController>(
         context,
         listen: false,
       );
 
+      print('🔍 [COMPLETE_SERVICE] Submitting oil change details to API...');
       await controller.submitOilChange(
         serviceId: widget.booking.serviceId,
-        quantity: selectedOil.quantity,
-        litres: int.parse(selectedOil.litres.replaceAll(RegExp(r'[^0-9]'), '')),
-        price: oilTotal / selectedOil.quantity,
+        quantity: validQuantity,
+        litres: litresValue,
+        price: priceValue,
         subOilType: selectedOil.litres,
         oilTotal: oilTotal,
         extraWork: extraWorkData,
         extraWorksTotal: extraWorksTotal,
-        inspectionType: 'oil change',
+        inspectionType: 'Oil Change', // API expects "Oil Change" with capital letters
         answers: answers,
       );
 
+      print('🔍 [COMPLETE_SERVICE] API call completed');
+
       // Hide loading dialog
-      Navigator.of(context).pop();
+      if (mounted) {
+        print('🔍 [COMPLETE_SERVICE] Hiding loading dialog...');
+        Navigator.of(context).pop();
+      }
 
-      // Close inspection dialog
-      Navigator.of(context).pop();
-
+      // Check response
       if (controller.response != null) {
-        // Success
+        // Check if response indicates success or error
+        final response = controller.response!;
+        final isSuccess = response['success'] != false;
+        
+        if (isSuccess) {
+          print('✅ [COMPLETE_SERVICE] Service completed successfully');
+          print('✅ [COMPLETE_SERVICE] Response: $response');
+          
+          // Close inspection dialog
+          if (mounted) {
+            Navigator.of(context).pop();
+          }
+
+          // Show success message
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    const Icon(Icons.check_circle, color: Colors.white),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        '✅ Service completed successfully for ${widget.booking.serviceId}',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ],
+                ),
+                backgroundColor: Colors.green,
+                duration: const Duration(seconds: 4),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
+
+          // Refresh the in-progress list
+          print('🔍 [COMPLETE_SERVICE] Refreshing in-progress services list...');
+          if (mounted) {
+            Provider.of<InProgressOilController>(
+              context,
+              listen: false,
+            ).fetchInProgressOilServices();
+          }
+        } else {
+          // API returned an error
+          final errorMessage = response['error'] ?? 'Unknown error occurred';
+          print('❌ [COMPLETE_SERVICE] Service completion failed: $errorMessage');
+          
+          // Close inspection dialog
+          if (mounted) {
+            Navigator.of(context).pop();
+          }
+          
+          // Show error message
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Row(
+                  children: [
+                    const Icon(Icons.error_outline, color: Colors.white),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        '❌ $errorMessage',
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ],
+                ),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 6),
+                behavior: SnackBarBehavior.floating,
+                action: SnackBarAction(
+                  label: 'Retry',
+                  textColor: Colors.white,
+                  onPressed: () {
+                    _completeInspection(context, inspectionItems);
+                  },
+                ),
+              ),
+            );
+          }
+        }
+      } else {
+        print('❌ [COMPLETE_SERVICE] Service completion failed - no response from server');
+        
+        // Close inspection dialog
+        if (mounted) {
+          Navigator.of(context).pop();
+        }
+        
+        // Show error message
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.white),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Text(
+                      '❌ Failed to complete service. No response from server. Please try again.',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: Colors.red,
+              duration: const Duration(seconds: 5),
+              behavior: SnackBarBehavior.floating,
+              action: SnackBarAction(
+                label: 'Retry',
+                textColor: Colors.white,
+                onPressed: () {
+                  _completeInspection(context, inspectionItems);
+                },
+              ),
+            ),
+          );
+        }
+      }
+    } catch (e, stackTrace) {
+      print('❌ [COMPLETE_SERVICE] Exception during service completion: $e');
+      print('❌ [COMPLETE_SERVICE] Stack trace: $stackTrace');
+      
+      // Hide loading dialog if still showing
+      if (mounted) {
+        try {
+          Navigator.of(context).pop();
+        } catch (popError) {
+          print('⚠️ [COMPLETE_SERVICE] Error closing loading dialog: $popError');
+        }
+      }
+
+      // Show detailed error message
+      if (mounted) {
+        String errorMessage = 'An error occurred';
+        
+        if (e.toString().contains('FormatException')) {
+          errorMessage = 'Invalid data format. Please check oil selection.';
+        } else if (e.toString().contains('SocketException')) {
+          errorMessage = 'Network error. Please check your internet connection.';
+        } else if (e.toString().contains('TimeoutException')) {
+          errorMessage = 'Request timeout. Please try again.';
+        } else {
+          errorMessage = e.toString();
+        }
+        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(
-              'Service completed successfully for ${widget.booking.serviceId} ✅',
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    '❌ Error: $errorMessage',
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                ),
+              ],
             ),
-            backgroundColor: Colors.green,
-            duration: const Duration(seconds: 3),
-          ),
-        );
-
-        // Refresh the in-progress list
-        Provider.of<InProgressOilController>(
-          context,
-          listen: false,
-        ).fetchInProgressOilServices();
-      } else {
-        // Error
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Failed to complete service. Please try again.'),
             backgroundColor: Colors.red,
+            duration: const Duration(seconds: 6),
+            behavior: SnackBarBehavior.floating,
+            action: SnackBarAction(
+              label: 'Retry',
+              textColor: Colors.white,
+              onPressed: () {
+                _completeInspection(context, inspectionItems);
+              },
+            ),
           ),
         );
       }
-    } catch (e) {
-      // Hide loading dialog if still showing
-      Navigator.of(context).pop();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
-      );
     }
+    
+    print('🔍 [COMPLETE_SERVICE] ========== Service Completion Ended ==========');
   }
 }
 

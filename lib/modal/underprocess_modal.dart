@@ -84,36 +84,36 @@ class ServiceCars {
 
   factory ServiceCars.fromJson(Map<String, dynamic> json) {
     return ServiceCars(
-      serviceId: json['service_id'] ?? '',
-      mainStatus: json['main_status'] ?? '',
-      customerName: json['customer_name'] ?? '',
-      phone: json['phone'] ?? '',
-      email: json['email'] ?? '',
-      address: json['address'] ?? '',
-      city: json['city'] ?? '',
-      branch: json['branch'] ?? '',
-      make: json['make'] ?? '',
-      model: json['model'] ?? '',
-      carType: json['car_type'] ?? '',
-      purchaseDate: json['purchase_date'] ?? '',
-      engineNumber: json['engine_number'] ?? '',
-      chasisNumber: json['chasis_number'] ?? '',
-      registrationNumber: json['registration_number'] ?? '',
+      serviceId: json['service_id']?.toString() ?? '',
+      mainStatus: json['main_status']?.toString() ?? '',
+      customerName: json['customer_name']?.toString() ?? '',
+      phone: json['phone']?.toString() ?? 'N/A',
+      email: json['email']?.toString() ?? '',
+      address: json['address']?.toString() ?? '',
+      city: json['city']?.toString() ?? '',
+      branch: json['branch']?.toString() ?? '',
+      make: json['make']?.toString() ?? '',
+      model: json['model']?.toString() ?? '',
+      carType: json['car_type']?.toString() ?? '',
+      purchaseDate: json['purchase_date']?.toString() ?? '',
+      engineNumber: json['engine_number']?.toString() ?? '',
+      chasisNumber: json['chasis_number']?.toString() ?? '',
+      registrationNumber: json['registration_number']?.toString() ?? '',
       fuelLevel: (json['fuel_level'] ?? 0).toDouble(),
       lastServiceOdometer: (json['last_service_odometer'] ?? 0).toDouble(),
       currentOdometerReading: (json['current_odometer_reading'] ?? 0)
           .toDouble(),
       nextServiceOdometer: (json['next_service_odometer'] ?? 0).toDouble(),
-      video: json['video'],
+      video: json['video']?.toString(),
       oilTotal: (json['oil_total'] ?? 0).toDouble(),
       carwashTotal: (json['carwash_total'] ?? 0).toDouble(),
       serviceTotal: (json['service_total'] ?? 0).toDouble(),
       extraWorksTotal: (json['extra_works_total'] ?? 0).toDouble(),
       grandTotal: (json['grand_total'] ?? 0).toDouble(),
-      services: (json['services'] as List)
+      services: (json['services'] as List? ?? [])
           .map((e) => ServiceItem.fromJson(e))
           .toList(),
-      extraWorkItems: (json['extra_work_items'] as List)
+      extraWorkItems: (json['extra_work_items'] as List? ?? [])
           .map((e) => ExtraWorkItem.fromJson(e))
           .toList(),
     );
@@ -141,13 +141,13 @@ class ServiceItem {
 
   factory ServiceItem.fromJson(Map<String, dynamic> json) {
     return ServiceItem(
-      serviceType: json['service_type'] ?? '',
-      washType: json['wash_type'],
-      oilBrand: json['oil_brand'],
-      oilSubtype: json['oil_subtype'],
+      serviceType: json['service_type']?.toString() ?? '',
+      washType: json['wash_type']?.toString(),
+      oilBrand: json['oil_brand']?.toString(),
+      oilSubtype: json['oil_subtype']?.toString(),
       qty: (json['qty'] ?? 0).toInt(),
       price: (json['price'] ?? 0).toDouble(),
-      status: json['status'],
+      status: json['status']?.toString(),
     );
   }
 }
@@ -165,7 +165,7 @@ class ExtraWorkItem {
 
   factory ExtraWorkItem.fromJson(Map<String, dynamic> json) {
     return ExtraWorkItem(
-      workItem: json['work_item'] ?? '',
+      workItem: json['work_item']?.toString() ?? '',
       qty: (json['qty'] ?? 0).toInt(),
       rate: (json['rate'] ?? 0).toDouble(),
     );

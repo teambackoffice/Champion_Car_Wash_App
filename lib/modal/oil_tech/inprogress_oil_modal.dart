@@ -45,7 +45,7 @@ class Datum {
   String serviceId;
   String mainStatus;
   String? customerName;
-  String phone;
+  String? phone;
   String? email;
   String address;
   String city;
@@ -67,8 +67,8 @@ class Datum {
   Datum({
     required this.serviceId,
     required this.mainStatus,
-    required this.customerName,
-    required this.phone,
+    this.customerName,
+    this.phone,
     this.email,
     required this.address,
     required this.city,
@@ -84,35 +84,35 @@ class Datum {
     required this.lastServiceOdometer,
     required this.currentOdometerReading,
     required this.nextServiceOdometer,
-    required this.video,
+    this.video,
     required this.services,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
-    serviceId: json['service_id'],
-    mainStatus: json['main_status'],
-    customerName: json['customer_name'],
-    phone: json['phone'],
-    email: json['email'] ?? '',
-    address: json['address'],
-    city: json['city'],
-    branch: json['branch'],
-    make: json['make'],
-    model: json['model'],
-    carType: json['car_type'],
-    purchaseDate: DateTime.parse(json['purchase_date']),
-    engineNumber: json['engine_number'],
-    chasisNumber: json['chasis_number'],
-    registrationNumber: json['registration_number'],
-    fuelLevel: json['fuel_level'],
-    lastServiceOdometer: json['last_service_odometer'],
-    currentOdometerReading: json['current_odometer_reading'],
-    nextServiceOdometer: json['next_service_odometer'],
-    video: json['video'],
-    services: List<Service>.from(
-      json['services'].map((x) => Service.fromJson(x)),
-    ),
-  );
+        serviceId: json['service_id']?.toString() ?? '',
+        mainStatus: json['main_status']?.toString() ?? '',
+        customerName: json['customer_name']?.toString(),
+        phone: json['phone']?.toString(),
+        email: json['email']?.toString(),
+        address: json['address']?.toString() ?? '',
+        city: json['city']?.toString() ?? '',
+        branch: json['branch']?.toString() ?? '',
+        make: json['make']?.toString() ?? '',
+        model: json['model']?.toString() ?? '',
+        carType: json['car_type']?.toString() ?? '',
+        purchaseDate: DateTime.parse(json['purchase_date']),
+        engineNumber: json['engine_number']?.toString() ?? '',
+        chasisNumber: json['chasis_number']?.toString() ?? '',
+        registrationNumber: json['registration_number']?.toString() ?? '',
+        fuelLevel: (json['fuel_level'] ?? 0).toDouble(),
+        lastServiceOdometer: (json['last_service_odometer'] ?? 0).toDouble(),
+        currentOdometerReading: (json['current_odometer_reading'] ?? 0).toDouble(),
+        nextServiceOdometer: (json['next_service_odometer'] ?? 0).toDouble(),
+        video: json['video'],
+        services: List<Service>.from(
+          (json['services'] as List? ?? []).map((x) => Service.fromJson(x)),
+        ),
+      );
 
   Map<String, dynamic> toJson() => {
     'service_id': serviceId,
@@ -152,9 +152,9 @@ class Service {
   });
 
   factory Service.fromJson(Map<String, dynamic> json) => Service(
-    serviceType: json['service_type'],
-    status: json['status'],
-    oilBrand: json['oil_brand'] ?? '',
+    serviceType: json['service_type']?.toString() ?? '',
+    status: json['status']?.toString(),
+    oilBrand: json['oil_brand']?.toString(),
   );
 
   Map<String, dynamic> toJson() => {
