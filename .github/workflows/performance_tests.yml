@@ -1,157 +1,33 @@
-name: Flutter Performance Build & Tests
+name: Build Champion Car Wash APK
 
 on:
-  pull_request:
-    branches: [ main, master, develop ]
   push:
-    branches: [ main, master ]
-  workflow_dispatch:  # Allow manual runs
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  flutter-performance-tests:
-    name: Run Performance Test Suite
+  build:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
 
     steps:
-      - name: 🧾 Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🛠️ Setup Flutter
+      - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.27.0'
-          channel: 'stable'
-          cache: true
-
-      - name: ⚙️ Setup Dart (optional)
-        uses: dart-lang/setup-dart@v1
-
-      - name: 📦 Install dependencies
-        run: flutter pub get
-
-      - name: 🧹 Clean and Analyze
-        run: |
-          flutter clean
-          flutter analyze || echo "Analyzer warnings only"
-
-      - name: 🧪 Run Unit Tests
-        run: flutter test test/performance/
-        continue-on-error: false
-
-      - name: 🏗️ Build Debug APK (for instrumentation)
-        run: |
-          flutter build apk --debug
-          echo "✅ Debug APK built successfully"
-
-      - name: 🧠 Run Performance Test Runner
-        run: |
-          chmod +x ./scripts/performance_test_runner.sh
-          ./scripts/performance_test_runner.sh --suite all --output reports/performance_results.json --json --verbose
-        continue-on-error: false
-
-      - name: 📊 Generate Coverage Reports
-        run: |
-          flutter test --coverage test/performance/
-          if command -v lcov &> /dev/null; then
-            lcov --list coverage/lcov.info
-          fi
-        continue-on-error: true
-
-      - name: 📤 Upload Test Results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: performance-test-reports
-          path: |
-            reports/
-            coverage/
-            build/app/outputs/flutter-apk/app-debug.apk
-          retention-days: 14
-
-  android-release-build:
-    name: Build and Upload Release APK
-    runs-on: ubuntu-latest
-    needs: flutter-performance-tests
-    timeout-minutes: 30
-
-    steps:
-      - name: 🧾 Checkout code
-        uses: actions/checkout@v4
-
-      - name: 🛠️ Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.27.0'
+          flutter-version: '3.35.7'
           channel: 'stable'
 
-      - name: 📦 Install dependencies
+      - name: Install dependencies
         run: flutter pub get
 
-      - name: 🏗️ Build Release APK
+      - name: Build release APK
         run: flutter build apk --release
 
-      - name: 📦 Check APK size
-        run: |
-          APK_SIZE=$(du -h build/app/outputs/flutter-apk/app-release.apk | cut -f1)
-          echo "📦 Release APK size: $APK_SIZE"
-          echo "APK_SIZE=$APK_SIZE" >> $GITHUB_ENV
-
-      - name: 📤 Upload Release APK
+      - name: Upload release APK
         uses: actions/upload-artifact@v4
         with:
-          name: flutter-release-apk
+          name: champion_car_wash_app-release
           path: build/app/outputs/flutter-apk/app-release.apk
-          retention-days: 14
-
-  regression-analysis:
-    name: Performance Regression Analysis
-    runs-on: ubuntu-latest
-    needs: [flutter-performance-tests, android-release-build]
-    if: github.event_name == 'pull_request'
-
-    steps:
-      - name: 🧾 Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: 📥 Download Test Artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: performance-test-reports
-          path: ./test-results
-
-      - name: 🔍 Compare Performance Baselines
-        run: |
-          echo "Analyzing regression data..."
-          echo "✅ No performance degradation detected."
-          # TODO: Add JSON comparison logic based on `reports/performance_results.json`
-
-      - name: 💬 Comment Results on PR
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const message = `
-            ## ⚙️ Champion Car Wash – Performance Test Report
-
-            ✅ All test suites passed successfully.
-
-            ### Summary
-            - Startup: < 2s ✅
-            - Memory: < 150MB ✅
-            - Frame Rate: 60fps ✅
-            - API Response: < 1s ✅
-
-            **APK Size:** ${process.env.APK_SIZE || 'N/A'}
-
-            _Generated automatically by GitHub Actions_
-            `;
-
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.name,
-              body: message
-            });
