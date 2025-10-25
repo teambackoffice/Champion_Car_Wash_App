@@ -460,7 +460,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
     }
 
     return DropdownButtonFormField<String>(
-      initialValue: _selectedMake,
+      value: _selectedMake,
       hint: Text('Select Make', style: TextStyle(color: Colors.grey[500])),
       style: const TextStyle(color: Colors.white),
       dropdownColor: const Color(0xFF2A2A2A),
@@ -501,7 +501,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
         }
 
         return DropdownButtonFormField<String>(
-          initialValue: _selectedModel,
+          value: _selectedModel,
           hint: Text('Select Model', style: TextStyle(color: Colors.grey[500])),
           style: const TextStyle(color: Colors.white),
           dropdownColor: const Color(0xFF2A2A2A),
@@ -549,7 +549,7 @@ class _CreateServicePageState extends State<CreateServicePage> {
     }
 
     return DropdownButtonFormField<String>(
-      initialValue: _selectedType,
+      value: _selectedType,
       hint: Text('Select Car Type', style: TextStyle(color: Colors.grey[500])),
       style: const TextStyle(color: Colors.white),
       dropdownColor: const Color(0xFF2A2A2A),

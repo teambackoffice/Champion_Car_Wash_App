@@ -354,7 +354,7 @@ class _PaymentHistoryViewerState extends State<PaymentHistoryViewer> {
               // Status filter
               Expanded(
                 child: DropdownButtonFormField<PaymentStatus?>(
-                  initialValue: _statusFilter,
+                  value: _statusFilter,
                   decoration: const InputDecoration(
                     labelText: 'Status',
                     border: OutlineInputBorder(),
@@ -382,7 +382,7 @@ class _PaymentHistoryViewerState extends State<PaymentHistoryViewer> {
               // Method filter
               Expanded(
                 child: DropdownButtonFormField<String?>(
-                  initialValue: _methodFilter,
+                  value: _methodFilter,
                   decoration: const InputDecoration(
                     labelText: 'Method',
                     border: OutlineInputBorder(),

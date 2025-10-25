@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:champion_car_wash_app/controller/get_newbooking_controller.dart';
 import 'package:champion_car_wash_app/modal/get_newbooking_modal.dart';
-import 'package:champion_car_wash_app/view/bottom_nav/homepage/new_booking/view_more.dart';
+import 'package:champion_car_wash_app/view/bottom_nav/homepage/new_booking/view_More.dart';
 import 'package:champion_car_wash_app/widgets/common/custom_back_button.dart';
 import 'package:champion_car_wash_app/widgets/common/refresh_loading_overlay.dart';
 import 'package:flutter/material.dart';

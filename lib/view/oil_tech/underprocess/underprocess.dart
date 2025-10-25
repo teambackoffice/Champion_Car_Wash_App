@@ -962,7 +962,7 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
                   }
 
                   return DropdownButtonFormField<String>(
-                    initialValue: selectedOilBrand,
+                    value: selectedOilBrand,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -1016,7 +1016,7 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
                   }
                   final subtypes = controller.oilSubtypes;
                   return DropdownButtonFormField<String>(
-                    initialValue: selectedLitres,
+                    value: selectedLitres,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
