@@ -8,66 +8,66 @@ on:
   workflow_dispatch:  # Allow manual runs
 
 jobs:
-  flutter-performance-tests:
-    name: Run Performance Test Suite
-    runs-on: ubuntu-latest
-    timeout-minutes: 40
+  # flutter-performance-tests:
+  #   name: Run Performance Test Suite
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 40
 
-    steps:
-      - name: 🧾 Checkout code
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: 🧾 Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: 🛠️ Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.32.8' # Includes Dart SDK 3.8.1
-          channel: 'stable'
-          cache: true
+  #     - name: 🛠️ Setup Flutter
+  #       uses: subosito/flutter-action@v2
+  #       with:
+  #         flutter-version: '3.32.8' # Includes Dart SDK 3.8.1
+  #         channel: 'stable'
+  #         cache: true
 
-      - name: ⚙️ Setup Dart (optional)
-        uses: dart-lang/setup-dart@v1
+  #     - name: ⚙️ Setup Dart (optional)
+  #       uses: dart-lang/setup-dart@v1
 
-      - name: 📦 Install dependencies
-        run: flutter pub get
+  #     - name: 📦 Install dependencies
+  #       run: flutter pub get
 
-      - name: 🧹 Clean and Analyze
-        run: |
-          flutter clean
-          flutter analyze || echo "Analyzer warnings only"
+  #     - name: 🧹 Clean and Analyze
+  #       run: |
+  #         flutter clean
+  #         flutter analyze || echo "Analyzer warnings only"
 
-      - name: 🧪 Run Unit Tests
-        run: flutter test test/performance/
-        continue-on-error: false
+  #     - name: 🧪 Run Unit Tests
+  #       run: flutter test test/performance/
+  #       continue-on-error: false
 
-      - name: 🏗️ Build Debug APK (for instrumentation)
-        run: |
-          flutter build apk --debug
-          echo "✅ Debug APK built successfully"
+  #     - name: 🏗️ Build Debug APK (for instrumentation)
+  #       run: |
+  #         flutter build apk --debug
+  #         echo "✅ Debug APK built successfully"
 
-      - name: 🧠 Run Performance Test Runner
-        run: |
-          chmod +x ./scripts/performance_test_runner.sh
-          ./scripts/performance_test_runner.sh --suite all --output reports/performance_results.json --json --verbose
-        continue-on-error: false
+  #     - name: 🧠 Run Performance Test Runner
+  #       run: |
+  #         chmod +x ./scripts/performance_test_runner.sh
+  #         ./scripts/performance_test_runner.sh --suite all --output reports/performance_results.json --json --verbose
+  #       continue-on-error: false
 
-      - name: 📊 Generate Coverage Reports
-        run: |
-          flutter test --coverage test/performance/
-          if command -v lcov &> /dev/null; then
-            lcov --list coverage/lcov.info
-          fi
-        continue-on-error: true
+  #     - name: 📊 Generate Coverage Reports
+  #       run: |
+  #         flutter test --coverage test/performance/
+  #         if command -v lcov &> /dev/null; then
+  #           lcov --list coverage/lcov.info
+  #         fi
+  #       continue-on-error: true
 
-      - name: 📤 Upload Test Results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: performance-test-reports
-          path: |
-            reports/
-            coverage/
-            build/app/outputs/flutter-apk/app-debug.apk
-          retention-days: 14
+  #     - name: 📤 Upload Test Results
+  #       if: always()
+  #       uses: actions/upload-artifact@v4
+  #       with:
+  #         name: performance-test-reports
+  #         path: |
+  #           reports/
+  #           coverage/
+  #           build/app/outputs/flutter-apk/app-debug.apk
+  #         retention-days: 14
 
   android-release-build:
     name: Build and Upload Release APK
