@@ -1,0 +1,37 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Champion_Car_Wash_App",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "Champion_Car_Wash_App (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "Champion_Car_Wash_App (dev)",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_dev.dart",
+            "args": [
+                "--flavor",
+                "dev"
+            ]
+        },
+
+        {
+            "name": "Champion_Car_Wash_App (prod)",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/main_prod.dart",
+            "args": [
+                "--flavor",
+                "prod"
+            ]
+        }
+    ]
+}

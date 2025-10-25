@@ -1,8 +1,16 @@
+import 'package:champion_car_wash_app/flavor_config.dart';
 import 'package:champion_car_wash_app/providers.dart';
 import 'package:champion_car_wash_app/view/splashscreen/splash_screen.dart';
+import 'package:champion_car_wash_app/service/payment_history_service.dart'
+    as history;
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 void main() {
+  FlavorConfig(
+    flavor: Flavor.dev,
+    values: FlavorValues(baseUrl: 'https://dev.example.com'),
+  );
   WidgetsFlutterBinding.ensureInitialized();
 
   // PERFORMANCE FIX: Don't block app startup with service initialization
@@ -13,34 +21,34 @@ void main() {
 }
 
 Future<void> _initializeServicesAsync() async {
-  // try {
-  //   if (kDebugMode) {
-  //     debugPrint('Initializing Stripe...');
-  //   }
-  //   if (kDebugMode) {
-  //     debugPrint('Stripe initialized successfully');
-  //   }
-  // } catch (e) {
-  //   if (kDebugMode) {
-  //     debugPrint('Stripe initialization failed: $e');
-  //     debugPrint('App will continue without Stripe functionality');
-  //   }
-  // }
+  try {
+    if (kDebugMode) {
+      debugPrint('Initializing Stripe...');
+    }
+    if (kDebugMode) {
+      debugPrint('Stripe initialized successfully');
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      debugPrint('Stripe initialization failed: $e');
+      debugPrint('App will continue without Stripe functionality');
+    }
+  }
 
-  // try {
-  //   if (kDebugMode) {
-  //     debugPrint('Initializing Payment History Service...');
-  //   }
-  //   // await history.PaymentHistoryService.instance.initialize();
-  //   if (kDebugMode) {
-  //     debugPrint('Payment History Service initialized successfully');
-  //   }
-  // } catch (e) {
-  //   if (kDebugMode) {
-  //     debugPrint('Payment History Service initialization failed: $e');
-  //     debugPrint('App will continue without payment history functionality');
-  //   }
-  // }
+  try {
+    if (kDebugMode) {
+      debugPrint('Initializing Payment History Service...');
+    }
+    await history.PaymentHistoryService.instance.initialize();
+    if (kDebugMode) {
+      debugPrint('Payment History Service initialized successfully');
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      debugPrint('Payment History Service initialization failed: $e');
+      debugPrint('App will continue without payment history functionality');
+    }
+  }
 }
 
 class MyApp extends StatelessWidget {

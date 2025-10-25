@@ -3,6 +3,7 @@ import 'package:champion_car_wash_app/view/bottom_nav/homepage/booking_status.da
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/create_service/create_service.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/pre_booking_now/pre_book.dart';
 import 'package:champion_car_wash_app/view/profile/profile_screen.dart';
+import 'package:champion_car_wash_app/widget_updater.dart';
 import 'package:champion_car_wash_app/widgets/common/refresh_loading_overlay.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -80,11 +81,14 @@ class _HomePageContentState extends State<HomePageContent> {
 
       debugPrint('✅ [HOMEPAGE] Service counts refreshed successfully');
 
+      // Update Android home screen widget
+      _updateHomeScreenWidget(controller);
+
       // Show success feedback
       if (mounted) {
         RefreshFeedback.showSuccess(
           context,
-          'Dashboard refreshed successfully',
+           'Dashboard refreshed successfully',
         );
       }
     } catch (e) {
@@ -104,7 +108,7 @@ class _HomePageContentState extends State<HomePageContent> {
     });
   }
 
-  Future<void> loadbranch() async {
+  Future<void> loadBranch() async {
     final storedBranch = await storage.read(key: 'branch');
     setState(() {
       branch = storedBranch ?? '';
@@ -748,5 +752,21 @@ class _HomePageContentState extends State<HomePageContent> {
         ),
       ),
     );
+  }
+
+  /// Update Android home screen widget with latest service counts
+  void _updateHomeScreenWidget(ServiceCountsController controller) {
+    try {
+      updateStatusWidgetFromCounts(
+        openCount: controller.openServiceCount,
+        prebookingCount: controller.prebookingCount,
+        inprogressCount: controller.inprogressServiceCount,
+        completedCount: controller.completedServiceCount,
+        totalCount: controller.totalServiceCount,
+      );
+      debugPrint('📱 [WIDGET] Home screen widget updated from homepage');
+    } catch (e) {
+      debugPrint('❌ [WIDGET] Failed to update home screen widget: $e');
+    }
   }
 }

@@ -3,6 +3,7 @@ import 'package:champion_car_wash_app/view/bottom_nav/homepage/new_booking/new_b
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/pre_booking/pre_booking.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/service_completed/service_completed.dart';
 import 'package:champion_car_wash_app/view/bottom_nav/homepage/under_process/under_process.dart';
+import 'package:champion_car_wash_app/widget_updater.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 // import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -38,6 +39,9 @@ class _BookingStatusState extends State<BookingStatus>
           try {
             await controller.fetchServiceCounts();
             debugPrint('✅ [BOOKING_STATUS] Initial fetch completed');
+            
+            // Update Android home screen widget with latest counts
+            _updateHomeScreenWidget(controller);
           } catch (e) {
             debugPrint('❌ [BOOKING_STATUS] Initial fetch failed: $e');
           }
@@ -327,5 +331,21 @@ class _BookingStatusState extends State<BookingStatus>
         ),
       ),
     );
+  }
+
+  /// Update Android home screen widget with latest service counts
+  void _updateHomeScreenWidget(ServiceCountsController controller) {
+    try {
+      updateStatusWidgetFromCounts(
+        openCount: controller.openServiceCount,
+        prebookingCount: controller.prebookingCount,
+        inprogressCount: controller.inprogressServiceCount,
+        completedCount: controller.completedServiceCount,
+        totalCount: controller.totalServiceCount,
+      );
+      debugPrint('📱 [WIDGET] Home screen widget updated successfully');
+    } catch (e) {
+      debugPrint('❌ [WIDGET] Failed to update home screen widget: $e');
+    }
   }
 }

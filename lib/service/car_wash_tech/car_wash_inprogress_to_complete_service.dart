@@ -4,16 +4,16 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:champion_car_wash_app/config/api_constants.dart';
 
-class CarWashInprogressToCompleteService {
+class CarWashInProgressToCompleteService {
   final _storage = const FlutterSecureStorage();
   final String _baseUrl =
       '${ApiConstants.baseUrl}/api/method/carwash.Api.auth.submit_carwash_details';
 
-  /// Submit Carwash details
-  Future<Map<String, dynamic>?> submitCarwashDetails({
+  /// Submit Car wash details
+  Future<Map<String, dynamic>?> submitCarWashDetails({
     required String serviceId,
     required int price,
-    required int carwashTotal,
+    required int carWashTotal,
     required String inspectionType,
     required List<Map<String, dynamic>> answers,
   }) async {
@@ -32,7 +32,7 @@ class CarWashInprogressToCompleteService {
       var body = json.encode({
         'service_id': serviceId,
         'price': price,
-        'carwash_total': carwashTotal,
+        'carwash_total': carWashTotal,
         'inspection_type': inspectionType,
         'answers': answers,
       });
@@ -58,8 +58,8 @@ class CarWashInprogressToCompleteService {
         throw Exception('Failed: ${response.reasonPhrase}');
       }
     } catch (e) {
-      debugPrint('Error submitting carwash details: $e');
-      throw Exception('Error submitting carwash details: $e');
+      debugPrint('Error submitting car wash details: $e');
+      throw Exception('Error submitting car wash details: $e');
     }
   }
 }

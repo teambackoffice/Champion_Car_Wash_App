@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Champion Car Wash</string>
+    <string name="booking_widget_description">View your upcoming booking details</string>
+    <string name="status_widget_description">Track service status counts at a glance</string>
+</resources>

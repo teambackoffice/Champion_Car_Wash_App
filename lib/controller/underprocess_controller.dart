@@ -2,6 +2,8 @@ import 'package:champion_car_wash_app/modal/underprocess_modal.dart';
 import 'package:champion_car_wash_app/service/underprocess_service.dart';
 import 'package:flutter/material.dart';
 
+import '../widget_updater.dart';
+
 class UnderProcessingController extends ChangeNotifier {
   final UnderprocessService _service = UnderprocessService();
 
@@ -119,6 +121,7 @@ class UnderProcessingController extends ChangeNotifier {
       _serviceStatuses[bookingId] = {};
     }
     _serviceStatuses[bookingId]![serviceType] = status;
+    // Note: Widget will be updated automatically by homepage refresh
     notifyListeners(); // This will update the UI automatically
   }
 
@@ -239,6 +242,7 @@ class UnderProcessingController extends ChangeNotifier {
   /// Clear status for a specific booking (useful when booking is completed/invoiced)
   void clearBookingStatus(String bookingId) {
     _serviceStatuses.remove(bookingId);
+    // Note: Widget will be updated automatically by homepage refresh
     notifyListeners();
   }
 

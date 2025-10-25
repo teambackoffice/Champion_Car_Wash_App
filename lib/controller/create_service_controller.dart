@@ -1,6 +1,7 @@
 import 'package:champion_car_wash_app/modal/create_service_modal.dart';
 import 'package:champion_car_wash_app/service/create_service.dart';
 import 'package:flutter/foundation.dart';
+import 'dart:developer' as developer;
 
 enum ServiceStatus { idle, loading, success, error }
 
@@ -24,6 +25,7 @@ class CarWashController extends ChangeNotifier {
 
   // Methods
   Future<void> createService(CreateServiceModal serviceModel) async {
+    developer.log('Attempting to create service...', name: 'CarWashController');
     _setStatus(ServiceStatus.loading);
     _clearMessages();
 
@@ -36,13 +38,16 @@ class CarWashController extends ChangeNotifier {
         _responseData = result['data'] as Map<String, dynamic>;
         _message = result['message'] as String?;
         _setStatus(ServiceStatus.success);
+        developer.log('Service created successfully: $_message', name: 'CarWashController', level: 800); // Info level
       } else {
         _errorMessage = result['message'] as String?;
         _setStatus(ServiceStatus.error);
+        developer.log('Failed to create service: $_errorMessage', name: 'CarWashController', level: 1000); // Severe level
       }
-    } catch (e) {
+    } catch (e, s) {
       _errorMessage = 'An unexpected error occurred: $e';
       _setStatus(ServiceStatus.error);
+      developer.log('Exception caught in createService: $e', name: 'CarWashController', error: e, stackTrace: s, level: 1000); // Severe level
     }
   }
 

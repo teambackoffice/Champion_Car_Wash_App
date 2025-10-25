@@ -2,7 +2,7 @@ import 'package:champion_car_wash_app/service/oil_tech/inprogress_to_complt_serv
 import 'package:flutter/material.dart';
 
 class OilInprogressStatusServiceController with ChangeNotifier {
-  final OilInprogressStatusService _service = OilInprogressStatusService();
+  final OilInProgressStatusService _service = OilInProgressStatusService();
 
   bool _isLoading = false;
   Map<String, dynamic>? _response;

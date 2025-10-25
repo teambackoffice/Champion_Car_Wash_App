@@ -257,11 +257,19 @@ ${widget.locationName}''';
                   ),
                   const SizedBox(height: 12),
                   const Text(
-                    'Service Created',
+                    'Service Created Successfully',
                     style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
                       color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Scan the QR code to track your service',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white70,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -285,19 +293,36 @@ ${widget.locationName}''',
                       size: 200.0,
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Text(
-                    widget.customerName,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                  const SizedBox(height: 16),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${widget.serviceType} • ${widget.washType}',
-                    style: const TextStyle(fontSize: 12, color: Colors.white70),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          widget.customerName,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          '${widget.washType}',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.white70,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 32),
                   SizedBox(

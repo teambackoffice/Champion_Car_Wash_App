@@ -1,0 +1,14 @@
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="250dp"
+    android:minHeight="180dp"
+    android:targetCellWidth="4"
+    android:targetCellHeight="3"
+    android:updatePeriodMillis="900000"
+    android:previewImage="@mipmap/ic_launcher"
+    android:previewLayout="@layout/status_widget_layout"
+    android:initialLayout="@layout/status_widget_layout"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen"
+    android:description="@string/status_widget_description"
+    android:initialKeyguardLayout="@layout/status_widget_layout">
+</appwidget-provider>

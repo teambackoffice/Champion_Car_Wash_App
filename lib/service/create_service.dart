@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'dart:io';
 
 import 'package:champion_car_wash_app/config/api_constants.dart';
@@ -15,18 +16,18 @@ class CreateService {
   Future<Map<String, dynamic>> createServiceWithCustomerVehicle(
     CreateServiceModal serviceModel,
   ) async {
-    print(baseUrl);
+    developer.log('API Base URL: $baseUrl', name: 'CreateService');
     try {
       // Read sid from secure storage
       String? sid = await _storage.read(key: 'sid');
-      print('SID from storage: $sid');
+      developer.log('SID from storage: $sid', name: 'CreateService');
 
       var request = http.MultipartRequest('POST', Uri.parse(baseUrl));
 
       // Add form fields
       final formData = serviceModel.toFormData();
       request.fields.addAll(formData);
-      print('Request Fields: $formData');
+      developer.log('Request Fields: $formData', name: 'CreateService');
 
       // Add video file if provided
       if (serviceModel.videoPath != null &&
@@ -35,16 +36,16 @@ class CreateService {
           request.files.add(
             await http.MultipartFile.fromPath('video', serviceModel.videoPath!),
           );
-          print('Video file attached: ${serviceModel.videoPath}');
+          developer.log('Video file attached: ${serviceModel.videoPath}', name: 'CreateService');
         } else {
-          print('Video file does not exist at path: ${serviceModel.videoPath}');
+          developer.log('Video file does not exist at path: ${serviceModel.videoPath}', name: 'CreateService', level: 900); // Warning level
         }
       }
 
       // Add headers
       if (sid != null && sid.isNotEmpty) {
         request.headers['Cookie'] = 'sid=$sid';
-        print('Header Cookie set: sid=$sid');
+        developer.log('Header Cookie set: sid=$sid', name: 'CreateService');
       }
 
       // Send request
@@ -52,8 +53,8 @@ class CreateService {
 
       // Parse response
       String responseBody = await response.stream.bytesToString();
-      print('Response Status Code: ${response.statusCode}');
-      print('Response Body: $responseBody');
+      developer.log('Response Status Code: ${response.statusCode}', name: 'CreateService');
+      developer.log('Response Body: $responseBody', name: 'CreateService');
 
       final decodedBody = jsonDecode(responseBody);
 
@@ -62,6 +63,7 @@ class CreateService {
         if (decodedBody is Map<String, dynamic> &&
             decodedBody['message'] != null &&
             decodedBody['message']['success'] == true) {
+          developer.log('Service created successfully', name: 'CreateService', level: 800); // Info level
           return {
             'success': true,
             'data': decodedBody,
@@ -71,6 +73,7 @@ class CreateService {
           };
         } else {
           // Handle cases where API returns 200 but operation failed
+          developer.log('API returned 200 but operation failed: ${decodedBody['message']?['message']}', name: 'CreateService', level: 1000); // Severe level
           return {
             'success': false,
             'error':
@@ -83,6 +86,7 @@ class CreateService {
         }
       } else {
         // Handle non-200 status codes
+        developer.log('API call failed with status code: ${response.statusCode}, reason: ${response.reasonPhrase}', name: 'CreateService', level: 1000); // Severe level
         return {
           'success': false,
           'error': response.reasonPhrase,
@@ -91,8 +95,8 @@ class CreateService {
               decodedBody['message']?['message'] ?? 'Failed to create service',
         };
       }
-    } catch (e) {
-      print('Exception caught: $e');
+    } catch (e, s) {
+      developer.log('Exception caught during createServiceWithCustomerVehicle: $e', name: 'CreateService', error: e, stackTrace: s, level: 1000); // Severe level
       return {
         'success': false,
         'error': e.toString(),

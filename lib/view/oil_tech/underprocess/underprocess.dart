@@ -486,7 +486,7 @@ class _ProcessingBookingCardState extends State<ProcessingBookingCard> {
                                 color: isDarkMode ? Colors.grey[300] : Colors.grey,
                               ),
                             ),
-                            TextSpan(
+                            const TextSpan(
                               text: 'Select Oil & Quantity',
                               style: TextStyle(
                                 color: Colors.blue,
@@ -962,7 +962,7 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
                   }
 
                   return DropdownButtonFormField<String>(
-                    value: selectedOilBrand,
+                    initialValue: selectedOilBrand,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -1016,7 +1016,7 @@ class _OilSelectionDialogState extends State<OilSelectionDialog> {
                   }
                   final subtypes = controller.oilSubtypes;
                   return DropdownButtonFormField<String>(
-                    value: selectedLitres,
+                    initialValue: selectedLitres,
                     decoration: InputDecoration(
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(8),
@@ -1147,7 +1147,7 @@ class _InspectionDialogState extends State<InspectionDialog> {
     super.initState();
     print('🔍 [INSPECTION_DIALOG] Initializing inspection dialog');
     print('🔍 [INSPECTION_DIALOG] Booking: ${widget.booking.serviceId}');
-    print('🔍 [INSPECTION_DIALOG] selectedOil: ${widget.selectedOil?.brand ?? 'null'}');
+    print('🔍 [INSPECTION_DIALOG] selectedOil: ${widget.selectedOil.brand ?? 'null'}');
     print('🔍 [INSPECTION_DIALOG] extraWorkItems: ${widget.extraWorkItems.length}');
     
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -1275,7 +1275,7 @@ class _InspectionDialogState extends State<InspectionDialog> {
       print('❌ [COMPLETE_SERVICE] No inspection items found');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('❌ No inspection items found. Please try again.'),
+          content: Text('No inspection items found. Please try again.'),
           backgroundColor: Colors.red,
           duration: Duration(seconds: 3),
         ),
@@ -1422,14 +1422,13 @@ class _InspectionDialogState extends State<InspectionDialog> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        '✅ Service completed successfully for ${widget.booking.serviceId}',
+                        'Service completed successfully for ${widget.booking.serviceId}',
                         style: const TextStyle(fontSize: 16),
                       ),
                     ),
                   ],
                 ),
                 backgroundColor: Colors.green,
-                duration: const Duration(seconds: 4),
                 behavior: SnackBarBehavior.floating,
               ),
             );
@@ -1463,7 +1462,7 @@ class _InspectionDialogState extends State<InspectionDialog> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
-                        '❌ $errorMessage',
+                        errorMessage,
                         style: const TextStyle(fontSize: 16),
                       ),
                     ),
@@ -1495,13 +1494,13 @@ class _InspectionDialogState extends State<InspectionDialog> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Row(
+              content: const Row(
                 children: [
-                  const Icon(Icons.error_outline, color: Colors.white),
-                  const SizedBox(width: 12),
-                  const Expanded(
+                  Icon(Icons.error_outline, color: Colors.white),
+                  SizedBox(width: 12),
+                  Expanded(
                     child: Text(
-                      '❌ Failed to complete service. No response from server. Please try again.',
+                      'Failed to complete service. No response from server.',
                       style: TextStyle(fontSize: 16),
                     ),
                   ),
@@ -1556,7 +1555,7 @@ class _InspectionDialogState extends State<InspectionDialog> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    '❌ Error: $errorMessage',
+                    'Error: $errorMessage',
                     style: const TextStyle(fontSize: 16),
                   ),
                 ),

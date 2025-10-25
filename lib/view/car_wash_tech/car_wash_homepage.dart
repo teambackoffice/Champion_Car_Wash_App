@@ -1,8 +1,9 @@
-import 'package:champion_car_wash_app/view/carwash_tech/completed_wash/completed_wash.dart';
-import 'package:champion_car_wash_app/view/carwash_tech/new_wash/new_wash.dart';
-import 'package:champion_car_wash_app/view/carwash_tech/underprocess_wash/underprocess_wash.dart';
+import 'package:champion_car_wash_app/view/car_wash_tech/underprocess_wash/underprocess_wash.dart';
 import 'package:champion_car_wash_app/view/login/login.dart';
 import 'package:flutter/material.dart';
+
+import 'completed_wash/completed_wash.dart';
+import 'new_wash/new_wash.dart';
 
 class CarWashTechnicianHomePage extends StatelessWidget {
   const CarWashTechnicianHomePage({super.key});

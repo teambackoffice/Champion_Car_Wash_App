@@ -4,7 +4,7 @@ import 'package:champion_car_wash_app/config/api_constants.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 
-class OilInprogressStatusService {
+class OilInProgressStatusService {
   final String _baseUrl =
       '${ApiConstants.baseUrl}/api/method/carwash.Api.auth.submit_oil_change_details';
 
